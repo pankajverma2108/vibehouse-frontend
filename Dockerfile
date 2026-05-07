@@ -1,17 +1,32 @@
-
-FROM python:3.14-slim
-
+# Stage 1: Install dependencies
+FROM node:20-alpine AS deps
 WORKDIR /app
+COPY package*.json ./
+RUN npm ci
 
-COPY ./ .
+# Stage 2: Build the Next.js app
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+# Accept API URL as build arg so it's baked into the client bundle
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+# Run next build directly — typecheck runs separately in CI
+RUN npx next build
 
-RUN pip install --upgrade pip && \
-    if [ -f requirements.txt ]; then \
-        pip install -r requirements.txt; \
-    else \
-        echo "No requirements.txt found"; \
-    fi
-
-EXPOSE 8088
-
-CMD ["python", "main.py"]
+# Stage 3: Production runner (uses standalone output — minimal footprint)
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+USER nextjs
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+CMD ["node", "server.js"]
