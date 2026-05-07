@@ -1,0 +1,506 @@
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100;200;300;400;500;600;700&display=swap");
+@import "tailwindcss";
+@import "react-day-picker/style.css";
+@import "../src/styles/theme.css";
+
+@font-face {
+  font-family: "Bebas Neue";
+  src: url("/fonts/Bebas_Neue/BebasNeue-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Acme";
+  src: url("/fonts/Acme/Acme-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("/fonts/Nunito/Nunito-VariableFont_wght.ttf") format("truetype");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("/fonts/Nunito/Nunito-Italic-VariableFont_wght.ttf") format("truetype");
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Varela Round";
+  src: url("/fonts/Varela_Round/VarelaRound-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suez One";
+  src: url("/fonts/Suez_One/SuezOne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Caveat";
+  src: url("/fonts/Caveat/Caveat-VariableFont_wght.ttf") format("truetype");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("truetype");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-biorhyme: "Acme", "Trebuchet MS", sans-serif;
+  --font-sora: "Nunito", "Segoe UI", sans-serif;
+  --font-encode: "Varela Round", "Segoe UI", sans-serif;
+  --font-suez: "Suez One", "Trebuchet MS", sans-serif;
+  --font-bebas: "Bebas Neue", "Trebuchet MS", sans-serif;
+  --vh-bg: #141226;
+  --vh-bg-soft: #201b36;
+  --vh-surface: #2d274b;
+  --vh-surface-2: #18152c;
+  --vh-section-a: #1a162d;
+  --vh-section-b: #1e1a34;
+  --vh-border: #4c4280;
+  --vh-hot: #ff4c30;
+  --vh-pink: #9787f3;
+  --vh-pink-soft: #b4a7f9;
+  --vh-cyan: #eaeffe;
+  --vh-ice: #fdfdff;
+  --vh-lime: #79f72c;
+  --vh-amber: #ffcc66;
+  --vh-panel: rgba(151, 135, 243, 0.05);
+  --vh-panel-soft: rgba(151, 135, 243, 0.03);
+  --vh-panel-strong: rgba(24, 21, 44, 0.92);
+  --vh-chip: rgba(234, 239, 254, 0.08);
+  --vh-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.25);
+  --vh-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(95% 70% at 20% 0%, rgba(151, 135, 243, 0.22) 0%, rgba(151, 135, 243, 0) 60%),
+    radial-gradient(85% 65% at 80% 18%, rgba(234, 239, 254, 0.16) 0%, rgba(234, 239, 254, 0) 60%),
+    linear-gradient(160deg, var(--vh-bg) 0%, var(--vh-bg-soft) 58%, #0f0c1a 100%);
+  color: white;
+  font-family: var(--font-sora);
+  scrollbar-color: var(--vh-pink) #0e0b1c;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #0e0b1c;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #9787f3 0%, #7e6ce3 100%);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #b0a3f8 0%, #9787f3 100%);
+}
+
+.vh-rating-marquee {
+  width: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.vh-rating-track,
+.vh-rating-track-reverse {
+  display: flex;
+  width: max-content;
+  gap: 12px;
+}
+
+.vh-rating-track {
+  animation: vh-marquee-left 22s linear infinite;
+}
+
+.vh-rating-track-reverse {
+  animation: vh-marquee-right 24s linear infinite;
+}
+
+.vh-rating-card {
+  min-width: 168px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes vh-marquee-left {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes vh-marquee-right {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.vh-calendar-dark.rdp-root {
+  --rdp-accent-color: #c62828;
+  --rdp-accent-background-color: #c62828;
+  --rdp-day_button-border-radius: 0;
+  --rdp-day_button-border: 1px solid rgba(51, 69, 103, 0.58);
+  --rdp-selected-border: 1px solid transparent;
+  --rdp-disabled-opacity: 0.3;
+  --rdp-outside-opacity: 0.35;
+  --rdp-today-color: var(--vh-cyan);
+  --rdp-range_middle-background-color: rgba(151, 135, 243, 0.2);
+  --rdp-range_middle-color: #ffffff;
+  --rdp-range_start-color: #ffffff;
+  --rdp-range_end-color: #ffffff;
+  --rdp-nav-height: 38px;
+  color: #ffffff;
+  background:
+    radial-gradient(110% 92% at 12% 0%, rgba(151, 135, 243, 0.1) 0%, rgba(151, 135, 243, 0) 50%),
+    radial-gradient(120% 100% at 84% 16%, rgba(234, 239, 254, 0.11) 0%, rgba(234, 239, 254, 0) 54%),
+    linear-gradient(180deg, #18142c 0%, #110e20 100%);
+}
+
+.vh-calendar-dark .rdp-months {
+  justify-content: center;
+}
+
+.vh-calendar-dark .rdp-month_caption {
+  color: #ffffff;
+  font-size: 1.42rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.vh-calendar-dark .rdp-caption_label {
+  color: var(--vh-pink);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.vh-calendar-dark .rdp-weekday {
+  color: rgba(147, 173, 216, 0.8);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.vh-calendar-dark .rdp-button_previous,
+.vh-calendar-dark .rdp-button_next {
+  border-radius: 999px;
+  color: var(--vh-pink);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vh-calendar-dark .rdp-chevron {
+  fill: var(--vh-pink);
+}
+
+.vh-calendar-dark .rdp-month_grid {
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+
+.vh-calendar-dark .rdp-day {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.vh-calendar-dark .rdp-day_button {
+  height: 44px;
+  width: 44px;
+  font-size: 1.24rem;
+  background: rgba(9, 19, 41, 0.65);
+}
+
+.vh-calendar-dark .rdp-day_button:hover:not(:disabled) {
+  background: rgba(151, 135, 243, 0.24);
+}
+
+.vh-calendar-dark .rdp-range_middle .rdp-day_button {
+  background: rgba(151, 135, 243, 0.15);
+}
+
+.vh-calendar-dark .rdp-selected .rdp-day_button,
+.vh-calendar-dark .rdp-range_start .rdp-day_button,
+.vh-calendar-dark .rdp-range_end .rdp-day_button {
+  background: var(--vh-pink);
+  border-color: var(--vh-pink);
+}
+
+.vh-calendar-dark .rdp-disabled {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.vh-calendar-dark .rdp-outside {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.vh-calendar-dark .rdp-today .rdp-day_button {
+  border: 2px solid var(--vh-cyan);
+  box-shadow: inset 0 0 0 1px rgba(9, 19, 41, 0.75);
+}
+
+a,
+button,
+input,
+select {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+@layer components {
+  .vh-shell {
+    @apply min-h-screen bg-[var(--vh-bg)] text-white;
+  }
+
+  .vh-container {
+    @apply mx-auto w-full max-w-screen-xl px-4 md:px-6;
+  }
+
+  .vh-section {
+    @apply py-8 md:py-10;
+    background-color: var(--vh-section-a);
+  }
+
+  .vh-section-alt {
+    background-color: var(--vh-section-b);
+  }
+
+  .vh-kicker {
+    @apply font-bold uppercase tracking-[1.4px] text-[12px];
+  }
+
+  .vh-title {
+    @apply uppercase tracking-[-1.2px] leading-tight text-3xl md:text-4xl;
+    font-family: var(--font-suez);
+    font-weight: 400;
+  }
+
+  .vh-subtitle {
+    @apply text-sm md:text-base italic text-white/75;
+  }
+
+  .vh-card {
+    @apply rounded-[12px] border-2 border-[var(--vh-border)] bg-[var(--vh-surface)] shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.18)];
+  }
+
+  .vh-panel {
+    @apply rounded-[24px] border border-white/12;
+    background: var(--vh-panel);
+    box-shadow: var(--vh-shadow);
+  }
+
+  .vh-panel-soft {
+    @apply rounded-[20px] border border-white/10;
+    background: var(--vh-panel-soft);
+  }
+
+  .vh-bento-tile {
+    border: 1px solid rgba(117, 100, 193, 0.38);
+    background: linear-gradient(180deg, rgba(4, 3, 22, 0.94), rgba(7, 4, 31, 0.94));
+    box-shadow: inset 0 0 0 1px rgba(117, 100, 193, 0.16);
+  }
+
+  .vh-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/72;
+    background: var(--vh-chip);
+  }
+
+  .vh-icon-pill {
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/78;
+    background: var(--vh-chip);
+  }
+
+  .vh-outline-button {
+    @apply inline-flex items-center justify-center rounded-[4px] border-2 border-white/30 bg-white/10 px-4 py-2 text-sm font-bold uppercase text-white;
+  }
+
+  .vh-primary-button {
+    @apply inline-flex items-center justify-center rounded-[4px] bg-[var(--vh-pink)] px-6 py-3 text-sm font-bold uppercase text-white shadow-[4px_4px_0px_0px_var(--vh-border)];
+  }
+
+  .vh-input {
+    @apply w-full rounded-[4px] border-2 border-[var(--vh-border)] bg-[#1e1a34] px-3 py-2 text-sm text-white outline-none focus:border-[var(--vh-pink)] focus:shadow-[0_0_0_3px_rgba(151,135,243,0.3)] transition-all;
+  }
+
+  .vh-rot-1 {
+    transform: rotate(-1deg);
+  }
+
+  .vh-rot-2 {
+    transform: rotate(1deg);
+  }
+
+  .vh-rot-3 {
+    transform: rotate(-2deg);
+  }
+
+  .font-biorhyme {
+    font-family: var(--font-biorhyme);
+  }
+
+  .font-sora {
+    font-family: var(--font-sora);
+  }
+
+  .font-encode {
+    font-family: var(--font-encode);
+  }
+
+  .staff-numeric {
+    font-family: var(--font-encode);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "cv11" 1;
+  }
+
+  .animate-accordion-down {
+    animation: vh-accordion-down 280ms ease-out;
+  }
+
+  .animate-accordion-up {
+    animation: vh-accordion-up 220ms ease-out;
+  }
+
+  .animate-vh-fade-in {
+    animation: vh-fade-in 180ms ease-out;
+  }
+
+  .animate-vh-fade-out {
+    animation: vh-fade-out 160ms ease-in;
+  }
+
+  .animate-vh-scale-in {
+    animation: vh-scale-in 180ms ease-out;
+  }
+
+  .animate-vh-slide-up {
+    animation: vh-slide-up 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-vh-pulse-glow {
+    animation: vh-pulse-glow 2s infinite ease-in-out;
+  }
+}
+
+@keyframes vh-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vh-pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(151, 135, 243, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(151, 135, 243, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(151, 135, 243, 0);
+  }
+}
+
+@keyframes vh-accordion-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes vh-accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes vh-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vh-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vh-scale-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

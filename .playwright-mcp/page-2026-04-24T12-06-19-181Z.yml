@@ -1,0 +1,55 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e6]:
+      - button "Open navigation menu" [ref=e7]
+      - link "The Daily Social" [ref=e13] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e14]: The Daily Social
+        - generic [ref=e15]: THE DAILY SOCIAL
+      - generic [ref=e16]:
+        - button "Profile" [disabled] [ref=e18]:
+          - img [ref=e19]
+          - generic [ref=e23]: Profile
+        - link "Book Now" [ref=e24] [cursor=pointer]:
+          - /url: /property?property_id=60765
+  - main [ref=e25]:
+    - generic [ref=e28]:
+      - heading "Stay confirmation" [level=1] [ref=e30]
+      - status [ref=e31]:
+        - generic [ref=e32]: Loading booking confirmation details.
+  - contentinfo [ref=e37]:
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e42]: THE DAILY SOCIAL
+          - paragraph [ref=e43]: Stay. Mix. Repeat.
+          - generic [ref=e44]:
+            - paragraph [ref=e45]: The Daily Social Koramangala
+            - paragraph [ref=e46]: 13/14, Bank Officer Housing Co-operative Society
+            - paragraph [ref=e47]: Bengaluru Urban, Karnataka, India
+            - link "View on Google Maps" [ref=e48] [cursor=pointer]:
+              - /url: https://maps.app.goo.gl/jJKJUUKzdmFJGbCG6?g_st=aw
+            - link "+91 88849 73328" [ref=e49] [cursor=pointer]:
+              - /url: tel:+918884973328
+            - link "thedailysocial01@gmail.com" [ref=e50] [cursor=pointer]:
+              - /url: mailto:thedailysocial01@gmail.com
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - heading "Quick Links" [level=3] [ref=e53]
+            - generic [ref=e54]:
+              - link "Home" [ref=e55] [cursor=pointer]:
+                - /url: /
+              - link "Property" [ref=e56] [cursor=pointer]:
+                - /url: /property
+              - link "Experiences" [ref=e57] [cursor=pointer]:
+                - /url: /events
+              - link "About" [ref=e58] [cursor=pointer]:
+                - /url: /about
+          - generic [ref=e59]:
+            - heading "Policies" [level=3] [ref=e60]
+            - link "Policies" [ref=e62] [cursor=pointer]:
+              - /url: /policies
+      - generic [ref=e65]: © 2026 The Daily Social. All rights reserved.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e71] [cursor=pointer]:
+    - img [ref=e72]

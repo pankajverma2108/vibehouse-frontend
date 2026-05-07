@@ -1,0 +1,125 @@
+Let's enable pages for my project. Ask me questions to clarify my goals or suggest options, then create or update pages and enable routing as needed.
+
+Global Responsive Mandate: All generated designs must be treated as a Mobile-First Progressive Web App (PWA) but must be fully responsive.
+Generate layouts that scale seamlessly across Mobile (320px - 480px), Tablet (768px - 1024px), Laptop (1280px - 1440px), and Desktop (1920px+).
+On mobile, stack grids vertically, enlarge touch targets (minimum 48x48px for CTAs), and use horizontal swipe carousels.
+On desktop, expand into CSS Grid/Flexbox multi-column layouts to utilize whitespace effectively.
+Maintain the exact color palette, typography (headers, body text, weight), border-radii, and drop-shadows found in the reference design The Daily Social Design 4.jpg.
+
+Prompt 1 : UI Extension & Component Generation for Property PLP
+
+CRITICAL DIRECTIVE: You are generating the "Room Selection" (Product Listing Page) based on the provided design reference (vhdsgn - Room Selection (Vibrant).jpg). Extract the exact vibrant color palette, typography, border-radii, drop shadows, and button styling from the reference. The aesthetic is energetic, safe, and community-driven.
+
+Generate the following vertical sections in strict order, seamlessly blending the design system:
+
+1. Rooms Hero Section:
+
+Layout: A bold, immersive header.
+
+Content: High-quality background imagery (or a sleek split-screen) featuring a vibrant dorm or common area. Include a strong headline (e.g., "Find Your Vibe. Book Your Bed.") and a short, energetic sub-headline about community and comfort.
+
+2. Room Categories Grid (The Core Conversion Engine):
+
+Layout: A clean, vertical list or a prominent card grid. Each room category must be a distinct, self-contained UI card.
+
+Card Structure (Apply to all three categories below):
+
+Visual: A mini-carousel or high-quality image of the specific room type.
+
+Header: Room Type Title.
+
+Features: Bullet points or pill-tags for key features (e.g., En-suite bathroom, reading lights, privacy curtains).
+
+Price Block: Prominent "Starting from ₹[X] / night" text.
+
+Action: A primary CTA button labeled "Check Dates" (this must match the primary button style from the reference design).
+
+The Categories to Generate:
+
+4-Bed Mixed Dorm
+
+4-Bed Female Dorm
+
+Private Room
+
+3. Included Assurances (Trust Markers):
+
+Layout: A horizontal, scannable strip or a compact 2x2 / 4x1 grid.
+
+Content: Clean iconography paired with short text: "Free Fast Wi-Fi", "AC in All Rooms", "Secure Lockers", "Fresh Linen & Daily Housekeeping".
+
+Styling: Use a subtle background fill that contrasts gently with the page background to break up the flow.
+
+4. House Rules (Setting Expectations):
+
+Layout: A structured, easy-to-read text block or a highlighted card section.
+
+Content: Maintain a friendly but firm tone. Use checkmarks or subtle icons for rules: "Quiet Hours (11 PM - 7 AM in dorms)", "Locker Usage Required", "Respect the Vibe (Anti-harassment policy)".
+
+5. FAQ & Contact:
+
+Layout: Split section or stacked.
+
+FAQ Component: A clean accordion-style list for 3-4 common questions (e.g., "What time is check-in?", "Do I need to bring a padlock?").
+
+Contact Component: Simple text layout for WhatsApp/Phone support, Email, and Property Address with a small map placeholder.
+
+Final Constraint Check: Ensure visual hierarchy prioritizes the "Check Dates" CTA buttons in the Room Categories Grid. Maintain consistent padding between sections.
+
+
+
+Prompt 2: Events Page
+System Prompt: UI Generation for The Daily Social Events PLP
+CRITICAL DIRECTIVE: You are generating the "Events & Experiences" page based on the provided reference vhdsgn - Event Booking (Vibrant).jpg and the global style guide The Daily Social Design 4.jpg. The aesthetic must feel like a high-energy nightlife and social hub. Use dark mode sections or high-contrast vibrant cards to emphasize the "evening vibe."
+Build the following sections strictly in this order:
+1. Events Hero:
+Layout: Full-width immersive background (darker overlay on a high-energy party/social image).
+Content: Massive headline "Never a dull evening." Subtitle text highlighting the community aspect.
+2. Upcoming Events Calendar (Action-Oriented):
+Layout: A dynamic horizontal scrolling list (mobile) or a 3-column masonry grid (desktop).
+Content: Cards for this week's specific events (e.g., "Neon DJ Night", "Old City Pub Crawl").
+Data Hooks: Date, Time, Location, Price (or "Free for Guests").
+Action: Include a prominent secondary CTA button on each card: "RSVP / Book".
+3. Standard Weekly Lineup:
+Layout: A clean, structured 7-day timeline or a 2x4 grid.
+Content: Monday to Sunday recurring schedule (e.g., Monday: Movie Night, Tuesday: Beer Pong Tournament, etc.). Keep it visually distinct from the specific "Upcoming Events" cards.
+4. Past Events Gallery (Social Proof):
+Layout: A tight masonry image grid.
+Content: High-quality, authentic-looking photos of guests having fun.
+Component: Include an "Follow our Vibe on Instagram" floating button overlay or section footer.
+Prompt 3: About (Property) Page
+System Prompt: UI Generation for The Daily Social About Page
+CRITICAL DIRECTIVE: You are generating the "About Us" page. Extract the core design system from The Daily Social Design 4.jpg. This is a trust-building and SEO-optimized page. The tone is professional but welcoming.
+Build the following sections strictly in this order:
+1. Hero:
+Layout: Split layout (desktop) or stacked (mobile) with an inviting exterior or vibrant common area photo.
+Content: Headline "More than just a bed."
+2. Main Content / The Daily Social Story:
+Layout: A mix of typography-heavy blocks and supporting images. Use a Z-pattern layout for desktop.
+Content: Text placeholders detailing the brand philosophy, focus on safety, mixed-gender co-living, and central locations.
+3. Feature Grid / Accordion:
+Layout: 2x2 grid of icons/text.
+Content: Highlight core pillars: "Community", "Cleanliness", "Location", "Security".
+4. Booking CTA Container:
+Layout: High-contrast, full-width banner.
+Content: "Ready to find your vibe?" with a primary "Search Availability" button.
+5. Standard Footer:
+Layout: Multi-column (desktop) or accordion (mobile). Includes social links, newsletter signup, and sub-page links.
+ Prompt 4: Legal & Payment Pages (Standardized Template)
+System Prompt: UI Generation for The Daily Social Legal & Policy Pages
+CRITICAL DIRECTIVE: You are generating a standardized template to be used across multiple text-heavy pages: Guest Policies, Privacy Policy, Refund Policy, and Terms & Conditions. Use the global style guide from The Daily Social Design 4.jpg but optimize strictly for maximum readability.
+Build the following sections strictly in this order:
+1. Simple Page Header:
+Layout: Compact, text-only or subtle patterned background.
+Content: Dynamic Page Title (e.g., "Guest Policies") and a "Last Updated: [Date]" subtext.
+2. Table of Contents (Sticky navigation):
+Layout: A sidebar menu (desktop) or a collapsible top-menu (mobile).
+Content: Anchor links to jump down the page.
+3. Main Text Content Area:
+Layout: A narrow, optimized reading column (max-width 750px) centered on the page.
+Styling: Use clear typography hierarchy (H2, H3, standard body text). Ensure high contrast between text and background.
+4. Contact Support Block:
+Layout: A small, friendly callout box at the bottom.
+Content: "Have questions about our policies? Contact the Vibe Crew." with an email/WhatsApp link.
+
+

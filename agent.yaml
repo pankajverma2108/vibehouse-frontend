@@ -1,0 +1,5 @@
+name: Extendbasedesignsections-Copy
+dockerfile_path: Dockerfile
+resources:
+  cpu: '3.0'
+  memory: 6.0Gi

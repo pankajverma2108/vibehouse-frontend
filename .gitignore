@@ -1,0 +1,19 @@
+node_modules/
+.next/
+out/
+dist/
+.env.local
+.env.*.local
+.env.production
+.env.example
+.env.*
+.local/
+
+# Internal planning and workflow docs (not for remote repo)
+guidelines/finalised_workflows/
+guidelines/api_routes/
+guidelines/
+docs/
+BUILD_PLAN.md
+ATTRIBUTIONS.md
+context.md
