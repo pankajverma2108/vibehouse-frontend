@@ -1,10 +1,12 @@
 .standaloneRoot {
-  --pu-black: #07070A;
-  --pu-red: #E30613;
+  --pu-black: var(--vh-bg);
+  --pu-red: var(--vh-pink);
+  --pu-red-soft: var(--vh-pink-soft);
+  --pu-ice: var(--vh-ice);
   min-height: 100vh;
   background: var(--pu-black);
-  color: var(--pu-red);
-  font-family: "Geologica", sans-serif;
+  color: var(--pu-ice);
+  font-family: var(--font-geologica);
   font-synthesis: none;
   font-variation-settings: "CRSV" 0, "SHRP" 0, "slnt" 0;
   text-transform: uppercase;
@@ -15,7 +17,7 @@
 .standaloneRoot *::before,
 .standaloneRoot *::after {
   box-sizing: border-box;
-  font-family: "Geologica", sans-serif !important;
+  font-family: var(--font-geologica) !important;
   font-style: normal;
   font-variation-settings: "CRSV" 0, "SHRP" 0, "slnt" 0;
 }
@@ -28,7 +30,7 @@
 .standaloneRoot main {
   width: min(100%, 1545px);
   margin: 0 auto;
-  padding: 0 56px 84px;
+  padding: 96px 56px 40px;
 }
 
 .header {
@@ -40,7 +42,7 @@
   margin: 0 auto;
   padding-top: 40px;
   padding-bottom: 24px;
-  border-bottom: 2px solid var(--pu-red);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .brand {
@@ -80,7 +82,7 @@
   display: none;
   border: 0;
   background: transparent;
-  color: var(--pu-red);
+  color: var(--pu-ice);
   font: inherit;
   font-size: 12px;
   font-weight: 700;
@@ -121,13 +123,27 @@
   font-weight: 700;
 }
 
+.sectionEyebrow,
+.splitEyebrow {
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.fileStamp,
+.sectionEyebrow,
+.splitEyebrow,
+.modelMeta,
+.inquiryForm label {
+  color: rgba(243, 238, 230, 0.72);
+}
+
 .facts {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin: 0;
   padding: 12px 0 0;
-  border-top: 1px solid var(--pu-red);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .factRow {
@@ -138,7 +154,7 @@
 .factRow dt {
   min-width: max-content;
   margin: 0;
-  opacity: 0.7;
+  opacity: 0.65;
   font-weight: 400;
 }
 
@@ -163,7 +179,7 @@
 .upcomingHeroHeading,
 .partnerHeroHeading {
   margin: 0;
-  color: var(--pu-red);
+  color: var(--pu-ice);
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -182,9 +198,14 @@
   text-align: left;
 }
 
+.upcomingTitleBlock .fileStamp {
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
 .upcomingHeroHeading {
   max-width: 100%;
-  margin: -12px 0 0;
+  margin: 0;
   font-size: clamp(72px, 14vw, 203px);
   line-height: 0.82;
   text-align: left;
@@ -192,23 +213,28 @@
 
 .dispatchPanel {
   position: absolute;
-  top: clamp(130px, 16.5vw, 240px);
+  top: calc(clamp(130px, 16.5vw, 240px) + 12px);
   right: 0;
-  width: 334px;
+  width: 400px;
 }
 
 .dispatchCopy {
-  width: 167px;
+  width: 360px;
   margin: 18px 0 0;
   font-size: 11px;
   font-weight: 400;
   line-height: 15.4px;
   letter-spacing: 0.55px;
+  color: rgba(243, 238, 230, 0.72);
+}
+
+.dispatchCopyLine {
+  display: block;
 }
 
 .upcomingSites {
   padding-top: 42px;
-  border-top: 2px solid var(--pu-red);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .splitEyebrow {
@@ -229,29 +255,31 @@
 }
 
 .siteCard {
-  border: 2px solid var(--pu-red);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: var(--vh-panel-soft);
 }
 
 .siteImageWrap {
   position: relative;
   aspect-ratio: 698.5 / 521.88;
   overflow: hidden;
-  border-bottom: 2px solid var(--pu-red);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .siteImage {
   object-fit: cover;
 }
 
-.siteImageWrap span {
+.siteSticker {
   position: absolute;
-  left: 12px;
-  top: 12px;
+  right: 16px;
+  top: 16px;
   z-index: 1;
+  border-radius: 4px;
   font-size: 10px;
-  font-weight: 700;
-  line-height: 15px;
-  letter-spacing: 1px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .siteBody {
@@ -265,13 +293,16 @@
   line-height: 0.85;
 }
 
-.siteBody p {
-  margin: 0 0 22px;
-  font-weight: 400;
+.siteBody .facts {
+  border-top: 0;
+  padding-top: 0;
+  min-height: 66px;
 }
 
-.siteBody .facts {
-  min-height: 66px;
+.siteCardLink {
+  display: block;
+  color: inherit;
+  text-decoration: none;
 }
 
 .bigCta {
@@ -280,10 +311,10 @@
   justify-content: center;
   gap: 18px;
   min-height: 178px;
-  margin-top: 64px;
-  border: 2px solid var(--pu-red);
-  background: transparent;
-  color: var(--pu-red);
+  margin-top: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: var(--vh-panel-soft);
+  color: var(--pu-ice);
   font-size: clamp(46px, 5.1vw, 72px);
   font-weight: 900;
   line-height: 0.96;
@@ -302,13 +333,13 @@
 .formButton:hover,
 .formButton:focus-visible {
   background: var(--pu-red);
-  color: var(--pu-black);
+  color: #ffffff;
 }
 
 .bigCta:active,
 .formButton:active {
   background: var(--pu-red);
-  color: var(--pu-black);
+  color: #ffffff;
   transform: scale(0.99);
 }
 
@@ -372,7 +403,7 @@
 .pillarCard {
   min-height: 250px;
   padding-top: 20px;
-  border-top: 2px solid var(--pu-red);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .pillarTop {
@@ -382,11 +413,16 @@
   min-height: 56px;
 }
 
+.pillarIcon {
+  filter: brightness(0) saturate(100%) invert(18%) sepia(87%) saturate(3621%) hue-rotate(346deg) brightness(88%) contrast(96%);
+}
+
 .pillarTop span {
   font-size: 11px;
   font-weight: 400;
   line-height: 16.5px;
   letter-spacing: 1.1px;
+  color: rgba(243, 238, 230, 0.7);
 }
 
 .pillarCard h2 {
@@ -396,13 +432,20 @@
   line-height: 0.9;
 }
 
-.pillarCard p {
-  width: 156px;
+.pillarCopy {
+  display: grid;
+  gap: 4px;
+  width: 100%;
   margin: 0;
   font-size: 12px;
   font-weight: 400;
   line-height: 16.8px;
   letter-spacing: 0.6px;
+  color: rgba(243, 238, 230, 0.76);
+}
+
+.pillarCopyLine {
+  display: block;
 }
 
 .modelsGrid {
@@ -412,15 +455,42 @@
 }
 
 .modelCard {
+  position: relative;
   min-height: 390px;
-  padding: 36px 34px;
-  border: 2px solid var(--pu-red);
+  padding: 58px 34px 36px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  background: rgba(16, 17, 26, 0.92);
+  box-shadow: var(--vh-shadow);
+  transition: border-color 200ms ease, transform 180ms ease;
 }
 
-.modelMeta {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 400;
+.modelCardWrap {
+  height: 100%;
+}
+
+.modelCard:hover {
+  border-color: var(--pu-red);
+}
+
+.modelTag {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.modelYear {
+  position: absolute;
+  right: 20px;
+  top: 24px;
+  font-size: 11px;
+  letter-spacing: 1.1px;
+  color: rgba(243, 238, 230, 0.7);
 }
 
 .modelCard h2 {
@@ -429,6 +499,7 @@
   font-size: clamp(64px, 5.55vw, 85.8px);
   font-weight: 900;
   line-height: 0.85;
+  color: var(--pu-ice);
 }
 
 .modelCard ul {
@@ -437,7 +508,7 @@
   gap: 11px;
   margin: 0;
   padding: 22px 0 0;
-  border-top: 1px solid var(--pu-red);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
   list-style: none;
 }
 
@@ -448,37 +519,69 @@
   font-weight: 400;
   line-height: 18px;
   letter-spacing: 0.6px;
+  color: rgba(243, 238, 230, 0.78);
+}
+
+.modelPointText {
+  color: rgba(243, 238, 230, 0.78);
+}
+
+.modelPointMarker {
+  color: var(--pu-red);
 }
 
 .inquirySection {
-  display: grid;
-  grid-template-columns: 38% 1fr;
-  gap: 64px;
   margin-top: 80px;
-  border-top: 2px solid var(--pu-red);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.inquiryIntro p {
-  width: 220px;
+.inquiryForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "fields summary"
+    "fields cta";
+  grid-template-rows: auto 1fr;
+  gap: 32px 64px;
+  padding-top: 0;
+  align-items: stretch;
+}
+
+.inquiryFields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  grid-area: fields;
+}
+
+.inquirySummary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  grid-area: summary;
+}
+
+.inquiryCopy {
+  width: 100%;
+  max-width: 520px;
   margin: 0;
   font-size: 12px;
   font-weight: 400;
   line-height: 18px;
   letter-spacing: 0.6px;
+  color: rgba(243, 238, 230, 0.72);
 }
 
-.inquiryForm {
-  display: flex;
-  flex-direction: column;
-  gap: 34px;
-  padding-top: 2px;
+.inquiryCopyLine {
+  display: block;
 }
 
 .inquiryForm label {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  font-family: "Geologica", sans-serif;
+  gap: 10px;
+  font-family: var(--font-geologica);
 }
 
 .inquiryForm input {
@@ -486,10 +589,10 @@
   min-height: 62px;
   padding: 0 0 12px;
   border: 0;
-  border-bottom: 2px solid var(--pu-red);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 0;
   background: transparent;
-  color: var(--pu-red);
+  color: var(--pu-ice);
   font: inherit;
   outline: none;
 }
@@ -499,10 +602,10 @@
   min-height: 132px;
   padding: 0 0 12px;
   border: 0;
-  border-bottom: 2px solid var(--pu-red);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 0;
   background: transparent;
-  color: var(--pu-red);
+  color: var(--pu-ice);
   font: inherit;
   line-height: 24px;
   resize: vertical;
@@ -511,12 +614,12 @@
 
 .inquiryForm input::placeholder,
 .inquiryForm textarea::placeholder {
-  color: rgba(227, 6, 19, 0.5);
+  color: rgba(243, 238, 230, 0.36);
 }
 
 .inquiryForm input:focus,
 .inquiryForm textarea:focus {
-  border-bottom-color: rgba(227, 6, 19, 0.76);
+  border-bottom-color: var(--pu-red);
 }
 
 .formButton {
@@ -524,18 +627,27 @@
   align-items: center;
   justify-content: center;
   gap: 18px;
-  min-height: 155px;
-  margin-top: 0;
-  border: 2px solid var(--pu-red);
-  background: transparent;
-  color: var(--pu-red);
-  font-family: "Geologica", sans-serif;
-  font-size: clamp(46px, 4.65vw, 72px);
-  font-weight: 900;
+  min-height: 82px;
+  margin-top: 8px;
+  font-family: var(--font-geologica);
+  font-size: 18px;
+  font-weight: 800;
   line-height: 1;
   text-transform: uppercase;
   cursor: pointer;
   transition: background-color 220ms ease, color 220ms ease, transform 180ms ease;
+}
+
+.inquiryCta {
+  width: 100%;
+  margin-top: 0;
+}
+
+.inquiryCtaWrap {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  grid-area: cta;
 }
 
 .standaloneFooter {
@@ -565,7 +677,7 @@
 
 @media (max-width: 767px) {
   .standaloneRoot main {
-    padding: 0 20px 48px;
+    padding: 80px 20px 24px;
   }
 
   .header {
@@ -634,11 +746,12 @@
 
   .dispatchPanel {
     position: static;
-    max-width: 334px;
+    max-width: 400px;
   }
 
   .dispatchCopy {
-    width: 170px;
+    width: 100%;
+    max-width: 360px;
     margin-top: 20px;
   }
 
@@ -647,7 +760,7 @@
   .modelsSection {
     padding-top: 42px;
     margin-top: 28px;
-    border-top: 1px solid var(--pu-red);
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
   }
 
   .splitEyebrow {
@@ -655,14 +768,9 @@
     margin-bottom: 32px;
   }
 
-  .splitEyebrow span:last-child {
-    display: none;
-  }
-
   .sitesGrid,
   .pillarsGrid,
-  .modelsGrid,
-  .inquirySection {
+  .modelsGrid {
     grid-template-columns: 1fr;
   }
 
@@ -705,7 +813,7 @@
 
   .bigCta {
     min-height: 92px;
-    margin-top: 26px;
+    margin-top: 18px;
     font-size: 36px;
     line-height: 36px;
     gap: 12px;
@@ -722,8 +830,8 @@
     line-height: 19.8px;
   }
 
-  .pillarCard p {
-    width: 190px;
+  .pillarCopy {
+    width: 100%;
   }
 
   .modelCard {
@@ -739,23 +847,38 @@
   }
 
   .inquirySection {
-    display: grid;
     gap: 28px;
     margin-top: 40px;
     padding-top: 42px;
     border-top-width: 1px;
   }
 
-  .inquiryIntro p {
-    width: 220px;
+  .inquiryForm {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "summary"
+      "fields"
+      "cta";
+    gap: 28px;
+    padding-top: 0;
   }
 
-  .inquiryForm {
-    gap: 38px;
+  .inquirySummary {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .inquiryCopy {
+    max-width: none;
+  }
+
+  .pillarsGrid .pillarCard:first-child {
+    border-top: 0;
+    padding-top: 0;
   }
 
   .inquiryForm label {
-    gap: 14px;
+    gap: 10px;
   }
 
   .inquiryForm input {
@@ -769,9 +892,9 @@
   }
 
   .formButton {
-    min-height: 87px;
-    font-size: 28px;
-    line-height: 28px;
+    min-height: 68px;
+    font-size: 16px;
+    line-height: 20px;
     gap: 12px;
   }
 

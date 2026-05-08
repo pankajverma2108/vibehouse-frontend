@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { PartnerWithUsPage } from "@/components/standalone/partner-upcoming-pages";
+import { PartnerWithUsPage } from "@/components/standalone/partner-with-us-page";
 
 export const dynamic = "force-dynamic";
 

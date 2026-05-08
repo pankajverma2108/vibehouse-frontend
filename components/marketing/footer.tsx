@@ -1,17 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-
 import { footerLinks, siteMeta } from "@/content/site";
 
 export function Footer() {
-  const pathname = usePathname();
-
-  if (pathname === "/upcoming" || pathname === "/partner-with-us") {
-    return null;
-  }
-
   return (
     <footer className="bg-[#07070a] px-4 py-10 md:px-6">
       <div className="vh-container">

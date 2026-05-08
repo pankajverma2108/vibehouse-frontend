@@ -1,6 +1,6 @@
 const ZOSTEL_PATTERN = /\bzostel\b/gi;
 const LOCALHOST_PATTERN = /^https?:\/\/(localhost|127(?:\.\d+){3})(:\d+)?$/i;
-const DEFAULT_SITE_ORIGIN = "https://extendbasedesignsections.vercel.app";
+const DEFAULT_SITE_ORIGIN = "https://www.thedailysocial.co.in";
 
 export const BRAND_NAME = "The Daily Social";
 export const BRAND_SHORT_NAME = "TDS";
@@ -66,12 +66,8 @@ export function getPreferredSiteOrigin(): string {
     }
   }
 
-  const envOrigins = [
-    process.env.NEXT_PUBLIC_SITE_URL,
-    process.env.NEXT_PUBLIC_APP_URL,
-    process.env.NEXT_PUBLIC_VERCEL_URL,
-    process.env.VERCEL_URL,
-  ];
+  const envOrigins = process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_ORIGIN;
+  
 
   for (const candidate of envOrigins) {
     const origin = toOrigin(candidate);
