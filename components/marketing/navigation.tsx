@@ -116,13 +116,7 @@ export function Navigation() {
     ),
     [searchParams],
   );
-  const isStandalonePage = pathname === "/upcoming" || pathname === "/partner-with-us";
-
   useEffect(() => {
-    if (isStandalonePage) {
-      return;
-    }
-
     let lastY = window.scrollY;
 
     const onScroll = () => {
@@ -145,10 +139,10 @@ export function Navigation() {
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => window.removeEventListener("scroll", onScroll);
-  }, [isStandalonePage]);
+  }, []);
 
   useEffect(() => {
-    if (isStandalonePage || !isProfileMenuOpen) {
+    if (!isProfileMenuOpen) {
       return;
     }
 
@@ -160,10 +154,10 @@ export function Navigation() {
 
     window.addEventListener("mousedown", onWindowClick);
     return () => window.removeEventListener("mousedown", onWindowClick);
-  }, [isProfileMenuOpen, isStandalonePage]);
+  }, [isProfileMenuOpen]);
 
   useEffect(() => {
-    if (isStandalonePage || !isDesktopMenuOpen) {
+    if (!isDesktopMenuOpen) {
       return;
     }
 
@@ -186,11 +180,7 @@ export function Navigation() {
       window.removeEventListener("mousedown", onWindowClick);
       window.removeEventListener("keydown", onEscape);
     };
-  }, [isDesktopMenuOpen, isStandalonePage]);
-
-  if (isStandalonePage) {
-    return null;
-  }
+  }, [isDesktopMenuOpen]);
 
   return (
     <motion.nav
