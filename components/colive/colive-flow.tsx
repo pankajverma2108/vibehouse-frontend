@@ -371,22 +371,25 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
         room.inventoryState !== "sold_out" && !hasUnavailableRoomPrice(room) ? Math.max(0, room.availableCount) : 0,
       ]),
     );
-    const next = Object.fromEntries(
-      Object.entries(selectedCounts)
-        .map(([key, value]) => [key, Math.min(value, allowed.get(key) ?? 0)] as const)
-        .filter((entry): entry is [string, number] => entry[1] > 0),
-    );
-    const before = Object.values(selectedCounts).reduce((sum, value) => sum + value, 0);
-    const after = Object.values(next).reduce((sum, value) => sum + value, 0);
+    let shouldNotifyAdjustment = false;
+    setSelectedCounts((current) => {
+      const next = Object.fromEntries(
+        Object.entries(current)
+          .map(([key, value]) => [key, Math.min(value, allowed.get(key) ?? 0)] as const)
+          .filter((entry): entry is [string, number] => entry[1] > 0),
+      );
+      const before = Object.values(current).reduce((sum, value) => sum + value, 0);
+      const after = Object.values(next).reduce((sum, value) => sum + value, 0);
+      shouldNotifyAdjustment = before > after;
+      return next;
+    });
 
-    setSelectedCounts(next);
-
-    if (before > after) {
+    if (shouldNotifyAdjustment) {
       toast.warning("Selection updated", {
         description: "Some rooms were adjusted to match current live availability.",
       });
     }
-  }, [rooms, selectedCounts]);
+  }, [rooms]);
 
   useEffect(() => {
     const signature = buildSelectionSignature({
