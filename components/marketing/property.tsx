@@ -38,6 +38,13 @@ import {
 import { toast } from "sonner";
 import { buildBookingSignature, saveBookingDraft, type BookingDraftRoom } from "@/lib/booking-session";
 import type { CxRoomCategory } from "@/lib/cx-api";
+import {
+  buildSelectionSignature,
+  consumeReviewResumeIntent,
+  getPropertySelection,
+  savePropertySelection,
+  saveReviewResumeIntent,
+} from "@/lib/property-selection-session";
 import { cn } from "@/lib/utils";
 import { formatINRPlain } from "@/lib/format-price";
 import {
@@ -1055,8 +1062,10 @@ export function Property({
   const [availabilityRequestedByUser, setAvailabilityRequestedByUser] = useState(initialAvailabilityEnabled);
   const [selectedEssentials] = useState<Record<string, number>>({});
   const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
-  const [resumeReviewAfterAuth, setResumeReviewAfterAuth] = useState(false);
   const roomResponseCacheRef = useRef<Map<string, CachedRoomPayload>>(new Map());
+  const didRestoreSelectionRef = useRef(false);
+  const lastRestoreContextRef = useRef<string | null>(null);
+  const lastSelectionSignatureRef = useRef<string | null>(null);
   const initialFrom = fromDateString(initialCheckIn);
   const initialTo = fromDateString(initialCheckOut);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
@@ -1111,7 +1120,7 @@ export function Property({
     [selectedEssentialDrafts],
   );
 
-  const applyRoomCategories = useCallback((nextCategories: RoomCategory[]) => {
+  const applyRoomCategories = useCallback((nextCategories: RoomCategory[], notifyOnAdjustment = false) => {
     setRoomCategoryList(nextCategories);
     setSelectedCounts((current) => {
       const allowed = new Map(
@@ -1123,11 +1132,19 @@ export function Property({
         ]),
       );
 
-      return Object.fromEntries(
+      const nextSelection = Object.fromEntries(
         Object.entries(current)
           .map<[string, number]>(([roomKey, quantity]) => [roomKey, Math.min(quantity, allowed.get(roomKey) ?? 0)])
           .filter((entry): entry is [string, number] => entry[1] > 0),
       );
+      const previousUnits = Object.values(current).reduce((sum, value) => sum + value, 0);
+      const nextUnits = Object.values(nextSelection).reduce((sum, value) => sum + value, 0);
+      if (notifyOnAdjustment && previousUnits > nextUnits) {
+        toast.warning("Selection updated", {
+          description: "Some rooms were adjusted to match current live availability.",
+        });
+      }
+      return nextSelection;
     });
   }, []);
 
@@ -1372,17 +1389,105 @@ export function Property({
     });
   }, [availabilityRequestedByUser, checkIn, checkOut, resolvedPropertyId]);
 
+  useEffect(() => {
+    if (!resolvedPropertyId || !checkIn || !checkOut) {
+      return;
+    }
+
+    const contextKey = `${resolvedPropertyId}::${checkIn}::${checkOut}`;
+    if (lastRestoreContextRef.current === contextKey) {
+      return;
+    }
+    lastRestoreContextRef.current = contextKey;
+
+    const stored = getPropertySelection("nightly");
+    if (
+      !stored ||
+      stored.propertyId !== resolvedPropertyId ||
+      stored.checkin !== checkIn ||
+      stored.checkout !== checkOut
+    ) {
+      return;
+    }
+
+    setSelectedCounts(stored.selectedCounts);
+    setIsAgeConfirmed(stored.isAgeConfirmed);
+    didRestoreSelectionRef.current = true;
+  }, [resolvedPropertyId, checkIn, checkOut]);
+
+  useEffect(() => {
+    if (!didRestoreSelectionRef.current || roomCategoryList.length === 0) {
+      return;
+    }
+    didRestoreSelectionRef.current = false;
+    applyRoomCategories(roomCategoryList, true);
+  }, [applyRoomCategories, roomCategoryList]);
+
+  useEffect(() => {
+    if (!resolvedPropertyId || !checkIn || !checkOut) {
+      return;
+    }
+
+    const signature = buildSelectionSignature({
+      source: "nightly",
+      propertyId: resolvedPropertyId,
+      checkin: checkIn,
+      checkout: checkOut,
+      selectedCounts,
+    });
+    if (lastSelectionSignatureRef.current === signature) {
+      return;
+    }
+    lastSelectionSignatureRef.current = signature;
+
+    const saveTimer = window.setTimeout(() => {
+      savePropertySelection({
+        source: "nightly",
+        propertyId: resolvedPropertyId,
+        checkin: checkIn,
+        checkout: checkOut,
+        selectedCounts,
+        isAgeConfirmed,
+        signature,
+      });
+    }, 150);
+
+    return () => {
+      window.clearTimeout(saveTimer);
+    };
+  }, [resolvedPropertyId, checkIn, checkOut, selectedCounts, isAgeConfirmed]);
+
   // Sync error state: keep it simple — no user-visible banners for availability errors.
   // The loading standard says: skeletons only, no text-based loading/error states.
 
   useEffect(() => {
-    if (!resumeReviewAfterAuth || !isAuthenticated) {
+    if (!isAuthenticated || !resolvedPropertyId || !checkIn || !checkOut || selectedRoomDrafts.length === 0) {
       return;
     }
 
-    setResumeReviewAfterAuth(false);
+    const intent = consumeReviewResumeIntent("nightly");
+    if (
+      !intent ||
+      intent.propertyId !== resolvedPropertyId ||
+      intent.checkin !== checkIn ||
+      intent.checkout !== checkOut
+    ) {
+      return;
+    }
+
+    const signature = buildSelectionSignature({
+      source: "nightly",
+      propertyId: resolvedPropertyId,
+      checkin: checkIn,
+      checkout: checkOut,
+      selectedCounts,
+    });
+    if (intent.signature !== signature) {
+      return;
+    }
+
     router.push("/bookingreview");
-  }, [isAuthenticated, resumeReviewAfterAuth, router]);
+  }, [isAuthenticated, resolvedPropertyId, checkIn, checkOut, selectedRoomDrafts.length, selectedCounts, router]);
 
   const openRoomPopup = (roomKey: string) => {
     setActiveRoomKey(roomKey);
@@ -1465,7 +1570,19 @@ export function Property({
     });
 
     if (!isAuthenticated) {
-      setResumeReviewAfterAuth(true);
+      saveReviewResumeIntent({
+        source: "nightly",
+        propertyId: resolvedPropertyId,
+        checkin: checkIn,
+        checkout: checkOut,
+        signature: buildSelectionSignature({
+          source: "nightly",
+          propertyId: resolvedPropertyId,
+          checkin: checkIn,
+          checkout: checkOut,
+          selectedCounts,
+        }),
+      });
       openAuthModal("signin");
       return;
     }
