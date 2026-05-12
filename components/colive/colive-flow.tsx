@@ -46,6 +46,13 @@ import { buildBookingSignature, saveBookingDraft, type BookingDraftRoom } from "
 import type { CxRoomCategory } from "@/lib/cx-api";
 import type { ColiveStayType } from "@/lib/colive-api";
 import { formatColiveDate, getDefaultMoveInDate, toIsoDate } from "@/lib/colive-flow-state";
+import {
+  buildSelectionSignature,
+  consumeReviewResumeIntent,
+  getPropertySelection,
+  savePropertySelection,
+  saveReviewResumeIntent,
+} from "@/lib/property-selection-session";
 import { cn } from "@/lib/utils";
 
 type RoomApiPayload = {
@@ -211,7 +218,9 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
   const [roomError, setRoomError] = useState<string | null>(null);
   const [selectedCounts, setSelectedCounts] = useState<Record<string, number>>({});
   const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
-  const resumeReviewAfterAuthRef = useRef(false);
+  const didRestoreSelectionRef = useRef(false);
+  const lastRestoreContextRef = useRef<string | null>(null);
+  const lastSelectionSignatureRef = useRef<string | null>(null);
   const checkoutDate = useMemo(() => addMonthsToIsoDate(moveIn, duration), [duration, moveIn]);
   const aboutText = propertyOverview.join(" ");
 
@@ -312,13 +321,106 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
   }, [loadRooms]);
 
   useEffect(() => {
-    if (!resumeReviewAfterAuthRef.current || !isAuthenticated) {
+    if (!isAuthenticated || selectedRoomDrafts.length === 0) {
       return;
     }
 
-    resumeReviewAfterAuthRef.current = false;
+    const intent = consumeReviewResumeIntent("colive");
+    if (!intent || intent.propertyId !== PROPERTY_ID || intent.checkin !== moveIn || intent.checkout !== checkoutDate) {
+      return;
+    }
+    const signature = buildSelectionSignature({
+      source: "colive",
+      propertyId: PROPERTY_ID,
+      checkin: moveIn,
+      checkout: checkoutDate,
+      selectedCounts,
+    });
+    if (intent.signature !== signature) {
+      return;
+    }
+
     router.push("/bookingreview");
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, selectedRoomDrafts.length, selectedCounts, moveIn, checkoutDate, router]);
+
+  useEffect(() => {
+    const contextKey = `${PROPERTY_ID}::${moveIn}::${checkoutDate}`;
+    if (lastRestoreContextRef.current === contextKey) {
+      return;
+    }
+    lastRestoreContextRef.current = contextKey;
+
+    const stored = getPropertySelection("colive");
+    if (!stored || stored.propertyId !== PROPERTY_ID || stored.checkin !== moveIn || stored.checkout !== checkoutDate) {
+      return;
+    }
+
+    setSelectedCounts(stored.selectedCounts);
+    setIsAgeConfirmed(stored.isAgeConfirmed);
+    didRestoreSelectionRef.current = true;
+  }, [moveIn, checkoutDate]);
+
+  useEffect(() => {
+    if (!didRestoreSelectionRef.current || rooms.length === 0) {
+      return;
+    }
+    didRestoreSelectionRef.current = false;
+    const allowed = new Map(
+      rooms.map((room) => [
+        getRoomSelectionKey(room),
+        room.inventoryState !== "sold_out" && !hasUnavailableRoomPrice(room) ? Math.max(0, room.availableCount) : 0,
+      ]),
+    );
+    let shouldNotifyAdjustment = false;
+    setSelectedCounts((current) => {
+      const next = Object.fromEntries(
+        Object.entries(current)
+          .map(([key, value]) => [key, Math.min(value, allowed.get(key) ?? 0)] as const)
+          .filter((entry): entry is [string, number] => entry[1] > 0),
+      );
+      const before = Object.values(current).reduce((sum, value) => sum + value, 0);
+      const after = Object.values(next).reduce((sum, value) => sum + value, 0);
+      shouldNotifyAdjustment = before > after;
+      return next;
+    });
+
+    if (shouldNotifyAdjustment) {
+      toast.warning("Selection updated", {
+        description: "Some rooms were adjusted to match current live availability.",
+      });
+    }
+  }, [rooms]);
+
+  useEffect(() => {
+    const signature = buildSelectionSignature({
+      source: "colive",
+      propertyId: PROPERTY_ID,
+      checkin: moveIn,
+      checkout: checkoutDate,
+      selectedCounts,
+    });
+    const persistenceSignature = `${signature}::${isAgeConfirmed ? "1" : "0"}`;
+    if (lastSelectionSignatureRef.current === persistenceSignature) {
+      return;
+    }
+    lastSelectionSignatureRef.current = persistenceSignature;
+
+    const saveTimer = window.setTimeout(() => {
+      savePropertySelection({
+        source: "colive",
+        propertyId: PROPERTY_ID,
+        checkin: moveIn,
+        checkout: checkoutDate,
+        selectedCounts,
+        isAgeConfirmed,
+        signature,
+      });
+    }, 150);
+
+    return () => {
+      window.clearTimeout(saveTimer);
+    };
+  }, [moveIn, checkoutDate, selectedCounts, isAgeConfirmed]);
 
   const updateCount = (roomKey: string, nextValue: number) => {
     const room = rooms.find((item) => getRoomSelectionKey(item) === roomKey);
@@ -383,7 +485,19 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     });
 
     if (!isAuthenticated) {
-      resumeReviewAfterAuthRef.current = true;
+      saveReviewResumeIntent({
+        source: "colive",
+        propertyId: PROPERTY_ID,
+        checkin: moveIn,
+        checkout: checkoutDate,
+        signature: buildSelectionSignature({
+          source: "colive",
+          propertyId: PROPERTY_ID,
+          checkin: moveIn,
+          checkout: checkoutDate,
+          selectedCounts,
+        }),
+      });
       openAuthModal("signin");
       return;
     }

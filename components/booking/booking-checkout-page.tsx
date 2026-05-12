@@ -79,6 +79,15 @@ type CouponRule = {
   minGuests?: number;
 };
 
+type CheckoutFlowAbortReason = "payment-failed" | "payment-cancelled" | "verification-pending";
+
+class CheckoutFlowAbortError extends Error {
+  constructor(message: string, readonly reason: CheckoutFlowAbortReason) {
+    super(message);
+    this.name = "CheckoutFlowAbortError";
+  }
+}
+
 declare global {
   interface Window {
     Razorpay?: RazorpayConstructor;
@@ -1052,14 +1061,14 @@ export function BookingCheckoutPage() {
         paymentHandledRef.current = false;
 
         await new Promise<void>((resolve, reject) => {
-          const markFailed = (message: string) => {
+          const markFailed = (message: string, reason: CheckoutFlowAbortReason) => {
             if (paymentHandledRef.current) {
               return;
             }
 
             paymentHandledRef.current = true;
             setFlowStage("failed");
-            reject(new Error(message));
+            reject(new CheckoutFlowAbortError(message, reason));
           };
 
           const razorpay = new Razorpay({
@@ -1084,7 +1093,8 @@ export function BookingCheckoutPage() {
             },
             modal: {
               ondismiss: () => {
-                markFailed("Payment was cancelled before confirmation.");
+                toast.error("Payment was cancelled before confirmation.");
+                markFailed("Payment was cancelled before confirmation.", "payment-cancelled");
               },
             },
             handler: async (response: RazorpaySuccessResponse) => {
@@ -1112,14 +1122,14 @@ export function BookingCheckoutPage() {
                 console.error("Failed to verify Colive payment", error);
                 setFlowStage("failed");
                 toast.error("Payment verification is still pending. Please check My Bookings in a moment.");
-                reject(error instanceof Error ? error : new Error("Colive payment verification failed."));
+                reject(new CheckoutFlowAbortError("Colive payment verification failed.", "verification-pending"));
               }
             },
           });
 
           razorpay.on("payment.failed", () => {
             toast.error("Razorpay reported a payment failure. Please try again.");
-            markFailed("Razorpay reported a payment failure. Please try again.");
+            markFailed("Razorpay reported a payment failure. Please try again.", "payment-failed");
           });
 
           razorpay.open();
@@ -1199,7 +1209,7 @@ export function BookingCheckoutPage() {
       paymentHandledRef.current = false;
 
       await new Promise<void>((resolve, reject) => {
-        const markFailed = async (message: string) => {
+        const markFailed = async (message: string, reason: CheckoutFlowAbortReason) => {
           if (paymentHandledRef.current) {
             return;
           }
@@ -1214,7 +1224,7 @@ export function BookingCheckoutPage() {
           }
 
           clearPendingBookingOrder();
-          reject(new Error(message));
+          reject(new CheckoutFlowAbortError(message, reason));
         };
 
         const razorpay = new Razorpay({
@@ -1239,7 +1249,8 @@ export function BookingCheckoutPage() {
           },
           modal: {
             ondismiss: () => {
-              void markFailed("Payment was cancelled before confirmation.");
+              toast.error("Payment was cancelled before confirmation.");
+              void markFailed("Payment was cancelled before confirmation.", "payment-cancelled");
             },
           },
           handler: async (response: RazorpaySuccessResponse) => {
@@ -1313,19 +1324,23 @@ export function BookingCheckoutPage() {
               console.error("Failed to verify booking payment", error);
               setFlowStage("failed");
               toast.error("Payment verification is still pending. Please check My Bookings in a moment.");
-              reject(error instanceof Error ? error : new Error("Payment verification failed."));
+              reject(new CheckoutFlowAbortError("Payment verification failed.", "verification-pending"));
             }
           },
         });
 
         razorpay.on("payment.failed", () => {
           toast.error("Razorpay reported a payment failure. Please try again.");
-          void markFailed("Razorpay reported a payment failure. Please try again.");
+          void markFailed("Razorpay reported a payment failure. Please try again.", "payment-failed");
         });
 
         razorpay.open();
       });
     } catch (error) {
+      if (error instanceof CheckoutFlowAbortError) {
+        return;
+      }
+
       setFlowStage("failed");
       console.error("Failed to start booking checkout", error);
       toast.error("Unable to start checkout right now. Please try again.");
