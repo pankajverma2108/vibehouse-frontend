@@ -1122,31 +1122,31 @@ export function Property({
 
   const applyRoomCategories = useCallback((nextCategories: RoomCategory[], notifyOnAdjustment = false) => {
     setRoomCategoryList(nextCategories);
-    setSelectedCounts((current) => {
-      const allowed = new Map(
-        nextCategories.map((room) => [
-          getRoomSelectionKey(room),
-          room.hasLiveAvailability && room.inventoryState !== "sold_out" && !hasUnavailableRoomPrice(room)
-            ? Math.max(0, room.availableCount)
-            : 0,
-        ]),
-      );
+    const allowed = new Map(
+      nextCategories.map((room) => [
+        getRoomSelectionKey(room),
+        room.hasLiveAvailability && room.inventoryState !== "sold_out" && !hasUnavailableRoomPrice(room)
+          ? Math.max(0, room.availableCount)
+          : 0,
+      ]),
+    );
 
-      const nextSelection = Object.fromEntries(
-        Object.entries(current)
-          .map<[string, number]>(([roomKey, quantity]) => [roomKey, Math.min(quantity, allowed.get(roomKey) ?? 0)])
-          .filter((entry): entry is [string, number] => entry[1] > 0),
-      );
-      const previousUnits = Object.values(current).reduce((sum, value) => sum + value, 0);
-      const nextUnits = Object.values(nextSelection).reduce((sum, value) => sum + value, 0);
-      if (notifyOnAdjustment && previousUnits > nextUnits) {
-        toast.warning("Selection updated", {
-          description: "Some rooms were adjusted to match current live availability.",
-        });
-      }
-      return nextSelection;
-    });
-  }, []);
+    const nextSelection = Object.fromEntries(
+      Object.entries(selectedCounts)
+        .map<[string, number]>(([roomKey, quantity]) => [roomKey, Math.min(quantity, allowed.get(roomKey) ?? 0)])
+        .filter((entry): entry is [string, number] => entry[1] > 0),
+    );
+    const previousUnits = Object.values(selectedCounts).reduce((sum, value) => sum + value, 0);
+    const nextUnits = Object.values(nextSelection).reduce((sum, value) => sum + value, 0);
+
+    setSelectedCounts(nextSelection);
+
+    if (notifyOnAdjustment && previousUnits > nextUnits) {
+      toast.warning("Selection updated", {
+        description: "Some rooms were adjusted to match current live availability.",
+      });
+    }
+  }, [selectedCounts]);
 
   const fetchRoomsPayload = useCallback(async (params: {
     checkin?: string;
@@ -1435,10 +1435,11 @@ export function Property({
       checkout: checkOut,
       selectedCounts,
     });
-    if (lastSelectionSignatureRef.current === signature) {
+    const persistenceSignature = `${signature}::${isAgeConfirmed ? "1" : "0"}`;
+    if (lastSelectionSignatureRef.current === persistenceSignature) {
       return;
     }
-    lastSelectionSignatureRef.current = signature;
+    lastSelectionSignatureRef.current = persistenceSignature;
 
     const saveTimer = window.setTimeout(() => {
       savePropertySelection({
