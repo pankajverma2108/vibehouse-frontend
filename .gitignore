@@ -18,4 +18,5 @@ BUILD_PLAN.md
 ATTRIBUTIONS.md
 context.md
 
-.playwright-mcp
+.playwright-mcp/
+*.tsbuildinfo
