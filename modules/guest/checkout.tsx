@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ClipboardCheck, ReceiptText } from "lucide-react";
+import { ClipboardCheck, PackageCheck, ReceiptText, ShoppingBag, WalletCards } from "lucide-react";
 import { toast } from "sonner";
 
 import { useGuestAuth } from "@/components/auth/guest-auth-provider";
 import { BentoCard } from "@/components/guest/bento-card";
 import { guestStickerTags } from "@/components/guest/guest-sticker-tags";
 import { SectionBlock } from "@/components/guest/section-block";
-import { StickySummary } from "@/components/guest/sticky-summary";
 import { Button } from "@/components/ui/button";
 import {
   checkoutCart,
@@ -69,6 +68,14 @@ function loadRazorpayCheckout(): Promise<void> {
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(value || 0);
+}
+
+function formatRentalStatus(value: string) {
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 export function GuestCheckout() {
@@ -191,7 +198,7 @@ export function GuestCheckout() {
           order_id: order.razorpay_order_id,
           amount: order.amount_paise,
           currency: order.currency,
-          name: "Vibe House",
+          name: "The Daily Social",
           description: "Guest checkout",
           prefill: {
             email: order.guest?.email ?? "",
@@ -264,44 +271,105 @@ export function GuestCheckout() {
     }
   };
 
+  const cartItems = visibleCart?.items ?? [];
+  const selectedQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <SectionBlock
-        description="Review paid extras, settle the total, and finish the stay when you are ready."
-        sticker={guestStickerTags.checkout}
-        title="Checkout summary"
-      >
-        {loading ? <p className="text-sm text-white/70">Loading checkout state...</p> : null}
-        {loadError ? <p className="text-sm text-rose-300">{loadError}</p> : null}
-        {paymentError ? <p className="text-sm text-rose-300">{paymentError}</p> : null}
-        {!selectedBookingId ? <p className="text-sm text-white/70">No active booking selected yet.</p> : null}
-        <div className="grid gap-4 md:grid-cols-2">
-          <BentoCard description="Move from review to payment in one smooth flow." icon={ClipboardCheck} title="Actions">
-            <div className="space-y-3">
-              <p className="text-sm text-white/75">{checkoutStatus}</p>
-              <Button className="h-10 rounded-[12px]" disabled={isPaying || loading || !selectedBookingId} onClick={() => void openPaymentFlow()} type="button">
-                {isPaying ? "Processing..." : "Continue to payment"}
-              </Button>
-            </div>
-          </BentoCard>
-          <BentoCard description="A clean read of what is currently sitting in your checkout total." icon={ReceiptText} title="Totals">
-            <div className="space-y-2 text-sm text-white/75">
-              <p>Cart lines: {(visibleCart?.items ?? []).length}</p>
-              <p>Borrow active: {activeBorrowCount}</p>
-              <p className="text-white">Cart total: {formatCurrency(visibleCart?.total ?? 0)}</p>
-            </div>
-          </BentoCard>
+    <div className="grid gap-6 pb-10 pt-4 lg:grid-cols-[minmax(0,1fr)_320px] md:pb-12">
+      <div className="space-y-8">
+        <section className="grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+          <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-7">
+            <p className="text-[11px] font-black uppercase text-[#f9cb37]">Stay Ledger</p>
+            <h1 className="mt-3 font-sectiontitle text-[36px] leading-tight text-white md:text-[52px]">Settle the extras cleanly.</h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-[#cbd5e1] md:text-base">
+              Review paid add-ons, active rentals, and the amount pending on this stay.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <BentoCard description="Cart checkout, payment order creation, and Razorpay verification stay in one flow." icon={WalletCards} sticker={{ label: "Secure", bg: "#f9cb37", text: "#111111", rotate: "rotate-[-2deg]" }} title="Payment ready" />
+            <BentoCard description="Desk-issued items stay visible here so return status is not hidden." icon={PackageCheck} sticker={{ label: "Active", bg: "#3a5f84", text: "#ffffff", rotate: "rotate-[1deg]" }} title="Rental status" />
+          </div>
+        </section>
+
+        <SectionBlock
+          description="Confirm the current stay charges before continuing to payment."
+          sticker={guestStickerTags.checkout}
+          title="Checkout Summary"
+        >
+          {loading ? <p className="text-sm text-white/70">Loading checkout state...</p> : null}
+          {loadError ? <p className="text-sm text-rose-300">{loadError}</p> : null}
+          {paymentError ? <p className="text-sm text-rose-300">{paymentError}</p> : null}
+          {!selectedBookingId ? <p className="text-sm text-white/70">No active booking selected yet.</p> : null}
+
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.65fr)]">
+            <article className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-black uppercase text-[#f9cb37]">Add-ons</p>
+                  <h3 className="mt-2 font-sectiontitle text-[24px] leading-8 text-white">Cart Items</h3>
+                </div>
+                <ShoppingBag className="h-5 w-5 text-[#f9cb37]" />
+              </div>
+              <div className="mt-5 space-y-3">
+                {cartItems.length === 0 ? <p className="text-sm text-white/65">No paid add-ons are waiting in the cart.</p> : null}
+                {cartItems.map((item) => (
+                  <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-3" key={item.id}>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold text-white">{item.name}</p>
+                      <p className="mt-0.5 text-xs text-white/52">Qty {item.quantity}</p>
+                    </div>
+                    <p className="text-sm font-black text-white">{formatCurrency(item.total_price)}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-black uppercase text-[#f9cb37]">Desk items</p>
+                  <h3 className="mt-2 font-sectiontitle text-[24px] leading-8 text-white">Rentals</h3>
+                </div>
+                <ReceiptText className="h-5 w-5 text-[#f9cb37]" />
+              </div>
+              <div className="mt-5 space-y-3">
+                {visibleMine.length === 0 ? <p className="text-sm text-white/65">No active rental items on this stay.</p> : null}
+                {visibleMine.slice(0, 4).map((item) => (
+                  <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-3" key={item.id}>
+                    <p className="min-w-0 truncate text-sm font-bold text-white">{item.product_name}</p>
+                    <p className="shrink-0 text-xs font-bold uppercase text-white/52">{formatRentalStatus(item.status)}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </div>
+        </SectionBlock>
+      </div>
+
+      <aside className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-4 shadow-[0_22px_56px_rgba(0,0,0,0.36)] backdrop-blur lg:sticky lg:top-28 lg:self-start">
+        <h3 className="font-sectiontitle text-[22px] leading-7 text-white">Checkout Preview</h3>
+        <div className="mt-4 space-y-3">
+          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-1 py-2">
+            <span className="text-xs font-bold uppercase text-[#94a3b8]">Add-ons</span>
+            <span className="text-sm font-black text-white">{selectedQuantity} selected</span>
+          </div>
+          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-1 py-2">
+            <span className="text-xs font-bold uppercase text-[#94a3b8]">Rentals</span>
+            <span className="text-sm font-black text-white">{activeBorrowCount} active</span>
+          </div>
+          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-1 py-2">
+            <span className="text-xs font-bold uppercase text-[#94a3b8]">Total</span>
+            <span className="text-sm font-black text-white">{formatCurrency(visibleCart?.total ?? 0)}</span>
+          </div>
         </div>
-      </SectionBlock>
-      <StickySummary
-        ctaLabel={isPaying ? "Processing..." : "Pay now"}
-        items={[
-          { label: "Add-ons", value: `${(visibleCart?.items ?? []).reduce((sum, item) => sum + item.quantity, 0)} selected` },
-          { label: "Borrow", value: `${activeBorrowCount} active` },
-          { label: "Total", value: formatCurrency(visibleCart?.total ?? 0) },
-        ]}
-        title="Checkout preview"
-      />
+        <div className="mt-4 rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-3 text-sm leading-6 text-white/72">
+          {checkoutStatus}
+        </div>
+        <Button className="mt-4 h-11 w-full rounded-[4px] bg-[var(--vh-pink)] font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]" disabled={isPaying || loading || !selectedBookingId} onClick={() => void openPaymentFlow()} type="button">
+          <ClipboardCheck className="mr-2 h-4 w-4" />
+          {isPaying ? "Processing..." : "Continue to payment"}
+        </Button>
+      </aside>
     </div>
   );
 }

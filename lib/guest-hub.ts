@@ -5,6 +5,10 @@ export type GuestHubBookingLike = Pick<
   "ezee_reservation_id" | "status" | "checkin_date" | "checkout_date"
 >;
 
+// Temporary override for frontend design/testing while backend status mapping is being fixed.
+// Remove or switch to false once guest APIs return in-house statuses (ARRIVED/CHECKED_IN/IN_HOUSE).
+const TEMPORARY_ALLOW_DATE_RANGE_ONLY_GUEST_HUB_ACCESS = true;
+
 function parseBookingTimestamp(value?: string | null): number | null {
   if (!value) {
     return null;
@@ -20,8 +24,21 @@ function getBookingNowTimestamp(): number {
   return now.getTime();
 }
 
+export function normalizeBookingStatus(status?: string | null): string {
+  return (status || "").trim().toUpperCase().replace(/[\s-]+/g, "_");
+}
+
+export function isInHouseBookingStatus(status?: string | null): boolean {
+  const normalizedStatus = normalizeBookingStatus(status);
+  return normalizedStatus === "ARRIVED"
+    || normalizedStatus === "CHECKED_IN"
+    || normalizedStatus === "CHECKEDIN"
+    || normalizedStatus === "IN_HOUSE"
+    || normalizedStatus === "INHOUSE";
+}
+
 export function getGuestHubStatus(booking: GuestHubBookingLike): "active" | "upcoming" | "past" {
-  const normalizedStatus = (booking.status || "").toUpperCase();
+  const normalizedStatus = normalizeBookingStatus(booking.status);
   const nowTimestamp = getBookingNowTimestamp();
   const checkInTimestamp = parseBookingTimestamp(booking.checkin_date);
   const checkOutTimestamp = parseBookingTimestamp(booking.checkout_date);
@@ -42,17 +59,11 @@ export function getGuestHubStatus(booking: GuestHubBookingLike): "active" | "upc
 }
 
 export function isGuestHubEligibleBooking(booking: GuestHubBookingLike): boolean {
-  const normalizedStatus = (booking.status || "").toUpperCase();
-
-  if (normalizedStatus === "CHECKED_IN" || normalizedStatus === "IN_HOUSE" || normalizedStatus === "INHOUSE" || normalizedStatus === "ACTIVE") {
-    return true;
+  if (TEMPORARY_ALLOW_DATE_RANGE_ONLY_GUEST_HUB_ACCESS) {
+    return getGuestHubStatus(booking) === "active";
   }
 
-  if (normalizedStatus === "CANCELLED" || normalizedStatus === "CHECKED_OUT" || normalizedStatus === "COMPLETED" || normalizedStatus === "REJECTED") {
-    return false;
-  }
-
-  if (normalizedStatus !== "APPROVED" && normalizedStatus !== "CONFIRMED") {
+  if (!isInHouseBookingStatus(booking.status)) {
     return false;
   }
 
@@ -82,11 +93,14 @@ export function findGuestBookingById<T extends GuestHubBookingLike>(bookings: T[
 
 export function getScopedGuestHubHref(bookingId: string, subpath = ""): string {
   const normalizedBookingId = bookingId.trim();
-  const normalizedSubpath = subpath.replace(/^\/+/, "");
+  const normalizedSubpath = subpath.trim().replace(/^\/+/, "");
+  const [pathPart = "", hashPart = ""] = normalizedSubpath.split("#");
+  const hash = hashPart ? `#${hashPart}` : "";
+  const baseHref = `/${encodeURIComponent(normalizedBookingId)}/guest`;
 
-  if (!normalizedSubpath) {
-    return `/${encodeURIComponent(normalizedBookingId)}/guest`;
+  if (!pathPart) {
+    return `${baseHref}${hash}`;
   }
 
-  return `/${encodeURIComponent(normalizedBookingId)}/guest/${normalizedSubpath}`;
+  return `${baseHref}/${pathPart}${hash}`;
 }

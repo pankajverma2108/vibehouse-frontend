@@ -5,7 +5,7 @@ import type { GuestStickerTagConfig } from "@/components/guest/guest-sticker-tag
 import { cn } from "@/lib/utils";
 
 type GuestPageShellProps = {
-  title: string;
+  title?: string;
   description?: string;
   sticker?: GuestStickerTagConfig;
   actions?: ReactNode;
@@ -24,31 +24,32 @@ export function GuestPageShell({
   return (
     <section
       className={cn(
-        "relative min-h-screen overflow-hidden bg-[#07070a] pb-28 pt-24 font-['Geologica'] text-white md:pb-16 md:pt-28",
+        "relative isolate min-h-screen overflow-x-clip bg-[#07070a] font-['Geologica'] text-white",
         className,
       )}
     >
-      <div className="pointer-events-none absolute -left-24 top-[18rem] h-80 w-44 rounded-full bg-[var(--vh-pink)]/12 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 top-[14rem] h-96 w-52 rounded-full bg-[var(--vh-hot)]/10 blur-3xl" />
-      <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-7 px-4 md:px-6 xl:px-0">
-        <header className="flex flex-col items-center gap-4 text-center">
-          {sticker ? (
-            <StickerTag
-              bg={sticker.bg}
-              className="px-3 py-1.5 text-[11px] font-black not-italic uppercase tracking-[0.12em]"
-              label={sticker.label}
-              rotate={sticker.rotate}
-              text={sticker.text}
-            />
-          ) : null}
-          <div className="max-w-3xl">
-            <h1 className="vh-title text-center text-[28px] leading-[1.08] text-white md:text-[34px]">
-              {title}
-            </h1>
-            {description ? <p className="mt-3 max-w-2xl text-sm leading-7 text-[#94a3b8] md:text-base">{description}</p> : null}
-          </div>
-          {actions ? <div className="flex flex-wrap items-center justify-center gap-3">{actions}</div> : null}
-        </header>
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.028)_1px,transparent_1px)] bg-[size:88px_88px] opacity-30" />
+      <div className="relative z-10 mx-auto flex w-full max-w-[1180px] flex-col gap-7 px-4 pb-0 pt-5 md:px-6 md:pt-7 xl:px-0">
+        {title || description || sticker || actions ? (
+          <header className="flex flex-col items-center gap-4 pt-8 text-center md:pt-10">
+            {sticker ? (
+              <StickerTag
+                bg={sticker.bg}
+                className="px-3 py-1.5 text-[11px] font-black not-italic uppercase"
+                label={sticker.label}
+                rotate={sticker.rotate}
+                text={sticker.text}
+              />
+            ) : null}
+            {title || description ? (
+              <div className="max-w-3xl">
+                {title ? <h1 className="vh-title text-center text-[28px] leading-[1.08] text-white md:text-[34px]">{title}</h1> : null}
+                {description ? <p className="mt-3 max-w-2xl text-sm leading-7 text-[#cbd5e1] md:text-base">{description}</p> : null}
+              </div>
+            ) : null}
+            {actions ? <div className="flex flex-wrap items-center justify-center gap-3">{actions}</div> : null}
+          </header>
+        ) : null}
 
         {children}
       </div>

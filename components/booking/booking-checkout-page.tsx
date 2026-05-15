@@ -81,6 +81,13 @@ type CouponRule = {
 
 type CheckoutFlowAbortReason = "payment-failed" | "payment-cancelled" | "verification-pending";
 
+type CatalogResponseEnvelope = {
+  items?: unknown;
+  data?: unknown;
+  catalog?: unknown;
+  addons?: unknown;
+};
+
 class CheckoutFlowAbortError extends Error {
   constructor(message: string, readonly reason: CheckoutFlowAbortReason) {
     super(message);
@@ -645,7 +652,10 @@ export function BookingCheckoutPage() {
       setCatalogError(null);
 
       try {
-        const response = coliveAddonPropertyId && coliveAddonDurationMonths
+        const usedPropertyId = draft?.propertyId ?? ADDON_PROPERTY_ID;
+        const isColive = coliveAddonPropertyId && coliveAddonDurationMonths;
+
+        const response: unknown = isColive
           ? await getColivePropertyAddons({
               propertyId: coliveAddonPropertyId,
               durationMonths: coliveAddonDurationMonths,
@@ -661,15 +671,30 @@ export function BookingCheckoutPage() {
                   available_stock: addon.max_quantity ?? null,
                 })),
             )
-          : await getStoreCatalog(ADDON_PROPERTY_ID);
+          : await getStoreCatalog(usedPropertyId);
+
+        const responseEnvelope = response as CatalogResponseEnvelope | null;
+        const unwrappedResponse = Array.isArray(response)
+          ? response
+          : Array.isArray(responseEnvelope?.items)
+            ? responseEnvelope.items
+            : Array.isArray(responseEnvelope?.data)
+              ? responseEnvelope.data
+              : Array.isArray(responseEnvelope?.catalog)
+                ? responseEnvelope.catalog
+                : Array.isArray(responseEnvelope?.addons)
+                  ? responseEnvelope.addons
+                  : [];
+
         if (cancelled) {
           return;
         }
 
         // The API has returned non-array payloads before, so filtering only starts after a strict array guard.
-        const nextCatalog = (Array.isArray(response) ? response : [])
+        const nextCatalog = (Array.isArray(unwrappedResponse) ? unwrappedResponse : [])
           .filter(isStoreCatalogItem)
           .filter((item) => item.category !== "BORROWABLE");
+        
         setCatalog(nextCatalog);
 
         setDraft((current) => {
@@ -702,12 +727,10 @@ export function BookingCheckoutPage() {
           saveBookingDraft(nextDraft);
           return nextDraft;
         });
-      } catch (error) {
+      } catch {
         if (cancelled) {
           return;
         }
-
-        console.error("Failed to load booking add-ons", error);
         setCatalog([]);
         setCatalogError("fallback-empty");
       } finally {
@@ -1543,7 +1566,7 @@ export function BookingCheckoutPage() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#f7c948]">Events</p>
               <h2 className="mt-2 font-sectiontitle text-[22px] text-white md:text-[24px]">Step out after check-in.</h2>
             </div>
-            <StickerTag label="After hours" bg="#3b82f6" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" text="#ffffff" rotate="rotate-[-8deg]" />
+            <StickerTag label="After hours" bg="#3b82f6" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" text="#ffffff" rotate="rotate-[6deg]" />
           </div>
           <p className="mt-3 font-body text-sm leading-6 text-white/72">
             Keep this booking compact, then jump into the event lineup for live music, mixers, and rooftop scenes.
@@ -1898,11 +1921,12 @@ export function BookingCheckoutPage() {
                   </div>
                 </div>
 
-                {eventCta}
-
                 <div className="overflow-hidden rounded-[22px] border border-dashed border-[rgba(255,255,255,0.28)] bg-[#07070a] shadow-[0_20px_45px_rgba(0,0,0,0.24)]">
                   <div className="p-6 md:p-8">
-                    <h2 className="font-sectiontitle text-[22px] text-white md:text-[24px]">Add to your stay</h2>
+                    <div className="flex items-start justify-between gap-4">
+                      <h2 className="font-sectiontitle text-[22px] text-white md:text-[24px]">Add Services</h2>
+                      <StickerTag label="Convinience Rewritten" bg="#dc2626" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" text="#ffffff" rotate="rotate-[6deg]" />
+                    </div>
 
                     {!catalogLoading && serviceItems.length === 0 ? (
                       <div className="mt-5 rounded-[14px] border border-dashed border-white/12 bg-black/20 px-4 py-5 text-sm text-white/70">
@@ -1964,6 +1988,9 @@ export function BookingCheckoutPage() {
                     </div>
                   </div>
                 </div>
+
+                {eventCta}
+
               </>
             ) : null}
           </div>

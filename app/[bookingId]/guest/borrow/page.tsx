@@ -1,5 +1,12 @@
-import { GuestBorrow } from "@/modules/guest/borrow";
+import { redirect } from "next/navigation";
 
-export default function ScopedGuestBorrowPage() {
-  return <GuestBorrow />;
+import { getScopedGuestHubHref } from "@/lib/guest-hub";
+
+export default async function ScopedGuestRentalsRedirectPage({
+  params,
+}: {
+  params: Promise<{ bookingId: string }>;
+}) {
+  const { bookingId } = await params;
+  redirect(getScopedGuestHubHref(bookingId, "addons#rentals"));
 }

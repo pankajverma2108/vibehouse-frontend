@@ -26,7 +26,7 @@ const offerCards = [
     icon: ShoppingBag,
   },
   {
-    title: "Borrow desk",
+    title: "Rentals desk",
     description: "Adapters, daily-use essentials, and handy items that make the stay easier.",
     icon: PackagePlus,
   },
@@ -43,10 +43,10 @@ export function GuestAccessState({ title, description, showSignIn = false }: Gue
   return (
     <section className="space-y-8">
       <div className="mx-auto max-w-3xl text-center">
-        <p className="inline-flex rounded-full border border-[var(--vh-pink)]/35 bg-[rgba(198,40,40,0.12)] px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-[var(--vh-pink)]">
+        <p className="inline-flex rounded-full border border-[var(--vh-pink)]/35 bg-[rgba(198,40,40,0.12)] px-3 py-1 text-xs font-bold uppercase text-[var(--vh-pink)]">
           Guest access
         </p>
-        <h2 className="vh-title mt-4 text-center text-[26px] text-white md:text-[34px]">{title}</h2>
+        <h2 className="font-sectiontitle mt-4 text-center text-[28px] leading-tight text-white md:text-[38px]">{title}</h2>
         <p className="mt-3 text-sm leading-7 text-white/72 md:text-base">{description}</p>
       </div>
 

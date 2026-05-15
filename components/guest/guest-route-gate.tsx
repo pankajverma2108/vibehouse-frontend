@@ -1,25 +1,103 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { useGuestAuth } from "@/components/auth/guest-auth-provider";
 import { GuestAccessState } from "@/components/guest/guest-access-state";
-import { getActiveGuestHubBooking, getGuestHubStatus, getScopedGuestHubHref, isGuestHubEligibleBooking, findGuestBookingById } from "@/lib/guest-hub";
+import { getStoredGuestToken } from "@/lib/guest-auth-api";
+import { getGuestBookings, linkGuestBooking } from "@/lib/booking-api";
+import { findGuestBookingById, getActiveGuestHubBooking, getGuestHubStatus, getScopedGuestHubHref, isGuestHubEligibleBooking, isInHouseBookingStatus } from "@/lib/guest-hub";
+
+type GateBookingLike = {
+  ezee_reservation_id: string;
+  checkin_date: string;
+  checkout_date: string;
+  status: string;
+};
+
+function applyStatusOverride<T extends GateBookingLike>(booking: T, nextStatus?: string | null): T {
+  if (!nextStatus) {
+    return booking;
+  }
+
+  return {
+    ...booking,
+    status: nextStatus,
+  };
+}
 
 export function GuestHubEntryGate() {
   const router = useRouter();
   const { guest, isAuthenticated, isRestoringSession } = useGuestAuth();
   const activeBooking = useMemo(() => getActiveGuestHubBooking(guest?.bookings ?? []), [guest?.bookings]);
+  const [fallbackBookingId, setFallbackBookingId] = useState<string | null>(null);
+  const [isResolvingFallback, setIsResolvingFallback] = useState(false);
 
   useEffect(() => {
-    if (!isRestoringSession && isAuthenticated && activeBooking) {
-      router.replace(getScopedGuestHubHref(activeBooking.ezee_reservation_id));
+    const nextBookingId = activeBooking?.ezee_reservation_id ?? fallbackBookingId;
+    if (!isRestoringSession && isAuthenticated && nextBookingId) {
+      router.replace(getScopedGuestHubHref(nextBookingId));
     }
-  }, [activeBooking, isAuthenticated, isRestoringSession, router]);
+  }, [activeBooking?.ezee_reservation_id, fallbackBookingId, isAuthenticated, isRestoringSession, router]);
 
-  if (isRestoringSession) {
+  useEffect(() => {
+    if (isRestoringSession || !isAuthenticated || activeBooking) {
+      setFallbackBookingId((current) => (current === null ? current : null));
+      setIsResolvingFallback((current) => (current ? false : current));
+      return;
+    }
+
+    const token = getStoredGuestToken();
+    if (!token) {
+      setFallbackBookingId((current) => (current === null ? current : null));
+      setIsResolvingFallback((current) => (current ? false : current));
+      return;
+    }
+
+    let cancelled = false;
+    setIsResolvingFallback(true);
+
+    const resolveFallbackBooking = async () => {
+      try {
+        const bookings = await getGuestBookings(token);
+        const activeDateWindowCandidates = bookings.filter((booking) => getGuestHubStatus(booking) === "active");
+
+        let resolvedBookingId: string | null = null;
+
+        for (const candidate of activeDateWindowCandidates) {
+          const linked = await linkGuestBooking(token, candidate.ezee_reservation_id);
+          const linkedStatus = linked.booking.status || linked.access.status || candidate.status;
+
+          if (isGuestHubEligibleBooking(applyStatusOverride(candidate, linkedStatus)) || isInHouseBookingStatus(linked.access.status)) {
+            resolvedBookingId = candidate.ezee_reservation_id;
+            break;
+          }
+        }
+
+        if (!cancelled) {
+          setFallbackBookingId(resolvedBookingId);
+        }
+      } catch {
+        if (!cancelled) {
+          setFallbackBookingId(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsResolvingFallback(false);
+        }
+      }
+    };
+
+    void resolveFallbackBooking();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeBooking, isAuthenticated, isRestoringSession]);
+
+  if (isRestoringSession || isResolvingFallback) {
     return <div className="h-80 animate-pulse rounded-[12px] bg-white/5" />;
   }
 
@@ -44,8 +122,56 @@ export function GuestHubEntryGate() {
 export function GuestBookingGate({ bookingId, children }: { bookingId: string; children: ReactNode }) {
   const { guest, isAuthenticated, isRestoringSession } = useGuestAuth();
   const matchingBooking = useMemo(() => findGuestBookingById(guest?.bookings ?? [], bookingId), [bookingId, guest?.bookings]);
+  const [fallbackEligible, setFallbackEligible] = useState(false);
+  const [isResolvingFallback, setIsResolvingFallback] = useState(false);
 
-  if (isRestoringSession) {
+  useEffect(() => {
+    if (isRestoringSession || !isAuthenticated || !matchingBooking || isGuestHubEligibleBooking(matchingBooking)) {
+      setFallbackEligible((current) => (current ? false : current));
+      setIsResolvingFallback((current) => (current ? false : current));
+      return;
+    }
+
+    const token = getStoredGuestToken();
+    if (!token) {
+      setFallbackEligible((current) => (current ? false : current));
+      setIsResolvingFallback((current) => (current ? false : current));
+      return;
+    }
+
+    let cancelled = false;
+    setFallbackEligible((current) => (current ? false : current));
+    setIsResolvingFallback(true);
+
+    const resolveScopedEligibility = async () => {
+      try {
+        const linked = await linkGuestBooking(token, bookingId);
+        const linkedStatus = linked.booking.status || linked.access.status || matchingBooking.status;
+        const bookingWithResolvedStatus = applyStatusOverride(matchingBooking, linkedStatus);
+        const nextEligible = isGuestHubEligibleBooking(bookingWithResolvedStatus) || isInHouseBookingStatus(linked.access.status);
+
+        if (!cancelled) {
+          setFallbackEligible(nextEligible);
+        }
+      } catch {
+        if (!cancelled) {
+          setFallbackEligible(false);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsResolvingFallback(false);
+        }
+      }
+    };
+
+    void resolveScopedEligibility();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [bookingId, isAuthenticated, isRestoringSession, matchingBooking]);
+
+  if (isRestoringSession || isResolvingFallback) {
     return <div className="h-80 animate-pulse rounded-[12px] bg-white/5" />;
   }
 
@@ -68,17 +194,18 @@ export function GuestBookingGate({ bookingId, children }: { bookingId: string; c
     );
   }
 
-  if (!isGuestHubEligibleBooking(matchingBooking)) {
+  if (!isGuestHubEligibleBooking(matchingBooking) && !fallbackEligible) {
     const status = getGuestHubStatus(matchingBooking);
+    const isPastStay = status === "past";
     const description =
-      status === "upcoming"
+      !isPastStay
         ? "This booking is linked to your account, but the hub opens once the stay becomes active at the property."
         : "This stay is no longer active for Guest Hub access. You can still review it from My Bookings.";
 
     return (
       <GuestAccessState
         description={description}
-        title={status === "upcoming" ? "Your stay is booked, but Guest Hub is not open yet." : "This stay is no longer active in Guest Hub."}
+        title={!isPastStay ? "Your stay is booked, but Guest Hub is not open yet." : "This stay is no longer active in Guest Hub."}
       />
     );
   }

@@ -4,7 +4,22 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, KeyRound, ShieldCheck, UserPlus, Waypoints } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  BedDouble,
+  CalendarDays,
+  ConciergeBell,
+  HelpCircle,
+  KeyRound,
+  PackageSearch,
+  ReceiptText,
+  Search,
+  ShieldCheck,
+  ShoppingBag,
+  UserPlus,
+  Waypoints,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { useGuestAuth } from "@/components/auth/guest-auth-provider";
@@ -14,100 +29,53 @@ import { guestStickerTags } from "@/components/guest/guest-sticker-tags";
 import { StickerTag } from "@/components/shared/sticker-tag";
 import { Button } from "@/components/ui/button";
 import { getGuestPropertyLocation } from "@/content/guest-properties";
+import { nearbyAttractions, propertyGallery, propertyGuidelines } from "@/content/rooms";
+import { siteMeta } from "@/content/site";
+import { useGuestCatalog } from "@/hooks/use-guest-catalog";
 import { getStoredGuestToken } from "@/lib/guest-auth-api";
-import { getGuestBookings, type GuestDashboardBooking } from "@/lib/guest-experience-api";
-import { cn } from "@/lib/utils";
+import { getGuestBookings, requestService, type GuestDashboardBooking } from "@/lib/guest-experience-api";
 import { useGuestExperience } from "@/state/guest-experience-provider";
 
-type ActionCard = {
+type QuickAction = {
   title: string;
+  copy: string;
   href: string;
-  icon: string;
-  featured?: boolean;
-  subtitle?: string;
-  sticker?: (typeof guestStickerTags)["extend"];
+  icon: typeof ConciergeBell;
+  sticker: string;
 };
 
-type GearCard = {
-  title: string;
-  price: string;
-  href: string;
-  icon: string;
-  featured?: boolean;
-};
+const quickActions: QuickAction[] = [
+  {
+    title: "Concierge",
+    copy: "Ask for housekeeping, support, or a front-desk handoff.",
+    href: "services",
+    icon: ConciergeBell,
+    sticker: "Recommended",
+  },
+  {
+    title: "Add-Ons",
+    copy: "Rent essentials, add comforts, and review stay upgrades.",
+    href: "addons",
+    icon: ShoppingBag,
+    sticker: "Popular",
+  },
+  {
+    title: "Stay Guide",
+    copy: "Rules, neighborhood picks, FAQs, and arrival details.",
+    href: "guide",
+    icon: Waypoints,
+    sticker: "Included",
+  },
+  {
+    title: "Checkout",
+    copy: "Review paid extras and settle anything pending.",
+    href: "checkout",
+    icon: ReceiptText,
+    sticker: "Available Today",
+  },
+];
 
-const actionCards: ActionCard[] = [
-  {
-    title: "Extend Stay",
-    href: "/guest/extend",
-    icon: "/guest-dashboard/icons/Icon-13.svg",
-    featured: true,
-    sticker: guestStickerTags.extend,
-  },
-  {
-    title: "Buy Add-ons",
-    href: "/guest/addons",
-    icon: "/guest-dashboard/icons/Icon-7.svg",
-    subtitle: "Snacks, extras, and handy comforts",
-  },
-  {
-    title: "Request Service",
-    href: "/guest/services",
-    icon: "/guest-dashboard/icons/Icon-5.svg",
-    subtitle: "Housekeeping, help, and quick support",
-  },
-] as const;
-
-const gearCards: GearCard[] = [
-  {
-    title: "Fresh Towels",
-    price: "Ready to request",
-    href: "/guest/addons",
-    icon: "/guest-dashboard/icons/Icon-12.svg",
-    featured: true,
-  },
-  {
-    title: "Adapter Kit",
-    price: "Keep every device charged",
-    href: "/guest/borrow",
-    icon: "/guest-dashboard/icons/Icon-4.svg",
-  },
-  {
-    title: "Hair Dryer",
-    price: "Quick borrow from the desk",
-    href: "/guest/borrow",
-    icon: "/guest-dashboard/icons/Icon-3.svg",
-  },
-  {
-    title: "Laundry Refresh",
-    price: "Sort the essentials in minutes",
-    href: "/guest/services",
-    icon: "/guest-dashboard/icons/Icon-8.svg",
-  },
-] as const;
-
-const stayFlexCards = [
-  {
-    title: "Late Checkout",
-    subtitle: "Keep the room a little longer when the day allows it.",
-    price: "Till 2:00 PM",
-    href: "/guest/extend",
-    cta: "Book now",
-  },
-  {
-    title: "One More Night",
-    subtitle: "Still settling in? Add another night without leaving the flow.",
-    price: "Keep the trip going",
-    href: "/guest/extend",
-    cta: "See options",
-  },
-] as const;
-
-const ruleCards = [
-  { label: "Network: StreetArt_Hub", icon: "/guest-dashboard/icons/Icon-1.svg" },
-  { label: "No smoking inside", icon: "/guest-dashboard/icons/Icon.svg" },
-  { label: "Quiet hours after 10 PM", icon: "/guest-dashboard/icons/Icon-6.svg" },
-] as const;
+const supportPhoneDigits = siteMeta.contact.phoneDisplay.replace(/\D/g, "");
 
 function getGuestSubpath(href: string) {
   return href.replace(/^\/guest\/?/, "");
@@ -154,111 +122,126 @@ function formatLockStatus(value?: string | null) {
     .join(" ");
 }
 
-function GuestIcon({ alt, className, src, size = 24 }: { alt: string; className?: string; src: string; size?: number }) {
-  return <Image alt={alt} className={cn("object-contain", className)} height={size} src={src} width={size} />;
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
+      <path
+        d="M19.11 4.93A10 10 0 0 0 12 2a9.95 9.95 0 0 0-8.38 15.34L3 22l4.82-1.48A10 10 0 1 0 19.11 4.93ZM12 20.1a8.04 8.04 0 0 1-4.09-1.12l-.29-.17-2.86.88.93-2.77-.19-.3A8.05 8.05 0 1 1 12 20.1Zm4.23-5.9c-.23-.11-1.34-.66-1.55-.74-.21-.08-.36-.11-.52.11-.15.23-.6.74-.73.9-.13.15-.27.17-.5.06-.23-.12-.96-.35-1.83-1.12-.67-.6-1.13-1.34-1.26-1.57-.13-.23-.01-.35.1-.47.1-.1.23-.27.34-.4.11-.13.15-.23.23-.38.08-.16.04-.29-.02-.4-.06-.11-.53-1.27-.72-1.74-.19-.46-.38-.4-.52-.4h-.44c-.16 0-.4.06-.61.29-.21.23-.8.78-.8 1.9s.82 2.19.93 2.34c.11.15 1.6 2.44 3.88 3.42.54.23.96.37 1.29.47.54.17 1.03.15 1.42.09.43-.07 1.34-.55 1.53-1.08.19-.53.19-.98.13-1.08-.06-.1-.21-.17-.44-.28Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
 }
 
-function PolaroidRoomCard({ booking, guideHref }: { booking: GuestDashboardBooking | null; guideHref: string }) {
-  const roomOrBed = formatRoomOrBed(booking?.room_number);
-  const roomType = booking?.room_type_name ?? "Your room details will appear here.";
-  const stayUntil = booking?.checkout_date ? `Until ${formatDate(booking.checkout_date)}` : "Checkout date pending";
-  const propertyName = booking?.property_name ?? "Your stay";
+function isLostFoundService(service: { id: string; name: string; code?: string }) {
+  const normalized = `${service.code ?? ""} ${service.id} ${service.name}`.toLowerCase();
+  return normalized.includes("lost") || normalized.includes("found");
+}
 
+function StayMetric({ icon: Icon, label, value, detail }: { icon: typeof CalendarDays; label: string; value: string; detail?: string }) {
   return (
-    <article className="relative mx-auto w-full max-w-[360px] rotate-[-2deg] bg-white p-3 pb-9 text-[#0f172a] shadow-[0_16px_32px_rgba(0,0,0,0.38)] md:max-w-[430px] lg:mx-0">
-      <div className="relative h-[280px] overflow-hidden bg-[#e2e8f0] md:h-[340px]">
-        <Image alt="Luxury hotel room" className="h-full w-full object-cover" height={680} priority src="/guest-dashboard/assets/luxury-hotel-room.png" width={760} />
-      </div>
-      <div className="mt-4 flex items-end justify-between gap-4">
+    <article className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-4">
+      <div className="flex items-center gap-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-[8px] border border-white/10 bg-black/20 text-[#f9cb37]">
+          <Icon className="h-4 w-4" />
+        </span>
         <div className="min-w-0">
-          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#475569]">Room / Bed</p>
-          <h2 className="truncate font-['Geologica'] text-[22px] font-black leading-7 tracking-[-0.04em] text-[#0f172a] md:text-[28px]">{roomOrBed}</h2>
-          <p className="mt-1 truncate text-sm font-normal leading-5 text-[#0f172a]/70 md:text-base">{roomType}</p>
-          <p className="mt-1 truncate text-xs font-medium leading-5 text-[#0f172a]/55">{propertyName}</p>
-          <p className="mt-2 text-xs font-black leading-4 text-[var(--vh-pink)] md:text-sm">{stayUntil}</p>
+          <p className="text-[11px] font-bold uppercase text-white/52">{label}</p>
+          <p className="mt-1 truncate text-base font-black text-white">{value}</p>
+          {detail ? <p className="mt-0.5 truncate text-xs text-white/55">{detail}</p> : null}
         </div>
-        <Link className="group flex shrink-0 flex-col items-end text-[var(--vh-pink)]" href={guideHref}>
-          <GuestIcon alt="" className="transition-transform group-hover:translate-x-1" size={32} src="/guest-dashboard/icons/Icon-14.svg" />
-          <span className="mt-1 text-right text-[10px] font-black uppercase leading-[15px]">House Guide</span>
-        </Link>
-      </div>
-      <div className="absolute right-3 top-3 md:-right-8 md:-top-7">
-        <StickerTag
-          bg={guestStickerTags.dashboard.bg}
-          className="px-3 py-1.5 text-[11px] font-black not-italic uppercase tracking-[0.12em]"
-          label={titleCaseStatus(booking?.status)}
-          rotate={guestStickerTags.dashboard.rotate}
-          text={guestStickerTags.dashboard.text}
-        />
       </div>
     </article>
   );
 }
 
-function ActionTile({ card, href }: { card: ActionCard; href: string }) {
+function getQuickActionSticker(sticker: string) {
+  if (sticker === "Popular") {
+    return { bg: "#f2c84b", text: "#111111", rotate: "rotate-[1deg]" as const };
+  }
+  if (sticker === "Included") {
+    return { bg: "#3a5f84", text: "#ffffff", rotate: "rotate-[-1deg]" as const };
+  }
+  if (sticker === "Available Today") {
+    return { bg: "#2f7e61", text: "#ffffff", rotate: "rotate-[1deg]" as const };
+  }
+  return { bg: "#f9cb37", text: "#111111", rotate: "rotate-[-2deg]" as const };
+}
+
+function QuickActionCard({ action, href }: { action: QuickAction; href: string }) {
+  const Icon = action.icon;
+  const sticker = getQuickActionSticker(action.sticker);
+
   return (
     <Link
-      className={cn(
-        "group relative flex min-h-[190px] flex-col justify-end overflow-hidden rounded-[8px] border-2 border-[var(--vh-pink)]/45 bg-[#1e293b] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.28)] transition hover:-translate-y-1 hover:border-[var(--vh-pink)] md:min-h-[210px]",
-        card.featured && "border-[var(--vh-pink)] bg-[linear-gradient(135deg,#c62828_0%,#8e1b1b_100%)]",
-      )}
+      className="group relative flex min-h-[190px] flex-col justify-between overflow-hidden rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 shadow-[0_18px_42px_rgba(0,0,0,0.24)] transition duration-300 hover:-translate-y-1 hover:border-[var(--vh-pink)]/60"
       href={href}
     >
-      {card.sticker ? (
-        <div className="absolute left-3 top-3">
-          <StickerTag
-            bg={card.sticker.bg}
-            className="px-3 py-1 text-[10px] font-black not-italic uppercase tracking-[0.12em]"
-            label={card.sticker.label}
-            rotate={card.sticker.rotate}
-            text={card.sticker.text}
-          />
-        </div>
-      ) : null}
-      <div className={cn("absolute right-6 top-6 flex h-14 w-14 items-center justify-center rounded-[12px] bg-[#3a0f12]", card.featured && "bg-white/10")}>
-        <GuestIcon alt="" className={card.featured ? "opacity-25" : undefined} size={28} src={card.icon} />
+      <div className="flex items-start justify-between gap-4">
+        <StickerTag
+          bg={sticker.bg}
+          className="px-3 py-1.5 text-[10px] font-black not-italic uppercase"
+          label={action.sticker}
+          rotate={sticker.rotate}
+          text={sticker.text}
+        />
+        <span className="flex h-11 w-11 items-center justify-center rounded-[8px] border border-[var(--vh-pink)]/30 bg-[rgba(198,40,40,0.14)] text-white">
+          <Icon className="h-5 w-5" />
+        </span>
       </div>
-      {card.subtitle ? <p className={cn("mb-2 max-w-[180px] text-xs font-medium leading-5", card.featured ? "text-white/76" : "text-[#94a3b8]")}>{card.subtitle}</p> : null}
-      <h3 className="max-w-[170px] font-['Geologica'] text-[24px] font-black leading-7 tracking-[-0.04em] text-white">{card.title}</h3>
-      <ArrowRight className="mt-3 h-6 w-6 text-white transition-transform group-hover:translate-x-1" />
+      <div>
+        <h3 className="font-sectiontitle text-[22px] leading-7 text-white">{action.title}</h3>
+        <p className="mt-2 text-sm leading-6 text-[#cbd5e1]">{action.copy}</p>
+        <span className="mt-4 inline-flex items-center gap-2 text-xs font-black uppercase text-white">
+          Open
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+        </span>
+      </div>
     </Link>
   );
 }
 
-function GearTile({ item, href }: { item: GearCard; href: string }) {
-  return (
-    <Link
-      className={cn(
-        "group relative flex min-h-[160px] flex-col items-center justify-center rounded-[8px] border-4 border-[var(--vh-pink)] bg-[#1e293b] p-4 text-center shadow-[0_16px_32px_rgba(0,0,0,0.28)] transition hover:-translate-y-1 md:min-h-[190px]",
-        item.featured && "bg-[linear-gradient(135deg,#c62828_0%,#8e1b1b_100%)]",
-      )}
-      href={href}
-    >
-      <GuestIcon alt="" size={32} src={item.icon} />
-      <h3 className="mt-4 font-['Geologica'] text-sm font-black uppercase leading-5 text-white md:text-base">{item.title}</h3>
-      <p className={cn("mt-1 text-[10px] leading-[15px]", item.featured ? "text-white/80" : "text-[#cbd5e1]")}>{item.price}</p>
-      <span className={cn("mt-4 rounded-full px-5 py-1.5 text-xs font-black uppercase", item.featured ? "bg-white text-[var(--vh-pink)]" : "bg-[var(--vh-pink)] text-white")}>
-        Open
-      </span>
-    </Link>
-  );
-}
+function HeroStayCard({ booking, guideHref }: { booking: GuestDashboardBooking | null; guideHref: string }) {
+  const roomOrBed = formatRoomOrBed(booking?.room_number);
+  const roomType = booking?.room_type_name ?? "Room details will appear here once the stay is synced.";
+  const propertyName = booking?.property_name ?? "The Daily Social";
+  const stayUntil = booking?.checkout_date ? `Until ${formatDate(booking.checkout_date)}` : "Checkout date pending";
 
-function StayFlexTile({ item, href }: { item: (typeof stayFlexCards)[number]; href: string }) {
   return (
-    <article className="relative overflow-hidden rounded-[8px] border-2 border-dashed border-[var(--vh-pink)]/60 bg-[#16070c] p-6 shadow-[0_18px_34px_rgba(0,0,0,0.24)]">
-      <div className="pointer-events-none absolute -left-10 -top-8 h-28 w-28 rounded-full bg-[var(--vh-pink)]/8" />
-      <div className="relative z-10 flex h-full flex-col gap-5">
-        <div>
-          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[var(--vh-pink)]">Stay Flex</p>
-          <h3 className="mt-3 font-['Geologica'] text-[24px] font-black leading-7 text-white">{item.title}</h3>
-          <p className="mt-2 max-w-md text-sm leading-6 text-[#cbd5e1]">{item.subtitle}</p>
-        </div>
-        <div className="mt-auto flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-base font-black uppercase tracking-[0.08em] text-white">{item.price}</p>
-          <Button asChild className="h-10 rounded-[4px] bg-[var(--vh-pink)] px-5 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]">
-            <Link href={href}>{item.cta}</Link>
-          </Button>
+    <article className="relative overflow-hidden rounded-[8px] border border-dashed border-white/24 bg-[#07070a] shadow-[0_24px_60px_rgba(0,0,0,0.32)]">
+      <div className="relative min-h-[440px]">
+        <Image
+          alt="The Daily Social guest room"
+          className="h-full min-h-[440px] w-full object-cover"
+          height={820}
+          priority
+          src={propertyGallery[0]?.src ?? "/images/property/hero-1.jpg"}
+          width={980}
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,10,0.18)_0%,rgba(7,7,10,0.84)_74%,#07070a_100%)]" />
+      </div>
+      <div className="absolute inset-x-0 bottom-0 p-5 md:p-7">
+        <StickerTag bg={guestStickerTags.dashboard.bg} className="px-3 py-1.5 text-[11px] font-bold uppercase" label={titleCaseStatus(booking?.status)} rotate={guestStickerTags.dashboard.rotate} text={guestStickerTags.dashboard.text} />
+        <h1 className="mt-4 max-w-xl font-sectiontitle text-[34px] leading-tight text-white md:text-[48px]">Welcome home for now.</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-white/76 md:text-base">
+          {propertyName} is set for your stay. Keep access, services, extras, and house guidance in one place.
+        </p>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-[8px] border border-white/12 bg-black/28 p-3 backdrop-blur">
+            <p className="text-[10px] font-black uppercase text-white/52">Room / Bed</p>
+            <p className="mt-1 truncate text-base font-black text-white">{roomOrBed}</p>
+          </div>
+          <div className="rounded-[8px] border border-white/12 bg-black/28 p-3 backdrop-blur">
+            <p className="text-[10px] font-black uppercase text-white/52">Room type</p>
+            <p className="mt-1 truncate text-base font-black text-white">{roomType}</p>
+          </div>
+          <Link className="group rounded-[8px] border border-[var(--vh-pink)]/50 bg-[rgba(198,40,40,0.22)] p-3 backdrop-blur transition hover:bg-[rgba(198,40,40,0.32)]" href={guideHref}>
+            <p className="text-[10px] font-black uppercase text-white/70">{stayUntil}</p>
+            <p className="mt-1 flex items-center gap-2 text-base font-black text-white">
+              Open guide
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </p>
+          </Link>
         </div>
       </div>
     </article>
@@ -267,11 +250,14 @@ function StayFlexTile({ item, href }: { item: (typeof stayFlexCards)[number]; hr
 
 export function GuestDashboard() {
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const { guest, isAuthenticated } = useGuestAuth();
+  const { guest, isAuthenticated, openAuthModal } = useGuestAuth();
   const { selectedBookingId, getGuestRouteHref } = useGuestExperience();
   const [bookingFallback, setBookingFallback] = useState<GuestDashboardBooking | null>(null);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [lostFoundSubmitting, setLostFoundSubmitting] = useState(false);
+  const [lostFoundMessage, setLostFoundMessage] = useState<string | null>(null);
+  const [lostFoundActionError, setLostFoundActionError] = useState<string | null>(null);
 
   const bookingFromAuth = useMemo(() => {
     const candidates = guest?.bookings ?? [];
@@ -351,12 +337,19 @@ export function GuestDashboard() {
   }, [bookingFromAuth, isAuthenticated, selectedBookingId]);
 
   const activeBooking = bookingFromAuth ?? (isAuthenticated ? bookingFallback : null);
-  const displayBookingError = bookingFromAuth ? null : bookingError;
+  const propertyId = activeBooking?.property_id ?? "";
   const propertyLocation = useMemo(() => getGuestPropertyLocation(activeBooking?.property_id), [activeBooking?.property_id]);
-  const accessValue = activeBooking?.door_passcode ?? "Shared at check-in";
+  const { data: catalogData, loading: catalogLoading, error: catalogError, reload: reloadCatalog } = useGuestCatalog(propertyId, Boolean(propertyId && selectedBookingId && isAuthenticated));
+  const lostFoundService = useMemo(() => {
+    const services = Array.isArray(catalogData.services) ? catalogData.services : [];
+    return services.find(isLostFoundService) ?? null;
+  }, [catalogData.services]);
+
+  const displayBookingError = bookingFromAuth ? null : bookingError;
   const stayWindow = `${formatDate(activeBooking?.checkin_date)} - ${formatDate(activeBooking?.checkout_date)}`;
   const roomOrBed = formatRoomOrBed(activeBooking?.room_number);
-  const statusLabel = titleCaseStatus(activeBooking?.status);
+  const accessValue = activeBooking?.door_passcode ?? "Shared at check-in";
+  const supportHref = `https://wa.me/${supportPhoneDigits}?text=${encodeURIComponent(`Hey The Daily Social, I need help with booking ${activeBooking?.ezee_reservation_id ?? selectedBookingId ?? ""}.`)}`;
 
   useEffect(() => {
     if (!rootRef.current || typeof window === "undefined") {
@@ -368,16 +361,11 @@ export function GuestDashboard() {
     }
 
     const context = gsap.context(() => {
-      const hero = rootRef.current?.querySelector("[data-gsap='hero']");
-      const sections = rootRef.current?.querySelectorAll("[data-gsap='section']");
-
-      if (hero) {
-        gsap.fromTo(hero, { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.75, ease: "power3.out" });
-      }
-
-      if (sections && sections.length > 0) {
-        gsap.fromTo(sections, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.68, stagger: 0.08, ease: "power3.out", delay: 0.08 });
-      }
+      gsap.fromTo(
+        "[data-guest-reveal]",
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.68, stagger: 0.08, ease: "power3.out" },
+      );
     }, rootRef);
 
     return () => {
@@ -385,114 +373,158 @@ export function GuestDashboard() {
     };
   }, [activeBooking?.ezee_reservation_id]);
 
+  const onSubmitLostFound = async () => {
+    if (!selectedBookingId) {
+      toast.error("No active booking found.");
+      return;
+    }
+    if (!isAuthenticated) {
+      openAuthModal("signin");
+      return;
+    }
+    if (!lostFoundService) {
+      toast.message("The care desk is not open for this stay right now.");
+      return;
+    }
+
+    const token = getStoredGuestToken();
+    if (!token) {
+      openAuthModal("signin");
+      return;
+    }
+
+    setLostFoundSubmitting(true);
+    setLostFoundMessage(null);
+    setLostFoundActionError(null);
+    try {
+      const response = await requestService(selectedBookingId, { product_id: lostFoundService.id }, token);
+      setLostFoundMessage(`${response.service_name} submitted. Ticket: ${response.ticket_id}`);
+      toast.success(response.message);
+    } catch (submitError) {
+      const message = submitError instanceof Error ? submitError.message : "Unable to submit request.";
+      setLostFoundActionError("Something went wrong while submitting the request.");
+      toast.error(message);
+    } finally {
+      setLostFoundSubmitting(false);
+    }
+  };
+
   return (
-    <div ref={rootRef} className="space-y-10 md:space-y-12">
-      {/* Hero and guest actions section */}
-      <section className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] xl:gap-12" data-gsap="hero">
-        <PolaroidRoomCard booking={activeBooking} guideHref={getGuestRouteHref("guide")} />
-
-        <div className="space-y-5 pt-1 lg:pt-8">
-          <div className="flex items-center gap-3">
-            <GuestIcon alt="" size={20} src="/guest-dashboard/icons/Icon-11.svg" />
-            <h2 className="font-['Geologica'] text-[20px] font-black leading-7 tracking-[-0.04em] text-[#f1f5f9]">Guest Actions</h2>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {actionCards.map((card) => (
-              <ActionTile card={card} href={getGuestRouteHref(getGuestSubpath(card.href))} key={card.title} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stay essentials section */}
-      <section className="grid gap-4 md:grid-cols-3" data-gsap="section">
-        <article className="rounded-[8px] border border-[var(--vh-pink)]/40 bg-[#16070c] p-5">
-          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[var(--vh-pink)]">Stay Window</p>
-          <p className="mt-3 text-lg font-black text-white">{stayWindow}</p>
-        </article>
-        <article className="rounded-[8px] border border-[var(--vh-pink)]/40 bg-[#16070c] p-5">
-          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[var(--vh-pink)]">Door Access</p>
-          <p className="mt-3 text-lg font-black text-white">{accessValue}</p>
-          <p className="mt-1 text-xs font-medium text-[#94a3b8]">{formatLockStatus(activeBooking?.lock_status)}</p>
-        </article>
-        <article className="rounded-[8px] border border-[var(--vh-pink)]/40 bg-[#16070c] p-5">
-          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[var(--vh-pink)]">Room / Bed</p>
-          <p className="mt-3 text-lg font-black text-white">{roomOrBed}</p>
-          <p className="mt-1 text-xs font-medium text-[#94a3b8]">{statusLabel}</p>
-        </article>
-      </section>
-
-      {bookingLoading ? <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#94a3b8]">Loading booking details...</p> : null}
-      {displayBookingError ? <p className="text-xs font-bold uppercase tracking-[0.12em] text-rose-300">{displayBookingError}</p> : null}
-
-      {/* Gear section */}
-      <SectionBlock className="mx-auto" title="Grab Your Gear">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-5 lg:grid-cols-3" data-gsap="section">
-          {gearCards.map((item, index) => (
-            <div className={cn(index === gearCards.length - 1 ? "col-span-2 lg:col-span-3 lg:mx-auto lg:w-full lg:max-w-[320px]" : "")} key={item.title}>
-              <GearTile href={getGuestRouteHref(getGuestSubpath(item.href))} item={item} />
+    <div ref={rootRef} className="space-y-10 pb-10 md:space-y-12 md:pb-12">
+      <section className="grid items-stretch gap-5 pt-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]" data-guest-reveal>
+        <HeroStayCard booking={activeBooking} guideHref={getGuestRouteHref("guide")} />
+        <aside className="flex flex-col gap-4">
+          <StayMetric detail={titleCaseStatus(activeBooking?.status)} icon={BadgeCheck} label="Booking" value={activeBooking?.ezee_reservation_id ?? "Stay syncing"} />
+          <StayMetric detail={formatLockStatus(activeBooking?.lock_status)} icon={KeyRound} label="Door Access" value={accessValue} />
+          <StayMetric detail={roomOrBed} icon={CalendarDays} label="Stay Window" value={stayWindow} />
+          <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5">
+            <p className="text-[11px] font-black uppercase text-[#f9cb37]">Need a human?</p>
+            <h2 className="mt-2 font-sectiontitle text-[24px] leading-8 text-white">The desk can help before the small thing becomes a whole thing.</h2>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Button asChild className="h-10 rounded-[4px] bg-[var(--vh-pink)] px-4 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]">
+                <a href={supportHref} rel="noreferrer" target="_blank">
+                  <WhatsAppIcon className="mr-2 h-4 w-4" />
+                  WhatsApp support
+                </a>
+              </Button>
+              <Button asChild className="h-10 rounded-[4px] border border-white/15 bg-white/8 px-4 font-black uppercase text-white hover:bg-white/12" variant="secondary">
+                <Link href={getGuestRouteHref("services")}>Open services</Link>
+              </Button>
             </div>
+          </div>
+        </aside>
+      </section>
+
+      {bookingLoading ? <p className="text-xs font-bold uppercase text-[#94a3b8]">Loading booking details...</p> : null}
+      {displayBookingError ? <p className="text-xs font-bold uppercase text-rose-300">{displayBookingError}</p> : null}
+
+      <SectionBlock description="The fastest paths for the things guests usually need during a stay." sticker={guestStickerTags.shell} title="Your Stay Console">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" data-guest-reveal>
+          {quickActions.map((action) => (
+            <QuickActionCard action={action} href={getGuestRouteHref(getGuestSubpath(action.href))} key={action.title} />
           ))}
         </div>
       </SectionBlock>
 
-      {/* Stay flexibility section */}
-      <SectionBlock description="More time options that feel easy to say yes to." title="Stay On Your Terms">
-        <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-2" data-gsap="section">
-          {stayFlexCards.map((item) => (
-            <StayFlexTile href={getGuestRouteHref(getGuestSubpath(item.href))} item={item} key={item.title} />
-          ))}
+      <section className="grid gap-5 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)]" data-guest-reveal id="lost-found">
+        <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-6">
+          <StickerTag bg={guestStickerTags.lostFound.bg} className="px-3 py-1.5 text-[11px] font-bold uppercase" label="Lost & Found" rotate={guestStickerTags.lostFound.rotate} text={guestStickerTags.lostFound.text} />
+          <h2 className="mt-4 font-sectiontitle text-[28px] leading-tight text-white md:text-[36px]">Left something behind?</h2>
+          <p className="mt-3 text-sm leading-7 text-[#cbd5e1]">
+            Raise a care-desk ticket from here. The property team can track it against this stay and follow up with the useful details.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Button className="h-10 rounded-[4px] bg-[var(--vh-pink)] px-4 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]" disabled={lostFoundSubmitting || !lostFoundService} onClick={() => void onSubmitLostFound()} type="button">
+              <Search className="mr-2 h-4 w-4" />
+              {lostFoundSubmitting ? "Submitting..." : "Report item"}
+            </Button>
+            {catalogError ? (
+              <Button className="h-10 rounded-[4px] border border-white/15 bg-white/8 px-4 font-black uppercase text-white hover:bg-white/12" onClick={() => void reloadCatalog()} type="button" variant="secondary">
+                Retry desk
+              </Button>
+            ) : null}
+          </div>
+          {catalogLoading ? <p className="mt-4 text-sm text-white/60">Checking care desk availability...</p> : null}
+          {!catalogLoading && !lostFoundService ? <p className="mt-4 text-sm text-white/60">Care-desk tickets are not open for this stay right now.</p> : null}
+          {lostFoundMessage ? <p className="mt-4 text-sm text-emerald-300">{lostFoundMessage}</p> : null}
+          {lostFoundActionError ? <p className="mt-4 text-sm text-rose-300">{lostFoundActionError}</p> : null}
+          {catalogError ? <p className="mt-4 text-sm text-rose-300">{catalogError}</p> : null}
         </div>
-      </SectionBlock>
-
-      {/* Rules section */}
-      <SectionBlock title="The Rules">
-        <article
-          className="relative overflow-hidden bg-[linear-gradient(145deg,rgba(198,40,40,0.24)_0%,#230f14_100%)] p-8 shadow-[0_2px_4px_2px_rgba(0,0,0,0.05)_inset] md:p-10"
-          data-gsap="section"
-          style={{ clipPath: "polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px))" }}
-        >
-          <div className="space-y-4">
-            {ruleCards.map((rule) => (
-              <div className="flex items-center gap-4 border-b border-[var(--vh-pink)]/30 pb-3" key={rule.label}>
-                <GuestIcon alt="" size={24} src={rule.icon} />
-                <p className="text-sm font-bold uppercase leading-5 text-[#f1f5f9]">{rule.label}</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <BentoCard description="Use your stay name, room, and booking reference when the team follows up." icon={PackageSearch} sticker={{ label: "Recommended", bg: "#f9cb37", text: "#111111", rotate: "rotate-[-2deg]" }} title="Describe the item" />
+          <BentoCard description="Found items stay with property operations until the team confirms ownership and handover." icon={ShieldCheck} sticker={{ label: "Included", bg: "#3a5f84", text: "#ffffff", rotate: "rotate-[1deg]" }} title="Desk verification" />
+          <article className="sm:col-span-2 rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[8px] border border-[var(--vh-pink)]/30 bg-[rgba(198,40,40,0.14)] text-[#f9cb37]">
+                <HelpCircle className="h-5 w-5" />
               </div>
+              <Button asChild className="h-9 rounded-[4px] bg-white px-4 font-black uppercase text-[#07070a] hover:bg-white/90">
+                <a href={supportHref} rel="noreferrer" target="_blank">Message support</a>
+              </Button>
+            </div>
+            <h3 className="mt-4 font-sectiontitle text-[24px] leading-8 text-white">Need faster help?</h3>
+            <p className="mt-2 text-sm leading-6 text-[#cbd5e1]">For urgent valuables, contact support too so the desk can prioritize the search.</p>
+          </article>
+        </div>
+      </section>
+
+      <SectionBlock action={<Button asChild className="h-10 rounded-[4px] bg-[var(--vh-pink)] px-5 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]"><a href={propertyLocation.mapsHref} rel="noreferrer" target="_blank">Open in Maps</a></Button>} sticker={guestStickerTags.notice} title="Property Highlights">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]" data-guest-reveal>
+          <article className="overflow-hidden rounded-[8px] border border-dashed border-white/24 bg-[#07070a]">
+            <div className="flex flex-col gap-2 border-b border-white/10 px-5 py-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-[11px] font-black uppercase text-[#f9cb37]">{propertyLocation.neighborhoodLabel}</p>
+                <h3 className="mt-1 font-sectiontitle text-xl text-white">{propertyLocation.title}</h3>
+                <p className="mt-1 max-w-3xl text-sm leading-6 text-[#cbd5e1]">{propertyLocation.address}</p>
+              </div>
+            </div>
+            <iframe
+              className="h-[260px] w-full md:h-[310px]"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              src={propertyLocation.embedUrl}
+              title={propertyLocation.title}
+            />
+          </article>
+          <div className="space-y-4">
+            {nearbyAttractions.slice(0, 3).map((place) => (
+              <article className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-4" key={place.name}>
+                <h3 className="mt-2 font-sectiontitle text-xl text-white">{place.name}</h3>
+                <p className="mt-1 text-sm text-[#cbd5e1]">{place.type} - {place.travel}</p>
+              </article>
             ))}
+            <article className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-4">
+              <p className="text-[11px] font-black uppercase text-white/52">House rhythm</p>
+              <p className="mt-2 text-sm leading-6 text-[#cbd5e1]">
+                Check-in starts at {propertyGuidelines.checkIn}. Check-out is by {propertyGuidelines.checkOut}. Keep a valid ID ready at the desk.
+              </p>
+            </article>
           </div>
-          <Button asChild className="mx-auto mt-8 flex h-11 w-full max-w-[260px] rounded-none border-2 border-[var(--vh-pink)] bg-transparent font-black uppercase text-[var(--vh-pink)] hover:bg-[var(--vh-pink)] hover:text-white">
-            <Link href={getGuestRouteHref("guide")}>Open House Guide</Link>
-          </Button>
-        </article>
+        </div>
       </SectionBlock>
 
-      {/* Map section */}
-      <SectionBlock action={<Button asChild className="h-10 rounded-[4px] bg-[var(--vh-pink)] px-5 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]"><a href={propertyLocation.mapsHref} rel="noreferrer" target="_blank">Open in Maps</a></Button>} sticker={guestStickerTags.notice} title="Find The Property">
-        <article className="overflow-hidden rounded-[10px] border-4 border-[#334155] bg-[#10131a] shadow-[0_16px_36px_rgba(0,0,0,0.32)]" data-gsap="section">
-          <div className="flex flex-col gap-2 border-b border-white/10 px-5 py-4 md:flex-row md:items-center md:justify-between md:px-6">
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[var(--vh-pink)]">{propertyLocation.neighborhoodLabel}</p>
-              <h3 className="mt-1 font-['Geologica'] text-xl font-black text-white">{propertyLocation.title}</h3>
-              <p className="mt-1 max-w-3xl text-sm leading-6 text-[#cbd5e1]">{propertyLocation.address}</p>
-            </div>
-            <div className="flex items-center gap-2 text-sm font-semibold text-white/70">
-              <GuestIcon alt="" size={16} src="/guest-dashboard/icons/Icon-2.svg" />
-              Easy arrival pin for this booking
-            </div>
-          </div>
-          <iframe
-            className="h-[260px] w-full md:h-[300px]"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            src={propertyLocation.embedUrl}
-            title={propertyLocation.title}
-          />
-        </article>
-      </SectionBlock>
-
-      {/* Gate access section */}
       <SectionBlock title="Gate Access / Visitors">
-        <div className="grid grid-cols-2 gap-4 xl:grid-cols-3" data-gsap="section">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" data-guest-reveal>
           <BentoCard description="Share the visitor name ahead of time so the desk can speed up arrival." icon={UserPlus} title="Invite visitor">
             <Button className="h-9 rounded-[4px] bg-[var(--vh-pink)] px-4 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]" onClick={() => toast.message("Ask the front desk to register your visitor.")} type="button">
               Ask the desk
@@ -500,27 +532,29 @@ export function GuestDashboard() {
           </BentoCard>
           <BentoCard description={`Use ${roomOrBed} and your stay name at reception for a smoother entry.`} icon={Waypoints} title="Arrival notes" />
           <BentoCard description="Need to pass entry details to a co-guest? Start from here first." icon={ShieldCheck} title="Share access">
-            <Button className="h-9 rounded-[4px] bg-[#1e293b] px-4 font-black uppercase text-white hover:bg-[#334155]" onClick={() => toast.message("Front desk will help confirm co-guest access.")} type="button" variant="secondary">
+            <Button className="h-9 rounded-[4px] bg-white/10 px-4 font-black uppercase text-white hover:bg-white/15" onClick={() => toast.message("Front desk will help confirm co-guest access.")} type="button" variant="secondary">
               Share details
             </Button>
           </BentoCard>
-          <div className="col-span-2 xl:col-span-3">
-            <BentoCard description="Keep a government ID ready and ask reception before sending anyone up." icon={KeyRound} title="Reception check">
-              <p className="text-sm leading-6 text-white/75">Guest access is approved on arrival, and visitor entry follows property rules for the current booking.</p>
-            </BentoCard>
-          </div>
+          <BentoCard description="Keep a government ID ready and ask reception before sending anyone up." icon={BedDouble} title="Reception check" />
         </div>
       </SectionBlock>
 
-      {/* Checkout section */}
-      <div className="flex justify-start" data-gsap="section">
-        <Button asChild className="h-10 rounded-[4px] bg-white px-5 font-black uppercase text-[#07070a] hover:bg-white/90">
-          <Link href={getGuestRouteHref("checkout")}>
-            <KeyRound className="mr-2 h-4 w-4" />
-            Checkout summary
-          </Link>
-        </Button>
-      </div>
+      <section className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-6" data-guest-reveal>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-[11px] font-black uppercase text-[#f9cb37]">Before checkout</p>
+            <h2 className="mt-2 font-sectiontitle text-[26px] leading-tight text-white">Checkout summary</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#cbd5e1]">Review add-ons, rentals, and totals in one place before you close out the stay.</p>
+          </div>
+          <Button asChild className="h-10 rounded-[4px] bg-white px-5 font-black uppercase text-[#07070a] hover:bg-white/90">
+            <Link href={getGuestRouteHref("checkout")}>
+              <KeyRound className="mr-2 h-4 w-4" />
+              Checkout summary
+            </Link>
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }

@@ -22,19 +22,19 @@ export function SectionBlock({
   className,
 }: SectionBlockProps) {
   return (
-    <section className={cn("space-y-5", className)}>
+    <section className={cn("space-y-5 py-2 md:py-3", className)}>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="max-w-2xl">
           {sticker ? (
             <StickerTag
               bg={sticker.bg}
-              className="px-3 py-1.5 text-[11px] font-black not-italic uppercase tracking-[0.12em]"
+              className="px-3 py-1.5 text-[11px] font-black not-italic uppercase"
               label={sticker.label}
               rotate={sticker.rotate}
               text={sticker.text}
             />
           ) : null}
-          <h2 className="vh-title mt-3 text-[22px] leading-[1.08] text-[#f1f5f9] md:text-[30px]">
+          <h2 className="font-sectiontitle mt-3 text-[24px] leading-tight text-[#f8fafc] md:text-[34px]">
             {title}
           </h2>
           {description ? <p className="mt-2 text-sm leading-6 text-[#94a3b8] md:text-base md:leading-7">{description}</p> : null}

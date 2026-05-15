@@ -35,24 +35,24 @@ export function BentoCard({
   return (
     <motion.article
       className={cn(
-        "group relative flex h-full flex-col overflow-hidden rounded-[8px] border-2 border-[var(--vh-pink)]/45 bg-[#1e293b] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] transition-colors duration-300 hover:border-[var(--vh-pink)] md:p-6",
+        "group relative flex h-full flex-col overflow-hidden rounded-[8px] border border-dashed border-[rgba(255,255,255,0.28)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] transition-colors duration-300 hover:border-[var(--vh-pink)]/55 md:p-6",
         className,
       )}
       initial={{ opacity: 0, y: 18 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      transition={{ duration: 0.36, ease: "easeOut" }}
       viewport={{ once: true, margin: "-10%" }}
-      whileHover={{ scale: 1.012, y: -3 }}
+      whileHover={{ y: -3 }}
       whileInView={{ opacity: 1, y: 0 }}
     >
-      <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-[28px] bg-[var(--vh-pink)]/10" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/24 to-transparent" />
       <div className="flex items-start justify-between gap-4">
-        <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-[12px] bg-[#3a0f12] text-[var(--vh-pink)] shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
+        <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-[8px] border border-[var(--vh-pink)]/30 bg-[rgba(198,40,40,0.12)] text-[#f9cb37] shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
           <Icon className="h-5 w-5" />
         </div>
         {sticker ? (
           <StickerTag
             bg={sticker.bg}
-            className="relative z-10 px-3 py-1.5 text-[10px] font-black not-italic uppercase tracking-[0.12em]"
+            className="relative z-10 px-3 py-1.5 text-[10px] font-black not-italic uppercase"
             label={sticker.label}
             rotate={sticker.rotate}
             text={sticker.text}
@@ -61,8 +61,8 @@ export function BentoCard({
       </div>
 
       <div className="relative z-10 mt-5 flex flex-1 flex-col">
-        <h3 className="font-['Geologica'] text-[24px] font-black uppercase leading-8 tracking-[-0.04em] text-white">{title}</h3>
-        <p className="mt-2 text-sm font-medium leading-6 text-[#94a3b8]">{description}</p>
+        <h3 className="font-sectiontitle text-[20px] leading-7 text-white md:text-[22px]">{title}</h3>
+        <p className="mt-2 text-sm font-medium leading-6 text-[#cbd5e1]">{description}</p>
         {children ? <div className="mt-5">{children}</div> : null}
       </div>
 

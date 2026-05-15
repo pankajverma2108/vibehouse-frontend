@@ -1,5 +1,12 @@
-import { GuestLostFound } from "@/modules/guest/lost-found";
+import { redirect } from "next/navigation";
 
-export default function ScopedGuestLostFoundPage() {
-  return <GuestLostFound />;
+import { getScopedGuestHubHref } from "@/lib/guest-hub";
+
+export default async function ScopedGuestLostFoundPage({
+  params,
+}: {
+  params: Promise<{ bookingId: string }>;
+}) {
+  const { bookingId } = await params;
+  redirect(getScopedGuestHubHref(bookingId, "#lost-found"));
 }

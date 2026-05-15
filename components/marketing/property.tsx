@@ -1396,25 +1396,28 @@ export function Property({
       return;
     }
 
-    const contextKey = `${resolvedPropertyId}::${checkIn}::${checkOut}`;
+    const contextKey = `${resolvedPropertyId}`;
     if (lastRestoreContextRef.current === contextKey) {
       return;
     }
     lastRestoreContextRef.current = contextKey;
 
+    // Restore room selections for the same property, regardless of date changes
     const stored = getPropertySelection("nightly");
-    if (
-      !stored ||
-      stored.propertyId !== resolvedPropertyId ||
-      stored.checkin !== checkIn ||
-      stored.checkout !== checkOut
-    ) {
+    if (!stored || stored.propertyId !== resolvedPropertyId) {
       return;
     }
 
-    setSelectedCounts(stored.selectedCounts);
-    setIsAgeConfirmed(stored.isAgeConfirmed);
-    didRestoreSelectionRef.current = true;
+    const frameId = window.requestAnimationFrame(() => {
+      // Always restore room selections when returning to the same property
+      setSelectedCounts(stored.selectedCounts);
+      setIsAgeConfirmed(stored.isAgeConfirmed);
+      didRestoreSelectionRef.current = true;
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
   }, [resolvedPropertyId, checkIn, checkOut]);
 
   useEffect(() => {

@@ -12,7 +12,7 @@ import { hostelNavItems } from "@/content/nav-menu";
 import { siteMeta } from "@/content/site";
 import { navFontStyles } from "@/content/typography";
 import { getDefaultPropertyDestinationHref } from "@/lib/cx-api";
-import { getActiveGuestHubBooking } from "@/lib/guest-hub";
+import { getActiveGuestHubBooking, getScopedGuestHubHref } from "@/lib/guest-hub";
 import { cn } from "@/lib/utils";
 
 type DesktopNavLink = {
@@ -89,6 +89,10 @@ const desktopNavCards: DesktopNavCard[] = [
     ],
   },
 ];
+
+function isGuestHubRoute(pathname: string): boolean {
+  return pathname === "/guest" || pathname.startsWith("/guest/") || /^\/[^/]+\/guest(?:\/|$)/.test(pathname);
+}
 
 export function Navigation() {
   const pathname = usePathname();
@@ -181,6 +185,10 @@ export function Navigation() {
       window.removeEventListener("keydown", onEscape);
     };
   }, [isDesktopMenuOpen]);
+
+  if (isGuestHubRoute(pathname)) {
+    return null;
+  }
 
   return (
     <motion.nav
@@ -329,12 +337,16 @@ export function Navigation() {
 
                         <div className="mt-4 flex flex-col gap-2.5">
                           {card.links.map((link, linkIndex) => {
+                            const resolvedHref = link.href === "/guest" && activeGuestHubBooking
+                              ? getScopedGuestHubHref(activeGuestHubBooking.ezee_reservation_id)
+                              : link.href;
+
                             if (link.external) {
                               return (
                                 <a
-                                  key={`${card.label}-${link.href}-${linkIndex}`}
+                                  key={`${card.label}-${resolvedHref}-${linkIndex}`}
                                   className="inline-flex items-center gap-1.5 text-[15px] transition-opacity hover:opacity-100"
-                                  href={link.href}
+                                  href={resolvedHref}
                                   rel="noreferrer"
                                   style={{ ...navFontStyles.desktopCardLink, color: card.textColor, opacity: 0.88 }}
                                   target="_blank"
@@ -346,13 +358,13 @@ export function Navigation() {
                               );
                             }
 
-                            const active = matchesNavLink(pathname, searchParams, link.href);
+                            const active = matchesNavLink(pathname, searchParams, resolvedHref);
 
                             return (
                               <Link
-                                key={`${card.label}-${link.href}-${linkIndex}`}
+                                key={`${card.label}-${resolvedHref}-${linkIndex}`}
                                 className="inline-flex items-center gap-1.5 text-[15px] transition-opacity hover:opacity-100"
-                                href={link.href}
+                                href={resolvedHref}
                                 style={{ ...navFontStyles.desktopCardLink, color: card.textColor, opacity: active ? 1 : 0.88 }}
                                 onClick={(event) => {
                                   if (link.requiresAuth && !shouldShowSignedInState) {
