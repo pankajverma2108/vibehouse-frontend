@@ -152,7 +152,7 @@ function MarketplaceCard({
   const sticker = item.kind === "upgrades" ? "Popular" : item.kind === "experiences" ? "Guest Favorite" : "Recommended";
 
   return (
-    <article className="group flex h-full flex-col rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 transition duration-300 hover:-translate-y-1 hover:border-[var(--vh-pink)]/55">
+    <article className="group flex h-full flex-col rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 transition duration-300 hover:-translate-y-1 hover:border-[var(--vh-pink)]/55" id={`marketplace-card-${item.id}`}>
       <div className="flex items-start justify-between gap-4">
         <span className="rounded-full border border-white/12 bg-black/20 px-3 py-1 text-[10px] font-black uppercase text-[#f9cb37]">{sticker}</span>
         <span className="flex h-11 w-11 items-center justify-center rounded-[8px] border border-[var(--vh-pink)]/30 bg-[rgba(198,40,40,0.12)] text-white">
@@ -194,7 +194,7 @@ function RentalCard({
   onRequest: () => void;
 }) {
   return (
-    <article className="group flex h-full flex-col rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 transition duration-300 hover:-translate-y-1 hover:border-[var(--vh-pink)]/55">
+    <article className="group flex h-full flex-col rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 transition duration-300 hover:-translate-y-1 hover:border-[var(--vh-pink)]/55" id={`rental-card-${item.id}`}>
       <div className="flex items-start justify-between gap-4">
         <span className="rounded-full border border-white/12 bg-black/20 px-3 py-1 text-[10px] font-black uppercase text-[#f9cb37]">Available Today</span>
         <span className="flex h-11 w-11 items-center justify-center rounded-[8px] border border-[var(--vh-pink)]/30 bg-[rgba(198,40,40,0.12)] text-white">
@@ -206,7 +206,7 @@ function RentalCard({
         <p className="mt-2 text-sm leading-6 text-[#cbd5e1]">Ready from the property desk, subject to live availability.</p>
         <div className="mt-5 flex items-center justify-between gap-4 border-t border-white/10 pt-4">
           <span className="text-xs font-bold uppercase text-white/52">{item.available} of {item.total} ready</span>
-          <Button className="h-9 rounded-[4px] bg-[var(--vh-pink)] px-4 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]" disabled={disabled || item.available <= 0} onClick={onRequest} type="button">
+          <Button className="vh-cta-button h-9 rounded-[4px] px-4 text-[11px]" disabled={disabled || item.available <= 0} onClick={onRequest} type="button">
             Request
           </Button>
         </div>
@@ -491,22 +491,24 @@ export function GuestAddons() {
   );
 
   return (
-    <div className="grid gap-6 pb-10 pt-4 lg:grid-cols-[minmax(0,1fr)_320px] md:pb-12">
+    <div className="grid gap-6 pb-10 pt-4 lg:grid-cols-[minmax(0,1fr)_320px] md:pb-12" id="addons-page">
       <div className="space-y-9">
-        <section className="grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-7">
+        {/* SECTION: Add-ons Hero */}
+        <section className="space-y-4" id="addons-hero-section">
+          <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-7" id="addons-hero-card">
             <p className="text-[11px] font-black uppercase text-[#f9cb37]">Guest Marketplace</p>
             <h1 className="mt-3 font-sectiontitle text-[36px] leading-tight text-white md:text-[52px]">Add comfort without leaving the stay flow.</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[#cbd5e1] md:text-base">
-              Rentals, experiences, upgrades, and essentials stay organized here and settle through the same guest checkout.
+              Rentals and essentials stay organized here and settle through the same guest checkout.
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2" id="addons-hero-cards-grid">
             <BentoCard description="Paid items stay in your cart until checkout." icon={WalletCards} sticker={{ label: "Transparent", bg: "#f9cb37", text: "#111111", rotate: "rotate-[-2deg]" }} title="One cart" />
             <BentoCard description="Desk-issued items show active status after the team confirms them." icon={PackageCheck} sticker={{ label: "Included", bg: "#3a5f84", text: "#ffffff", rotate: "rotate-[1deg]" }} title="Rental tracking" />
           </div>
         </section>
 
+        {/* SECTION: Add-ons Marketplace */}
         <SectionBlock
           description="Browse by intent. Every action keeps the same booking, auth, cart, and desk-state handling."
           sticker={guestStickerTags.addons}
@@ -516,7 +518,7 @@ export function GuestAddons() {
           {catalogError ? (
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-sm text-rose-300">{catalogError}</p>
-              <Button className="h-8 rounded-[4px] px-3 text-xs" onClick={() => void reload()} type="button" variant="secondary">
+              <Button className="vh-cta-button h-8 rounded-[4px] bg-white px-3 text-xs text-[#07070a] hover:bg-white/90" onClick={() => void reload()} type="button" variant="secondary">
                 Retry
               </Button>
             </div>
@@ -527,6 +529,7 @@ export function GuestAddons() {
           {rentalActionError ? <p className="text-sm text-rose-300">{rentalActionError}</p> : null}
 
           <div className="space-y-10">
+            {/* SUBSECTION: Rentals */}
             <section className="scroll-mt-28 space-y-4" id="rentals">
               <div>
                 <p className="text-[11px] font-black uppercase text-[#f9cb37]">Available Today</p>
@@ -546,10 +549,10 @@ export function GuestAddons() {
               </div>
             </section>
 
-            {renderCartSection("experiences", "Experiences", "Food, social, and stay moments that make the visit feel less transactional.", groupedItems.experiences)}
-            {renderCartSection("upgrades", "Upgrades", "Time and comfort upgrades for days when your schedule needs a little more room.", groupedItems.upgrades)}
+            {/* SUBSECTION: Essentials */}
             {renderCartSection("essentials", "Essentials", "Snacks, practical comforts, and the little extras guests usually remember too late.", groupedItems.essentials)}
 
+            {/* SUBSECTION: Active Rentals */}
             <section className="scroll-mt-28 space-y-4" id="active-rentals">
               <div>
                 <p className="text-[11px] font-black uppercase text-[#f9cb37]">Stay Ledger</p>
@@ -559,7 +562,7 @@ export function GuestAddons() {
               {visibleMine.length === 0 ? <p className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-4 text-sm text-white/70">No active rentals yet.</p> : null}
               <div className="grid gap-4 md:grid-cols-2">
                 {visibleMine.map((item) => (
-                  <article className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-4" key={item.id}>
+                  <article className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-4" id={`active-rental-card-${item.id}`} key={item.id}>
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
                         <h4 className="truncate font-sectiontitle text-xl text-white">{item.product_name}</h4>
@@ -568,7 +571,7 @@ export function GuestAddons() {
                       <BadgeCheck className="h-5 w-5 shrink-0 text-[#f9cb37]" />
                     </div>
                     <Button
-                      className="mt-4 h-9 rounded-[4px] bg-white/10 px-4 font-black uppercase text-white hover:bg-white/15"
+                      className="vh-cta-button mt-4 h-9 rounded-[4px] bg-white px-4 text-[11px] text-[#07070a] hover:bg-white/90"
                       disabled={item.status !== "CHECKED_OUT" && item.status !== "OVERDUE"}
                       onClick={() => onReturnUiAction(item.id)}
                       type="button"
@@ -584,6 +587,7 @@ export function GuestAddons() {
         </SectionBlock>
       </div>
 
+      {/* SECTION: Add-ons Sticky Summary */}
       <StickySummary
         ctaLabel="Review checkout"
         items={[

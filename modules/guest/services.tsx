@@ -60,6 +60,7 @@ export function GuestServices() {
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [lastTicketMessage, setLastTicketMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const primaryCtaClass = "vh-cta-button h-9 rounded-[4px] px-4 text-[11px]";
 
   const serviceItems = useMemo(
     () => (Array.isArray(data.services) ? data.services : []).filter((service) => !isLostFoundService(service)),
@@ -101,15 +102,13 @@ export function GuestServices() {
 
   return (
     <div className="space-y-8 pb-10 md:pb-12">
-      <section className="grid gap-5 pt-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-        <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-7">
+      {/* SECTION: Services Hero */}
+      <section className="grid gap-5 pt-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]" id="services-hero-section">
+        <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-7" id="services-hero-card">
           <div className="flex items-start justify-end">
             <StickerTag bg="#f9cb37" className="px-3 py-1.5 text-[11px] font-black not-italic uppercase" label="Concierge Desk" rotate="rotate-[-2deg]" text="#111111" />
           </div>
           <h1 className="mt-3 font-sectiontitle text-[36px] leading-tight text-white md:text-[52px]">Service, without the lobby wait.</h1>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-[#cbd5e1] md:text-base">
-            Send stay requests to the property team, keep the ticket, and continue with the day.
-          </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <BentoCard description="Requests are tied to your active booking so the desk sees the stay context." icon={BellRing} sticker={{ label: "Recommended", bg: "#f9cb37", text: "#111111", rotate: "rotate-[-2deg]" }} title="Booking-aware" />
@@ -117,6 +116,7 @@ export function GuestServices() {
         </div>
       </section>
 
+      {/* SECTION: Concierge Services */}
       <SectionBlock
         description="Choose what you need and the team will handle it as a service ticket."
         sticker={guestStickerTags.services}
@@ -126,7 +126,7 @@ export function GuestServices() {
         {error ? (
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-sm text-rose-300">{error}</p>
-            <Button className="h-8 rounded-[4px] px-3 text-xs" onClick={() => void reload()} type="button" variant="secondary">
+            <Button className="vh-cta-button h-8 rounded-[4px] bg-white px-3 text-xs text-[#07070a] hover:bg-white/90" onClick={() => void reload()} type="button" variant="secondary">
               Retry
             </Button>
           </div>
@@ -147,6 +147,7 @@ export function GuestServices() {
                   !available && "opacity-70",
                 )}
                 key={service.id}
+                id={`service-card-${service.id}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <span className="flex h-12 w-12 items-center justify-center rounded-[8px] border border-[var(--vh-pink)]/30 bg-[rgba(198,40,40,0.12)] text-[#f9cb37]">
@@ -166,7 +167,7 @@ export function GuestServices() {
                 <p className="mt-2 text-sm leading-6 text-[#cbd5e1]">Ticketed concierge request with desk follow-up.</p>
                 <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
                   <span className="text-xs font-bold uppercase text-white/52">{getServiceMeta(service)}</span>
-                  <Button className="h-9 rounded-[4px] bg-[var(--vh-pink)] px-4 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]" disabled={submittingId === service.id || !available} onClick={() => void onRequestService(service.id)} type="button">
+                  <Button className={primaryCtaClass} disabled={submittingId === service.id || !available} onClick={() => void onRequestService(service.id)} type="button">
                     {submittingId === service.id ? "Sending..." : "Request"}
                   </Button>
                 </div>

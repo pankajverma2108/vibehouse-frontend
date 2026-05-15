@@ -41,7 +41,7 @@ export function StickySummary({
           </div>
         ))}
       </div>
-      <Button className="mt-4 h-10 w-full rounded-[4px] bg-[var(--vh-pink)] font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]" type="button">
+      <Button className="vh-cta-button mt-4 h-10 w-full rounded-[4px] text-xs" type="button">
         {ctaLabel}
       </Button>
     </aside>

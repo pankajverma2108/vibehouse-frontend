@@ -7,7 +7,6 @@ import Link from "next/link";
 import {
   ArrowRight,
   BadgeCheck,
-  BedDouble,
   CalendarDays,
   ConciergeBell,
   HelpCircle,
@@ -17,7 +16,6 @@ import {
   Search,
   ShieldCheck,
   ShoppingBag,
-  UserPlus,
   Waypoints,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -171,11 +169,13 @@ function getQuickActionSticker(sticker: string) {
 function QuickActionCard({ action, href }: { action: QuickAction; href: string }) {
   const Icon = action.icon;
   const sticker = getQuickActionSticker(action.sticker);
+  const cardId = `stay-console-card-${action.title.toLowerCase().replaceAll(" ", "-")}`;
 
   return (
     <Link
       className="group relative flex min-h-[190px] flex-col justify-between overflow-hidden rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 shadow-[0_18px_42px_rgba(0,0,0,0.24)] transition duration-300 hover:-translate-y-1 hover:border-[var(--vh-pink)]/60"
       href={href}
+      id={cardId}
     >
       <div className="flex items-start justify-between gap-4">
         <StickerTag
@@ -201,14 +201,11 @@ function QuickActionCard({ action, href }: { action: QuickAction; href: string }
   );
 }
 
-function HeroStayCard({ booking, guideHref }: { booking: GuestDashboardBooking | null; guideHref: string }) {
-  const roomOrBed = formatRoomOrBed(booking?.room_number);
-  const roomType = booking?.room_type_name ?? "Room details will appear here once the stay is synced.";
+function HeroStayCard({ booking }: { booking: GuestDashboardBooking | null }) {
   const propertyName = booking?.property_name ?? "The Daily Social";
-  const stayUntil = booking?.checkout_date ? `Until ${formatDate(booking.checkout_date)}` : "Checkout date pending";
 
   return (
-    <article className="relative overflow-hidden rounded-[8px] border border-dashed border-white/24 bg-[#07070a] shadow-[0_24px_60px_rgba(0,0,0,0.32)]">
+    <article className="relative overflow-hidden rounded-[8px] border border-dashed border-white/24 bg-[#07070a] shadow-[0_24px_60px_rgba(0,0,0,0.32)]" id="home-hero-stay-card">
       <div className="relative min-h-[440px]">
         <Image
           alt="The Daily Social guest room"
@@ -226,23 +223,6 @@ function HeroStayCard({ booking, guideHref }: { booking: GuestDashboardBooking |
         <p className="mt-3 max-w-2xl text-sm leading-7 text-white/76 md:text-base">
           {propertyName} is set for your stay. Keep access, services, extras, and house guidance in one place.
         </p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-[8px] border border-white/12 bg-black/28 p-3 backdrop-blur">
-            <p className="text-[10px] font-black uppercase text-white/52">Room / Bed</p>
-            <p className="mt-1 truncate text-base font-black text-white">{roomOrBed}</p>
-          </div>
-          <div className="rounded-[8px] border border-white/12 bg-black/28 p-3 backdrop-blur">
-            <p className="text-[10px] font-black uppercase text-white/52">Room type</p>
-            <p className="mt-1 truncate text-base font-black text-white">{roomType}</p>
-          </div>
-          <Link className="group rounded-[8px] border border-[var(--vh-pink)]/50 bg-[rgba(198,40,40,0.22)] p-3 backdrop-blur transition hover:bg-[rgba(198,40,40,0.32)]" href={guideHref}>
-            <p className="text-[10px] font-black uppercase text-white/70">{stayUntil}</p>
-            <p className="mt-1 flex items-center gap-2 text-base font-black text-white">
-              Open guide
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </p>
-          </Link>
-        </div>
       </div>
     </article>
   );
@@ -350,6 +330,7 @@ export function GuestDashboard() {
   const roomOrBed = formatRoomOrBed(activeBooking?.room_number);
   const accessValue = activeBooking?.door_passcode ?? "Shared at check-in";
   const supportHref = `https://wa.me/${supportPhoneDigits}?text=${encodeURIComponent(`Hey The Daily Social, I need help with booking ${activeBooking?.ezee_reservation_id ?? selectedBookingId ?? ""}.`)}`;
+  const primaryCtaClass = "vh-cta-button h-10 rounded-[4px] px-4 text-xs";
 
   useEffect(() => {
     if (!rootRef.current || typeof window === "undefined") {
@@ -411,23 +392,24 @@ export function GuestDashboard() {
 
   return (
     <div ref={rootRef} className="space-y-10 pb-10 md:space-y-12 md:pb-12">
-      <section className="grid items-stretch gap-5 pt-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]" data-guest-reveal>
-        <HeroStayCard booking={activeBooking} guideHref={getGuestRouteHref("guide")} />
+      {/* SECTION: Home Hero */}
+      <section className="grid items-stretch gap-5 pt-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]" data-guest-reveal id="home-hero-section">
+        <HeroStayCard booking={activeBooking} />
         <aside className="flex flex-col gap-4">
-          <StayMetric detail={titleCaseStatus(activeBooking?.status)} icon={BadgeCheck} label="Booking" value={activeBooking?.ezee_reservation_id ?? "Stay syncing"} />
+          <StayMetric icon={BadgeCheck} label="Room / Bed" value={roomOrBed} />
           <StayMetric detail={formatLockStatus(activeBooking?.lock_status)} icon={KeyRound} label="Door Access" value={accessValue} />
-          <StayMetric detail={roomOrBed} icon={CalendarDays} label="Stay Window" value={stayWindow} />
-          <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5">
+          <StayMetric detail={titleCaseStatus(activeBooking?.status)} icon={CalendarDays} label="Stay Window" value={stayWindow} />
+          <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5" id="home-support-card">
             <p className="text-[11px] font-black uppercase text-[#f9cb37]">Need a human?</p>
             <h2 className="mt-2 font-sectiontitle text-[24px] leading-8 text-white">The desk can help before the small thing becomes a whole thing.</h2>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Button asChild className="h-10 rounded-[4px] bg-[var(--vh-pink)] px-4 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]">
+              <Button asChild className={primaryCtaClass}>
                 <a href={supportHref} rel="noreferrer" target="_blank">
                   <WhatsAppIcon className="mr-2 h-4 w-4" />
                   WhatsApp support
                 </a>
               </Button>
-              <Button asChild className="h-10 rounded-[4px] border border-white/15 bg-white/8 px-4 font-black uppercase text-white hover:bg-white/12" variant="secondary">
+              <Button asChild className="vh-cta-button h-10 rounded-[4px] bg-white px-4 text-xs text-[#07070a] hover:bg-white/90" variant="secondary">
                 <Link href={getGuestRouteHref("services")}>Open services</Link>
               </Button>
             </div>
@@ -438,6 +420,7 @@ export function GuestDashboard() {
       {bookingLoading ? <p className="text-xs font-bold uppercase text-[#94a3b8]">Loading booking details...</p> : null}
       {displayBookingError ? <p className="text-xs font-bold uppercase text-rose-300">{displayBookingError}</p> : null}
 
+      {/* SECTION: Stay Console */}
       <SectionBlock description="The fastest paths for the things guests usually need during a stay." sticker={guestStickerTags.shell} title="Your Stay Console">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" data-guest-reveal>
           {quickActions.map((action) => (
@@ -446,20 +429,21 @@ export function GuestDashboard() {
         </div>
       </SectionBlock>
 
+      {/* SECTION: Lost And Found */}
       <section className="grid gap-5 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)]" data-guest-reveal id="lost-found">
-        <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-6">
+        <div className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-6" id="lost-found-main-card">
           <StickerTag bg={guestStickerTags.lostFound.bg} className="px-3 py-1.5 text-[11px] font-bold uppercase" label="Lost & Found" rotate={guestStickerTags.lostFound.rotate} text={guestStickerTags.lostFound.text} />
           <h2 className="mt-4 font-sectiontitle text-[28px] leading-tight text-white md:text-[36px]">Left something behind?</h2>
           <p className="mt-3 text-sm leading-7 text-[#cbd5e1]">
             Raise a care-desk ticket from here. The property team can track it against this stay and follow up with the useful details.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button className="h-10 rounded-[4px] bg-[var(--vh-pink)] px-4 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]" disabled={lostFoundSubmitting || !lostFoundService} onClick={() => void onSubmitLostFound()} type="button">
+            <Button className={primaryCtaClass} disabled={lostFoundSubmitting || !lostFoundService} onClick={() => void onSubmitLostFound()} type="button">
               <Search className="mr-2 h-4 w-4" />
               {lostFoundSubmitting ? "Submitting..." : "Report item"}
             </Button>
             {catalogError ? (
-              <Button className="h-10 rounded-[4px] border border-white/15 bg-white/8 px-4 font-black uppercase text-white hover:bg-white/12" onClick={() => void reloadCatalog()} type="button" variant="secondary">
+              <Button className="vh-cta-button h-10 rounded-[4px] bg-white px-4 text-xs text-[#07070a] hover:bg-white/90" onClick={() => void reloadCatalog()} type="button" variant="secondary">
                 Retry desk
               </Button>
             ) : null}
@@ -473,12 +457,12 @@ export function GuestDashboard() {
         <div className="grid gap-4 sm:grid-cols-2">
           <BentoCard description="Use your stay name, room, and booking reference when the team follows up." icon={PackageSearch} sticker={{ label: "Recommended", bg: "#f9cb37", text: "#111111", rotate: "rotate-[-2deg]" }} title="Describe the item" />
           <BentoCard description="Found items stay with property operations until the team confirms ownership and handover." icon={ShieldCheck} sticker={{ label: "Included", bg: "#3a5f84", text: "#ffffff", rotate: "rotate-[1deg]" }} title="Desk verification" />
-          <article className="sm:col-span-2 rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-6">
+          <article className="sm:col-span-2 rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-6" id="lost-found-support-card">
             <div className="flex items-start justify-between gap-4">
               <div className="flex h-11 w-11 items-center justify-center rounded-[8px] border border-[var(--vh-pink)]/30 bg-[rgba(198,40,40,0.14)] text-[#f9cb37]">
                 <HelpCircle className="h-5 w-5" />
               </div>
-              <Button asChild className="h-9 rounded-[4px] bg-white px-4 font-black uppercase text-[#07070a] hover:bg-white/90">
+              <Button asChild className="vh-cta-button h-9 rounded-[4px] bg-white px-4 text-[11px] text-[#07070a] hover:bg-white/90">
                 <a href={supportHref} rel="noreferrer" target="_blank">Message support</a>
               </Button>
             </div>
@@ -488,7 +472,8 @@ export function GuestDashboard() {
         </div>
       </section>
 
-      <SectionBlock action={<Button asChild className="h-10 rounded-[4px] bg-[var(--vh-pink)] px-5 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]"><a href={propertyLocation.mapsHref} rel="noreferrer" target="_blank">Open in Maps</a></Button>} sticker={guestStickerTags.notice} title="Property Highlights">
+      {/* SECTION: Property Highlights */}
+      <SectionBlock action={<Button asChild className="vh-cta-button h-10 rounded-[4px] px-5 text-xs"><a href={propertyLocation.mapsHref} rel="noreferrer" target="_blank">Open in Maps</a></Button>} sticker={guestStickerTags.notice} title="Property Highlights">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]" data-guest-reveal>
           <article className="overflow-hidden rounded-[8px] border border-dashed border-white/24 bg-[#07070a]">
             <div className="flex flex-col gap-2 border-b border-white/10 px-5 py-4 md:flex-row md:items-center md:justify-between">
@@ -522,32 +507,15 @@ export function GuestDashboard() {
           </div>
         </div>
       </SectionBlock>
-
-      <SectionBlock title="Gate Access / Visitors">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" data-guest-reveal>
-          <BentoCard description="Share the visitor name ahead of time so the desk can speed up arrival." icon={UserPlus} title="Invite visitor">
-            <Button className="h-9 rounded-[4px] bg-[var(--vh-pink)] px-4 font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]" onClick={() => toast.message("Ask the front desk to register your visitor.")} type="button">
-              Ask the desk
-            </Button>
-          </BentoCard>
-          <BentoCard description={`Use ${roomOrBed} and your stay name at reception for a smoother entry.`} icon={Waypoints} title="Arrival notes" />
-          <BentoCard description="Need to pass entry details to a co-guest? Start from here first." icon={ShieldCheck} title="Share access">
-            <Button className="h-9 rounded-[4px] bg-white/10 px-4 font-black uppercase text-white hover:bg-white/15" onClick={() => toast.message("Front desk will help confirm co-guest access.")} type="button" variant="secondary">
-              Share details
-            </Button>
-          </BentoCard>
-          <BentoCard description="Keep a government ID ready and ask reception before sending anyone up." icon={BedDouble} title="Reception check" />
-        </div>
-      </SectionBlock>
-
-      <section className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-6" data-guest-reveal>
+      {/* SECTION: Checkout Summary */}
+      <section className="rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 md:p-6" data-guest-reveal id="checkout-summary-section">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-[11px] font-black uppercase text-[#f9cb37]">Before checkout</p>
             <h2 className="mt-2 font-sectiontitle text-[26px] leading-tight text-white">Checkout summary</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-[#cbd5e1]">Review add-ons, rentals, and totals in one place before you close out the stay.</p>
           </div>
-          <Button asChild className="h-10 rounded-[4px] bg-white px-5 font-black uppercase text-[#07070a] hover:bg-white/90">
+          <Button asChild className="vh-cta-button h-10 rounded-[4px] bg-white px-5 text-xs text-[#07070a] hover:bg-white/90">
             <Link href={getGuestRouteHref("checkout")}>
               <KeyRound className="mr-2 h-4 w-4" />
               Checkout summary

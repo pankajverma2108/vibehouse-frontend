@@ -28,7 +28,6 @@ export function GuestPageShell({
         className,
       )}
     >
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.028)_1px,transparent_1px)] bg-[size:88px_88px] opacity-30" />
       <div className="relative z-10 mx-auto flex w-full max-w-[1180px] flex-col gap-7 px-4 pb-0 pt-5 md:px-6 md:pt-7 xl:px-0">
         {title || description || sticker || actions ? (
           <header className="flex flex-col items-center gap-4 pt-8 text-center md:pt-10">
