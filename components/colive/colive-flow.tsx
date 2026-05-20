@@ -53,6 +53,7 @@ import {
   savePropertySelection,
   saveReviewResumeIntent,
 } from "@/lib/property-selection-session";
+import { usePropertyId, getPropertyName } from "@/lib/property-resolver";
 import { cn } from "@/lib/utils";
 
 type RoomApiPayload = {
@@ -66,9 +67,6 @@ type RoomApiPayload = {
 type AvailabilitySource = "catalog" | "ezee_live" | "live_provider" | "local_db_estimate" | "unknown";
 
 type RoomCategory = CxRoomCategory;
-
-const PROPERTY_ID = "60765";
-const PROPERTY_NAME = "The Daily Social - Koramangala A";
 
 const durationOptions = [1, 2, 3];
 const stayTypeOptions: Array<{ value: ColiveStayType; label: string }> = [
@@ -205,6 +203,7 @@ function SectionTitle({ title, copy }: { title: string; copy?: string }) {
 export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {}) {
   void initialLocation;
   const router = useRouter();
+  const propertyId = usePropertyId();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isRestoringSession, openAuthModal } = useGuestAuth();
   const [aboutExpanded, setAboutExpanded] = useState(false);
@@ -258,7 +257,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
 
     try {
       const query = new URLSearchParams({
-        property_id: PROPERTY_ID,
+        property_id: propertyId,
         checkin: moveIn,
         checkout: checkoutDate,
       });
@@ -292,7 +291,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
       setIsLoadingRooms(false);
       setIsRefreshingRooms(false);
     }
-  }, [checkoutDate, moveIn, rooms.length]);
+  }, [checkoutDate, moveIn, rooms.length, propertyId]);
 
   useLayoutEffect(() => {
     if (!rootRef.current || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -326,12 +325,12 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     }
 
     const intent = consumeReviewResumeIntent("colive");
-    if (!intent || intent.propertyId !== PROPERTY_ID || intent.checkin !== moveIn || intent.checkout !== checkoutDate) {
+    if (!intent || intent.propertyId !== propertyId || intent.checkin !== moveIn || intent.checkout !== checkoutDate) {
       return;
     }
     const signature = buildSelectionSignature({
       source: "colive",
-      propertyId: PROPERTY_ID,
+      propertyId,
       checkin: moveIn,
       checkout: checkoutDate,
       selectedCounts,
@@ -344,21 +343,21 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
   }, [isAuthenticated, selectedRoomDrafts.length, selectedCounts, moveIn, checkoutDate, router]);
 
   useEffect(() => {
-    const contextKey = `${PROPERTY_ID}::${moveIn}::${checkoutDate}`;
+    const contextKey = `${propertyId}::${moveIn}::${checkoutDate}`;
     if (lastRestoreContextRef.current === contextKey) {
       return;
     }
     lastRestoreContextRef.current = contextKey;
 
     const stored = getPropertySelection("colive");
-    if (!stored || stored.propertyId !== PROPERTY_ID || stored.checkin !== moveIn || stored.checkout !== checkoutDate) {
+    if (!stored || stored.propertyId !== propertyId || stored.checkin !== moveIn || stored.checkout !== checkoutDate) {
       return;
     }
 
     setSelectedCounts(stored.selectedCounts);
     setIsAgeConfirmed(stored.isAgeConfirmed);
     didRestoreSelectionRef.current = true;
-  }, [moveIn, checkoutDate]);
+  }, [moveIn, checkoutDate, propertyId]);
 
   useEffect(() => {
     if (!didRestoreSelectionRef.current || rooms.length === 0) {
@@ -394,7 +393,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
   useEffect(() => {
     const signature = buildSelectionSignature({
       source: "colive",
-      propertyId: PROPERTY_ID,
+      propertyId,
       checkin: moveIn,
       checkout: checkoutDate,
       selectedCounts,
@@ -408,7 +407,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     const saveTimer = window.setTimeout(() => {
       savePropertySelection({
         source: "colive",
-        propertyId: PROPERTY_ID,
+        propertyId,
         checkin: moveIn,
         checkout: checkoutDate,
         selectedCounts,
@@ -455,7 +454,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     }
 
     const signature = buildBookingSignature({
-      propertyId: PROPERTY_ID,
+      propertyId,
       checkinDate: moveIn,
       checkoutDate,
       rooms: selectedRoomDrafts.map((room) => ({ roomTypeId: room.roomTypeId, quantity: room.quantity })),
@@ -463,7 +462,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     });
 
     saveBookingDraft({
-      propertyId: PROPERTY_ID,
+      propertyId,
       checkinDate: moveIn,
       checkoutDate,
       rooms: selectedRoomDrafts,
@@ -472,8 +471,8 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
       createdAt: Date.now(),
       source: "colive",
       colive: {
-        propertyId: PROPERTY_ID,
-        propertyName: PROPERTY_NAME,
+        propertyId,
+        propertyName: getPropertyName(propertyId),
         moveInDate: moveIn,
         durationMonths: duration,
         stayType,
@@ -487,12 +486,12 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     if (!isAuthenticated) {
       saveReviewResumeIntent({
         source: "colive",
-        propertyId: PROPERTY_ID,
+        propertyId,
         checkin: moveIn,
         checkout: checkoutDate,
         signature: buildSelectionSignature({
           source: "colive",
-          propertyId: PROPERTY_ID,
+          propertyId,
           checkin: moveIn,
           checkout: checkoutDate,
           selectedCounts,
@@ -521,7 +520,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
               </span>
             </h1>
             <p className="mx-auto mt-5 max-w-[760px] text-base leading-7 text-white/78 md:text-lg">
-              {PROPERTY_NAME} as a monthly home base. Same property flow, same booking checkout, Colive rates and availability revalidated by backend.
+              {getPropertyName(propertyId)} as a monthly home base. Same property flow, same booking checkout, Colive rates and availability revalidated by backend.
             </p>
           </div>
 

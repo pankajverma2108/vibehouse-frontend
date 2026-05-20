@@ -1,8 +1,7 @@
 import type { EventCardProps, RoomCardProps } from "@/content/types";
 import { getApiBaseUrl } from "@/lib/vibehouse-api";
 import { formatINRPlain } from "@/lib/format-price";
-
-const DEFAULT_PROPERTY_ID = "60765";
+import { sanitizePropertyId as sanitizePropertyIdFromResolver } from "@/lib/property-resolver";
 const CANONICAL_PROPERTY_ID_REGEX = /^\d+$/;
 const FALLBACK_EVENT_IMAGE =
   "https://images.unsplash.com/photo-1647649644192-af6183269fa4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200";
@@ -263,10 +262,14 @@ function ensureArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
-function sanitizePropertyId(value: unknown): string {
+// Use sanitizePropertyId from property-resolver instead; kept as internal export for backwards compat if needed
+function sanitizePropertyIdInternal(value: unknown): string {
   const raw = ensureString(value);
   return CANONICAL_PROPERTY_ID_REGEX.test(raw) ? raw : "";
 }
+
+// Re-export for backwards compatibility
+const sanitizePropertyId = sanitizePropertyIdInternal;
 
 function normalizeAvailabilitySource(value: unknown, fallback: AvailabilitySource): AvailabilitySource {
   const raw = ensureString(value).toLowerCase();
@@ -437,15 +440,22 @@ function normalizeEvent(event: RawEvent): EventCardProps {
   };
 }
 
-export async function getPublicEvents(options?: {
-  propertyId?: string;
+/**
+ * Get public events for a property.
+ * propertyId is now required (multi-property model).
+ * Backend will return 400 if property_id is missing or invalid.
+ */
+export async function getPublicEvents(options: {
+  propertyId: string;
   limit?: number;
 }): Promise<EventCardProps[]> {
-  const propertyId = ensureString(options?.propertyId);
-  const limit = options?.limit;
-  const path = propertyId
-    ? `/public/events?property_id=${encodeURIComponent(propertyId)}`
-    : "/public/events";
+  const propertyId = sanitizePropertyId(options.propertyId);
+  if (!propertyId) {
+    return fallbackEvents(options.limit ?? 3);
+  }
+
+  const limit = options.limit;
+  const path = `/public/events?property_id=${encodeURIComponent(propertyId)}`;
   const raw = await fetchUnknownJson(path);
   
   if (!raw) {
@@ -639,44 +649,43 @@ export async function getRoomCatalog(options?: {
   return snapshot.roomTypes;
 }
 
-export async function getRoomCatalogSnapshot(options?: {
-  propertyId?: string;
+/**
+ * Get room catalog snapshot for a property.
+ * propertyId is now required (multi-property model).
+ * Backend will return 400 if property_id is missing or invalid.
+ */
+export async function getRoomCatalogSnapshot(options: {
+  propertyId: string;
 }): Promise<RoomAvailabilitySnapshot> {
-  const propertyId = sanitizePropertyId(options?.propertyId);
+  const propertyId = sanitizePropertyId(options.propertyId);
 
-  async function fetchCatalog(includePropertyId: boolean) {
-    const params = new URLSearchParams();
-
-    if (includePropertyId && propertyId) {
-      params.set("property_id", propertyId);
-    }
-
-    const path = params.size > 0
-      ? `/guest/booking/rooms?${params.toString()}`
-      : "/guest/booking/rooms";
-
-    return (await fetchUnknownJson(path)) as RawRoomAvailability | null;
+  if (!propertyId) {
+    recordTelemetry({ type: "null_payload", source: "room" });
+    return {
+      propertyId: "",
+      checkin: "",
+      checkout: "",
+      mode: "catalog",
+      availabilitySource: "catalog",
+      hasLiveAvailability: false,
+      availabilityError: null,
+      roomTypes: fallbackRoomTypes(),
+    };
   }
 
-  let raw = await fetchCatalog(true);
-  let resolvedPropertyId = ensureString(raw?.property_id, propertyId);
+  const params = new URLSearchParams({
+    property_id: propertyId,
+  });
+
+  const path = `/guest/booking/rooms?${params.toString()}`;
+  const raw = (await fetchUnknownJson(path)) as RawRoomAvailability | null;
 
   if (!raw) {
     recordTelemetry({ type: "null_payload", source: "room" });
   }
 
-  let list = ensureArray(raw?.room_types) as RawRoomType[];
-
-  if (propertyId && list.length === 0) {
-    const retryRaw = await fetchCatalog(false);
-    const retryList = ensureArray(retryRaw?.room_types) as RawRoomType[];
-
-    if (retryList.length > 0) {
-      raw = retryRaw;
-      list = retryList;
-      resolvedPropertyId = ensureString(retryRaw?.property_id, resolvedPropertyId);
-    }
-  }
+  const resolvedPropertyId = ensureString(raw?.property_id, propertyId);
+  const list = ensureArray(raw?.room_types) as RawRoomType[];
 
   if (list.length === 0) {
     recordTelemetry({ type: "empty_array", source: "room" });
@@ -704,14 +713,34 @@ export async function getRoomCatalogSnapshot(options?: {
   };
 }
 
-export async function getRoomAvailabilitySnapshot(options?: {
-  propertyId?: string;
+/**
+ * Get room availability snapshot for a property and date range.
+ * propertyId is now required (multi-property model).
+ * Backend will return 400 if property_id is missing or invalid.
+ */
+export async function getRoomAvailabilitySnapshot(options: {
+  propertyId: string;
   checkin?: string;
   checkout?: string;
 }): Promise<RoomAvailabilitySnapshot> {
-  const propertyId = sanitizePropertyId(options?.propertyId);
-  const checkin = ensureString(options?.checkin);
-  const checkout = ensureString(options?.checkout);
+  const propertyId = sanitizePropertyId(options.propertyId);
+  const checkin = ensureString(options.checkin);
+  const checkout = ensureString(options.checkout);
+
+  if (!propertyId) {
+    recordTelemetry({ type: "null_payload", source: "room" });
+    return {
+      propertyId: "",
+      checkin,
+      checkout,
+      mode: "availability",
+      availabilitySource: "unknown",
+      hasLiveAvailability: false,
+      availabilityError: "Property ID is required.",
+      roomTypes: fallbackRoomTypes(),
+    };
+  }
+
   const catalogSnapshot = await getRoomCatalogSnapshot({ propertyId });
 
   const resolvedPropertyId = catalogSnapshot.propertyId || propertyId;
@@ -726,21 +755,15 @@ export async function getRoomAvailabilitySnapshot(options?: {
     };
   }
 
-  async function fetchSnapshot(includePropertyId: boolean) {
-    const params = new URLSearchParams({
-      checkin,
-      checkout,
-    });
+  const params = new URLSearchParams({
+    checkin,
+    checkout,
+    property_id: propertyId,
+  });
 
-    if (includePropertyId && propertyId) {
-      params.set("property_id", propertyId);
-    }
+  const path = `/guest/booking/availability?${params.toString()}`;
+  const raw = (await fetchUnknownJson(path)) as RawRoomAvailability | null;
 
-    const path = `/guest/booking/availability?${params.toString()}`;
-    return (await fetchUnknownJson(path)) as RawRoomAvailability | null;
-  }
-
-  let raw = await fetchSnapshot(true);
   let resolvedLivePropertyId = ensureString(raw?.property_id, resolvedPropertyId);
   let availabilitySource = normalizeAvailabilitySource(raw?.availability_source, "unknown");
 
@@ -748,19 +771,7 @@ export async function getRoomAvailabilitySnapshot(options?: {
     recordTelemetry({ type: "null_payload", source: "room" });
   }
 
-  let list = ensureArray(raw?.room_types) as RawRoomType[];
-
-  if (propertyId && list.length === 0) {
-    const retryRaw = await fetchSnapshot(false);
-    const retryList = ensureArray(retryRaw?.room_types) as RawRoomType[];
-
-    if (retryList.length > 0) {
-      raw = retryRaw;
-      list = retryList;
-      resolvedLivePropertyId = ensureString(retryRaw?.property_id, resolvedLivePropertyId);
-      availabilitySource = normalizeAvailabilitySource(retryRaw?.availability_source, "unknown");
-    }
-  }
+  const list = ensureArray(raw?.room_types) as RawRoomType[];
 
   const catalogMapById = new Map(catalogSnapshot.roomTypes.map((room) => [room.id, room]));
   const catalogMapBySlug = new Map(catalogSnapshot.roomTypes.map((room) => [room.slug, room]));
@@ -961,9 +972,13 @@ export function roomTypesToPropertyCategories(roomTypes: NormalizedRoomType[]): 
   });
 }
 
+/**
+ * @deprecated Use resolveServerPropertyId or resolveClientPropertyId from lib/property-resolver
+ * Kept for backwards compatibility but should not be used for new code.
+ */
 export function getDefaultPropertyId() {
   const configured = process.env.NEXT_PUBLIC_PROPERTY_ID?.trim() || "";
-  return sanitizePropertyId(configured) || DEFAULT_PROPERTY_ID;
+  return sanitizePropertyId(configured) || "";
 }
 
 /**

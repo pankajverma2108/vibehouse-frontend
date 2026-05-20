@@ -1,11 +1,12 @@
 import { ColiveFlow } from "@/components/colive/colive-flow";
 import { Property } from "@/components/marketing/property";
 import {
-  getDefaultPropertyId,
   getRoomCatalogSnapshot,
   getRoomAvailabilitySnapshot,
   roomTypesToPropertyCategories,
 } from "@/lib/cx-api";
+import { resolveServerPropertyId } from "@/lib/property-resolver";
+import { headers } from "next/headers";
 
 const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -39,7 +40,9 @@ export default async function PropertyPage({ searchParams }: PropertyPageProps) 
     return <ColiveFlow initialLocation={params.location} />;
   }
 
-  const requestedPropertyId = params?.property_id || getDefaultPropertyId() || undefined;
+  const headerList = await headers();
+  const hostname = headerList.get("host") || "";
+  const requestedPropertyId = resolveServerPropertyId({ explicit: params?.property_id, hostname }) || undefined;
   const requestedCheckin = readValidIsoDate(params?.checkin);
   const requestedCheckout = readValidIsoDate(params?.checkout);
   const hasRequestedDateWindow = Boolean(

@@ -1,0 +1,119 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  S3_BUCKET_DEV: "devbuteak.in"
+  S3_BUCKET_STAG: ""
+  S3_BUCKET_PROD: ""
+  DEV_DIST_ID: "E34B01CUURLFN6"
+  STAG_DIST_ID: ""
+  PROD_DIST_ID: ""
+
+# === DEV ===
+reactjs-dev-build:
+  stage: build
+  image:
+    name: node:20-alpine
+    entrypoint: [""]
+  script:
+    - echo "Building DEV package"
+    - npm install
+    - CI=false npm run build_dev
+    - echo "DEV Build successful"
+  artifacts:
+    expire_in: 1 year
+    paths:
+      - build
+  only:
+    refs:
+      - developer
+
+s3-dev-deploy:
+  stage: deploy
+  image:
+    name: amazon/aws-cli:latest
+    entrypoint: [""]
+  script:
+    - echo "Deploying DEV package"
+    - aws s3 sync build/ s3://${S3_BUCKET_DEV} --delete --cache-control max-age=0,public
+    - aws cloudfront create-invalidation --distribution-id $DEV_DIST_ID --paths "/*"
+    - echo "DEV Deployment & CloudFront invalidation successful"
+  dependencies:
+    - reactjs-dev-build
+  only:
+    refs:
+      - developer
+
+# === STAGING ===
+reactjs-stag-build:
+  stage: build
+  when: manual
+  image:
+    name: node:20-alpine
+    entrypoint: [""]
+  script:
+    - echo "Building STAGING package"
+    - npm install
+    - CI=false npm run build_stag
+    - echo "STAGING Build successful"
+  artifacts:
+    expire_in: 1 year
+    paths:
+      - build
+  only:
+    refs:
+      - staging
+
+s3-stag-deploy:
+  stage: deploy
+  when: manual
+  image:
+    name: amazon/aws-cli:latest
+    entrypoint: [""]
+  script:
+    - echo "Deploying STAGING package"
+    - aws s3 sync build/ s3://${S3_BUCKET_STAG} --delete --cache-control max-age=0,public
+    - aws cloudfront create-invalidation --distribution-id $STAG_DIST_ID --paths "/*"
+    - echo "STAGING Deployment & CloudFront invalidation successful"
+  dependencies:
+    - reactjs-stag-build
+  only:
+    refs:
+      - staging
+
+# === PRODUCTION ===
+reactjs-prod-build:
+  stage: build
+  image:
+    name: node:14-alpine
+    entrypoint: [""]
+  script:
+    - echo "Building PROD package"
+    - npm install
+    - CI=false npm run build_prod
+    - echo "PROD Build successful"
+  artifacts:
+    expire_in: 1 year
+    paths:
+      - build
+  only:
+    refs:
+      - main
+
+s3-prod-deploy:
+  stage: deploy
+  image:
+    name: amazon/aws-cli:latest
+    entrypoint: [""]
+  script:
+    - echo "Deploying PROD package"
+    - aws s3 sync build/ s3://${S3_BUCKET_PROD} --delete --cache-control max-age=0,public
+    - aws cloudfront create-invalidation --distribution-id $PROD_DIST_ID --paths "/*"
+    - echo "PROD Deployment & CloudFront invalidation successful"
+  dependencies:
+    - reactjs-prod-build
+  only:
+    refs:
+      - main
+

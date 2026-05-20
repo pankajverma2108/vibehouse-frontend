@@ -1,0 +1,4248 @@
+openapi: 3.0.1
+info:
+  title: MyGate IoT Access Pro API
+  description: RESTful API for MyGate IoT Access Pro Integration Service - B2B smart
+    lock management system
+  license:
+    name: Proprietary
+    url: https://mygate.com/license
+  version: 1.0.0
+servers:
+  - url: https://knoxapi.mygate.com/partner-access
+    description: Production Server
+tags:
+  - name: Authentication
+    description: Authentication APIs
+  - name: Partner Management
+    description: APIs for managing partners and partner operations
+  - name: Property Management
+    description: APIs for managing properties and property operations
+  - name: Room Management
+    description: APIs for managing rooms and room access
+  - name: Guest Management
+    description: APIs for managing individual guests
+  - name: Access Management
+    description: APIs for managing access permissions and PINs
+
+paths:
+  /v1/rooms/{roomId}:
+    get:
+      tags:
+        - Room Management
+      summary: Get room details
+      description: Retrieve detailed information about a specific room including lock
+        info, guests, and statistics
+      operationId: getRoom
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: roomId
+          in: path
+          description: Room ID
+          required: true
+          schema:
+            type: string
+          example: room123
+      responses:
+        '200':
+          description: Room details retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Room not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    put:
+      tags:
+        - Room Management
+      summary: Update room details
+      description: Update information for an existing room
+      operationId: updateRoom
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: roomId
+          in: path
+          description: Room ID
+          required: true
+          schema:
+            type: string
+          example: room123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomUpdateRequest'
+        required: true
+      responses:
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Room updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Room not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    delete:
+      tags:
+        - Room Management
+      summary: Delete room
+      description: Soft delete a room from the system
+      operationId: deleteRoom
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: roomId
+          in: path
+          description: Room ID
+          required: true
+          schema:
+            type: string
+          example: room123
+      responses:
+        '200':
+          description: Room deleted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Room not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/properties/{propertyId}:
+    get:
+      tags:
+        - Property Management
+      summary: Get property details
+      description: Retrieve detailed information about a specific property
+      operationId: getProperty
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property ID
+          required: true
+          schema:
+            type: string
+          example: prop123
+      responses:
+        '200':
+          description: Property details retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    put:
+      tags:
+        - Property Management
+      summary: Update property details
+      description: Update information for an existing property
+      operationId: updateProperty
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property ID
+          required: true
+          schema:
+            type: string
+          example: prop123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyUpdateRequest'
+        required: true
+      responses:
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Property updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    delete:
+      tags:
+        - Property Management
+      summary: Delete property
+      description: Soft delete a property from the system
+      operationId: deleteProperty
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property ID
+          required: true
+          schema:
+            type: string
+          example: prop123
+      responses:
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Property deleted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/partners/{partnerId}:
+    get:
+      tags:
+        - Partner Management
+      summary: Get partner details
+      description: Retrieve detailed information about a specific partner
+      operationId: getPartner
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: partnerId
+          in: path
+          description: Partner ID
+          required: true
+          schema:
+            type: string
+          example: partner123
+      responses:
+        '200':
+          description: Partner details retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Partner not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    put:
+      tags:
+        - Partner Management
+      summary: Update partner details
+      description: Update information for an existing partner
+      operationId: updatePartner
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: partnerId
+          in: path
+          description: Partner ID
+          required: true
+          schema:
+            type: string
+          example: partner123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: Partner updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Partner not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/guests/{guestId}:
+    get:
+      tags:
+        - Guest Management
+      summary: Get guest details
+      description: Retrieves details of a specific guest
+      operationId: getGuest
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: guestId
+          in: path
+          description: Guest ID
+          required: true
+          schema:
+            type: string
+          example: guest_123
+      responses:
+        '404':
+          description: Guest not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Authentication failed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Guest details retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    put:
+      tags:
+        - Guest Management
+      summary: Update guest details
+      description: Updates details of a specific guest
+      operationId: updateGuest
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: guestId
+          in: path
+          description: Guest ID
+          required: true
+          schema:
+            type: string
+          example: guest_123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestUpdateRequest'
+        required: true
+      responses:
+        '400':
+          description: Validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Guest not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Authentication failed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Guest updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    delete:
+      tags:
+        - Guest Management
+      summary: Check out guest from room
+      description: Checks out a guest from a specific room (sets room status to CHECKED_OUT)
+      operationId: deleteGuest
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: roomId
+          in: query
+          description: Room ID to check out guest from
+          required: true
+          schema:
+            type: string
+          example: room_123
+        - name: guestId
+          in: path
+          description: Guest ID
+          required: true
+          schema:
+            type: string
+          example: guest_123
+      responses:
+        '400':
+          description: Validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Authentication failed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Guest or room assignment not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Guest checked out from room successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/accesses/{accessId}:
+    get:
+      tags:
+        - Access Management
+      summary: Get access details
+      description: Retrieves detailed information about a specific access including
+        permissions and validity.
+      operationId: getAccess
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: accessId
+          in: path
+          description: Unique identifier of the access
+          required: true
+          schema:
+            type: string
+          example: access123
+      responses:
+        '404':
+          description: Access not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Access details retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    put:
+      tags:
+        - Access Management
+      summary: Update access details
+      description: Updates access permissions, validity period, or other access-related
+        settings.
+      operationId: updateAccess
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: accessId
+          in: path
+          description: Unique identifier of the access
+          required: true
+          schema:
+            type: string
+          example: access123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessUpdateRequest'
+        required: true
+      responses:
+        '404':
+          description: Access not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Access updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    delete:
+      tags:
+        - Access Management
+      summary: Revoke access
+      description: Revokes an existing access permission. This will deactivate the
+        access and prevent future use.
+      operationId: revokeAccess
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: accessId
+          in: path
+          description: Unique identifier of the access to revoke
+          required: true
+          schema:
+            type: string
+          example: access123
+      responses:
+        '404':
+          description: Access not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Access revoked successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/accesses/admin-toggle:
+    put:
+      tags:
+        - Access Management
+      summary: Toggle user admin authority
+      description: Toggles admin authority for a user on IoT devices. Grants or revokes
+        admin role for app-based (REMOTE) access users.
+      operationId: toggleAdminAuthority
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminToggleRequest'
+        required: true
+      responses:
+        '200':
+          description: Admin authority updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error or IoT service failure
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: User, property, or room not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication or insufficient permissions
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/rooms/{roomId}/detach-lock:
+    post:
+      tags:
+        - Room Management
+      summary: Detach lock from room
+      description: Detach the lock device from a specific room
+      operationId: detachLockFromRoom
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: roomId
+          in: path
+          description: Room ID
+          required: true
+          schema:
+            type: string
+          example: room123
+      responses:
+        '200':
+          description: Lock detached successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Room not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/rooms/{roomId}/attach-lock:
+    post:
+      tags:
+        - Room Management
+      summary: Attach lock to room
+      description: Attach a lock device to a specific room
+      operationId: attachLockToRoom
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: roomId
+          in: path
+          description: Room ID
+          required: true
+          schema:
+            type: string
+          example: room123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttachLockRequest'
+        required: true
+      responses:
+        '200':
+          description: Lock attached successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Room not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/rooms/{roomId}/accesses:
+    get:
+      tags:
+        - Room Management
+      summary: Get accesses for room
+      description: Retrieve all access entries for a specific room with optional filtering
+      operationId: getRoomAccesses
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: roomId
+          in: path
+          description: Room ID
+          required: true
+          schema:
+            type: string
+          example: room123
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 50
+          example: 50
+        - name: guest_id
+          in: query
+          description: Filter by guest ID
+          required: false
+          schema:
+            type: string
+          example: guest456
+        - name: access_type
+          in: query
+          description: Filter by access type
+          required: false
+          schema:
+            type: string
+          example: PASSCODE
+        - name: status
+          in: query
+          description: Filter by status
+          required: false
+          schema:
+            type: string
+          example: ACTIVE
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    post:
+      tags:
+        - Room Management
+      summary: Create access for guest in room
+      description: Create a new access entry for a guest in the specified room
+      operationId: createRoomAccess
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: roomId
+          in: path
+          description: Room ID
+          required: true
+          schema:
+            type: string
+          example: room123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomAccessCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/properties:
+    get:
+      tags:
+        - Property Management
+      summary: Get list of properties
+      description: Retrieve a paginated list of properties with optional filtering
+        by city, area, and partner
+      operationId: getProperties
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+          example: 20
+        - name: city
+          in: query
+          description: Filter by city
+          required: false
+          schema:
+            type: string
+          example: Mumbai
+        - name: area
+          in: query
+          description: Filter by area
+          required: false
+          schema:
+            type: string
+          example: Bandra
+      responses:
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Properties retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    post:
+      tags:
+        - Property Management
+      summary: Add new property
+      description: Create a new property in the system
+      operationId: addProperty
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Property created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/properties/{propertyId}/rooms:
+    get:
+      tags:
+        - Property Management
+      summary: Get rooms in property
+      description: Retrieve a paginated list of rooms for a specific property
+      operationId: getRoomsInProperty
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property ID
+          required: true
+          schema:
+            type: string
+          example: prop123
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 50
+          example: 50
+      responses:
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Rooms retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    post:
+      tags:
+        - Property Management
+      summary: Add room to property
+      description: Create a new room in a specific property
+      operationId: addRoomToProperty
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property ID
+          required: true
+          schema:
+            type: string
+          example: prop123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Room created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/properties/{propertyId}/managers:
+    get:
+      tags:
+        - Property Management
+      summary: Get property managers
+      description: Retrieves list of managers assigned to a specific property
+      operationId: getPropertyManagers
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: API Key for authentication
+          required: true
+          example: your-api-key
+          schema:
+            type: string
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property ID
+          required: true
+          schema:
+            type: string
+          example: property123
+      responses:
+        '200':
+          description: Property managers retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Authentication failed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    post:
+      tags:
+        - Property Management
+      summary: Assign managers to property
+      description: Assigns multiple users as managers for a specific property
+      operationId: assignManagersToProperty
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: API Key for authentication
+          required: true
+          example: your-api-key
+          schema:
+            type: string
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property ID
+          required: true
+          schema:
+            type: string
+          example: property123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignManagersRequest'
+        required: true
+      responses:
+        '200':
+          description: Managers assigned successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Authentication failed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/properties/{propertyId}/guests:
+    get:
+      tags:
+        - Property Management
+      summary: Get guests in property
+      description: Retrieve a paginated list of guests for a specific property with
+        filtering options
+      operationId: getGuestsInProperty
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property ID
+          required: true
+          schema:
+            type: string
+          example: prop123
+        - name: roomId
+          in: query
+          description: Filter by room ID
+          required: false
+          schema:
+            type: string
+          example: room123
+      responses:
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Guests retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    post:
+      tags:
+        - Property Management
+      summary: Add guest to property
+      description: Create a new guest in a specific property
+      operationId: addGuestToProperty
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property ID
+          required: true
+          schema:
+            type: string
+          example: prop123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Guest created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '403':
+          description: Insufficient permissions
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/partners/{partnerId}/users:
+    get:
+      tags:
+        - Partner Management
+      summary: Get partner users
+      description: Retrieve a list of users associated with a specific partner
+      operationId: getPartnerUsers
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: partnerId
+          in: path
+          description: Partner ID
+          required: true
+          schema:
+            type: string
+          example: partner123
+      responses:
+        '200':
+          description: Partner users retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Partner not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    post:
+      tags:
+        - Partner Management
+      summary: Add user to partner
+      description: Add a new user to the specified partner organization
+      operationId: addPartnerUser
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: partnerId
+          in: path
+          description: Partner ID
+          required: true
+          schema:
+            type: string
+          example: partner123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerUserCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Partner user added successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Partner not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/partners/{partnerId}/locks:
+    get:
+      tags:
+        - Partner Management
+      summary: Get locks assigned to partner
+      description: Retrieve a paginated list of locks assigned to a specific partner
+      operationId: getPartnerLocks
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: partnerId
+          in: path
+          description: Partner ID
+          required: true
+          schema:
+            type: string
+          example: partner123
+        - name: property_id
+          in: query
+          description: Property ID filter (optional)
+          required: false
+          schema:
+            type: string
+          example: property456
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 50
+          example: 50
+      responses:
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Partner locks retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Partner not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+    post:
+      tags:
+        - Partner Management
+      summary: Assign locks to partner
+      description: Assign one or more locks to a partner using serial numbers sent
+        as JSON payload or csv file
+      operationId: assignLocksToPartnerCsv_1
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: partnerId
+          in: path
+          description: Partner ID
+          required: true
+          schema:
+            type: string
+          example: partner123
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - csv_file
+              type: object
+              properties:
+                csv_file:
+                  type: string
+                  description: CSV file containing serial numbers
+                  format: binary
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignLocksRequest'
+        required: true
+      responses:
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Partner not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Locks assigned successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: API Login
+      description: Generates access token for authenticated mobile number without
+        OTP verification. Requires valid API key.
+      operationId: apiLogin
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: Partner API key for authentication
+          required: true
+          example: your-api-key
+          schema:
+            type: string
+        - name: partner-id
+          in: header
+          description: Partner ID for validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiLoginRequest'
+        required: true
+      responses:
+        '400':
+          description: Invalid mobile number
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: User not found or inactive
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Access token generated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApiLoginResponse'
+  /v1/accesses/generate-access:
+    post:
+      tags:
+        - Access Management
+      summary: Generate access (PASSCODE or REMOTE) for staff for a room
+      description: Generates new access for a specific room. Supports PASSCODE and
+        REMOTE.
+      operationId: generateAccess_1
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateAccessRequest'
+        required: true
+      responses:
+        '201':
+          description: Access generated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error or IoT service failure
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/properties/{propertyId}/access-logs:
+    get:
+      tags:
+        - Property Management
+      summary: Get property access logs
+      description: Retrieve access logs for a specific property with filtering options
+      operationId: getPropertyAccessLogs
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property ID
+          required: true
+          schema:
+            type: string
+          example: prop123
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 50
+          example: 50
+        - name: room_id
+          in: query
+          description: Filter by room ID
+          required: false
+          schema:
+            type: string
+          example: room123
+        - name: guest_id
+          in: query
+          description: Filter by guest ID
+          required: false
+          schema:
+            type: string
+          example: guest123
+        - name: access_type
+          in: query
+          description: Filter by access type
+          required: false
+          schema:
+            type: string
+          example: PASSCODE
+        - name: start_date
+          in: query
+          description: Start date filter (Unix timestamp)
+          required: false
+          schema:
+            type: integer
+            format: int64
+          example: 1691011200
+        - name: end_date
+          in: query
+          description: End date filter (Unix timestamp)
+          required: false
+          schema:
+            type: integer
+            format: int64
+          example: 1693689599
+      responses:
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Access logs retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/properties/user/{userId}:
+    get:
+      tags:
+        - Property Management
+      summary: Get properties managed by a user
+      description: Retrieves list of properties managed by a specific user with pagination
+      operationId: getUserProperties
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: API Key for authentication
+          required: true
+          example: your-api-key
+          schema:
+            type: string
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+          example: user123
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+          example: 20
+      responses:
+        '400':
+          description: Invalid request parameters
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Authentication failed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: User properties retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/partners/{partnerId}/properties:
+    get:
+      tags:
+        - Partner Management
+      summary: Get partner properties
+      description: Retrieve a paginated list of properties belonging to a specific
+        partner
+      operationId: getPartnerProperties
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: partnerId
+          in: path
+          description: Partner ID
+          required: true
+          schema:
+            type: string
+          example: partner123
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+          example: 20
+        - name: city
+          in: query
+          description: Filter by city
+          required: false
+          schema:
+            type: string
+          example: Bangalore
+        - name: area
+          in: query
+          description: Filter by area
+          required: false
+          schema:
+            type: string
+          example: Koramangala
+      responses:
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Invalid authentication
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Partner properties retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Partner not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/partners/{partnerId}/accesses:
+    get:
+      tags:
+        - Partner Management
+      summary: Get partner accesses
+      description: Retrieves all access permissions for a specific partner across
+        all properties and rooms. Only accessible by PARTNER_ADMIN role.
+      operationId: getPartnerAccesses
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: partnerId
+          in: path
+          description: Partner ID
+          required: true
+          schema:
+            type: string
+          example: partner123
+        - name: page
+          in: query
+          description: 'Page number (default: 1)'
+          required: false
+          schema:
+            type: integer
+            format: int32
+          example: 1
+        - name: limit
+          in: query
+          description: 'Items per page (default: 20)'
+          required: false
+          schema:
+            type: integer
+            format: int32
+          example: 20
+        - name: property_id
+          in: query
+          description: Filter by property ID
+          required: false
+          schema:
+            type: string
+          example: prop123
+        - name: room_ids
+          in: query
+          description: Filter by room ID(s) - supports CSV format
+          required: false
+          schema:
+            type: string
+          example: room123,room456
+        - name: guest_id
+          in: query
+          description: Filter by guest ID
+          required: false
+          schema:
+            type: string
+          example: guest123
+        - name: access_type
+          in: query
+          description: Filter by access type
+          required: false
+          schema:
+            type: string
+            enum:
+              - PASSCODE
+              - REMOTE
+              - FINGERPRINT
+              - RFID
+              - KEY
+          example: PASSCODE
+        - name: status
+          in: query
+          description: Filter by status
+          required: false
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - EXPIRED
+              - REVOKED
+          example: ACTIVE
+      responses:
+        '401':
+          description: Access denied - Only partner admin can access
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Partner not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Partner accesses retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/guests/{guestId}/accesses:
+    get:
+      tags:
+        - Guest Management
+      summary: Get guest accesses
+      description: Retrieves all access permissions for a specific guest
+      operationId: getGuestAccesses
+      parameters:
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: guestId
+          in: path
+          description: Guest ID
+          required: true
+          schema:
+            type: string
+          example: guest_123
+        - name: page
+          in: query
+          description: 'Page number (default: 1)'
+          required: false
+          schema:
+            type: integer
+            format: int32
+          example: 1
+        - name: limit
+          in: query
+          description: 'Items per page (default: 50)'
+          required: false
+          schema:
+            type: integer
+            format: int32
+          example: 50
+        - name: status
+          in: query
+          description: Filter by status
+          required: false
+          schema:
+            type: string
+          example: ACTIVE
+        - name: roomId
+          in: query
+          description: Filter by room ID
+          required: false
+          schema:
+            type: string
+          example: room123
+      responses:
+        '404':
+          description: Guest not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Authentication failed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Guest accesses retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/properties/{propertyId}/managers/{managerId}:
+    delete:
+      tags:
+        - Property Management
+      summary: Remove manager from property
+      description: Remove a specific manager from a property. Only
+        Partner Admins can perform this operation.
+      operationId: removeManagerFromProperty
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: API key for authentication
+          required: true
+          example: your-api-key
+          schema:
+            type: string
+        - name: partner-id
+          in: header
+          description: Partner ID for validation
+          required: true
+          example: Partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9898756476
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: propertyId
+          in: path
+          description: Property 10
+          required: true
+          schema:
+            type: string
+          example: property123
+        - name: managerId
+          in: path
+          description: Manager ID (User ID
+          required: true
+          schema:
+            type: string
+          example: user456
+      responses:
+        '401':
+          description: Authentication failed or insufficient permissions
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: Manager removed successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/partners/{partnerId}/users/{userId}:
+    delete:
+      tags:
+        - Partner Management
+      summary: Delete partner user
+      description: Delete a user from partner's organization. Only super admins can
+        perform this operation. Validates that user is not assigned as property manager.
+      operationId: deletePartnerUser
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: API Key for authentication
+          required: true
+          example: your-api-key
+          schema:
+            type: string
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: partnerId
+          in: path
+          description: Partner ID
+          required: true
+          schema:
+            type: string
+          example: partner123
+        - name: userId
+          in: path
+          description: User ID to delete
+          required: true
+          schema:
+            type: string
+          example: user123
+      responses:
+        '401':
+          description: Authentication failed or not super admin
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '200':
+          description: User deleted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Cannot delete user due to property manager assignments
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /v1/partners/{partnerId}/locks/{lockId}:
+    delete:
+      tags:
+        - Partner Management
+      summary: Delete partner lock
+      description: Delete a lock from partner's inventory. Validates that there are
+        no active guests or accesses before deletion.
+      operationId: deletePartnerLock
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: API Key for authentication
+          required: true
+          example: your-api-key
+          schema:
+            type: string
+        - name: partner-id
+          in: header
+          description: Partner ID for dual validation
+          required: true
+          example: partner123
+          schema:
+            type: string
+        - name: mobile
+          in: header
+          description: User mobile number for dual validation
+          required: true
+          example: 9876543210
+          schema:
+            type: string
+        - name: platform
+          in: header
+          description: Platform identifier (1=app, 2=web, 3=api)
+          required: true
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+              - '3'
+          example: 3
+        - name: session-token
+          in: header
+          description: 'Session token (for all platforms: web uses session tokens, app/API uses access tokens)'
+          required: true
+          example: your-session-token
+          schema:
+            type: string
+        - name: partnerId
+          in: path
+          description: Partner ID
+          required: true
+          schema:
+            type: string
+          example: partner123
+        - name: lockId
+          in: path
+          description: Lock ID to delete
+          required: true
+          schema:
+            type: string
+          example: lock123
+      responses:
+        '200':
+          description: Lock deleted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Lock not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Cannot delete lock due to active guests or accesses
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Authentication failed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+components:
+  schemas:
+    RoomUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the room
+          example: Room 101 Updated
+        floor:
+          minimum: 0
+          type: integer
+          description: Floor number
+          format: int32
+          example: 1
+        capacity:
+          minimum: 1
+          type: integer
+          description: Room capacity
+          format: int32
+          example: 3
+        status:
+          type: string
+          description: Status of the room
+          example: AVAILABLE
+          enum:
+            - AVAILABLE
+            - OCCUPIED
+            - MAINTENANCE
+            - OUT_OF_ORDER
+            - ACTIVE
+            - INACTIVE
+        description:
+          type: string
+          description: Additional description or notes about the room
+          example: Updated corner room with balcony
+        room_number:
+          type: string
+          description: Room number
+          example: 101A
+        room_type:
+          type: string
+          description: Type of room
+          example: DOUBLE
+          enum:
+            - SINGLE
+            - DOUBLE
+      description: Room update request
+    BaseResponse:
+      type: object
+      properties:
+        es:
+          type: integer
+          description: 'Error state indicator: 0=success, 1=error, 2=no data'
+          format: int32
+          example: 0
+          enum:
+            - 0
+            - 1
+            - 2
+        message:
+          type: string
+          description: Human-readable status message
+          example: Operation completed successfully
+        response:
+          type: string
+          description: Response data as JSON string
+          example: '{"id":"guest123","name":"John Doe"}'
+        errorCode:
+          type: integer
+          description: Application-specific error code
+          format: int32
+          example: 1001
+        statusCode:
+          type: integer
+          description: Internal status code
+          format: int32
+          example: 200
+        time:
+          type: integer
+          description: Response timestamp as Unix timestamp in seconds
+          format: int64
+          example: 1704067200
+      description: Standard API response wrapper
+    PropertyUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the property
+          example: Sunset Residency Updated
+        city:
+          type: string
+          description: City where the property is located
+          example: Mumbai
+        area:
+          type: string
+          description: Area where the property is located
+          example: Bandra
+        address:
+          type: string
+          description: Full address of the property
+          example: 456 Updated Property Street, Bandra, Mumbai
+        status:
+          type: string
+          description: Status of the property
+          example: ACTIVE
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - MAINTENANCE
+        description:
+          type: string
+          description: Additional description or notes about the property
+          example: Updated modern hostel with all amenities
+        manager_id:
+          type: string
+          description: ID of the user who will manage this property
+          example: user_456
+        property_type:
+          type: string
+          description: Type of property
+          example: HOSTEL
+          enum:
+            - HOSTEL
+            - HOTEL
+            - PG
+            - CO_LIVING
+            - STUDENT_HOUSING
+        total_floors:
+          minimum: 1
+          type: integer
+          description: Total number of floors in the property
+          format: int32
+          example: 4
+      description: Property update request
+    PartnerUpdateRequest:
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          minLength: 0
+          type: string
+          description: Name of the partner organization
+          example: ABC Properties Ltd
+        mobile:
+          pattern: ^[0-9]{10}$
+          type: string
+          description: Primary mobile number
+          example: '9876543210'
+        email:
+          type: string
+          description: Primary email address
+          format: email
+          example: contact@abcproperties.com
+        city:
+          maxLength: 50
+          minLength: 0
+          type: string
+          description: City where the partner is located
+          example: Bangalore
+        area:
+          maxLength: 100
+          minLength: 0
+          type: string
+          description: Area or locality where the partner is located
+          example: Koramangala
+        address:
+          maxLength: 500
+          minLength: 0
+          type: string
+          description: Complete address of the partner
+          example: 123, ABC Building, Main Street, Koramangala, Bangalore - 560034
+        status:
+          type: string
+          description: Partner status
+          example: ACTIVE
+          enum:
+            - ACTIVE
+            - INACTIVE
+        contact_person:
+          maxLength: 100
+          minLength: 0
+          type: string
+          description: Name of the primary contact person
+          example: John Doe
+      description: Partner update request
+    GuestUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Full name of the guest
+          example: Jane Smith Updated
+        mobile:
+          type: string
+          description: Mobile number of the guest
+          example: '9876543211'
+        email:
+          type: string
+          description: Email address of the guest
+          example: jane.updated@email.com
+        guest_type:
+          type: string
+          description: Type of guest
+          example: RESIDENT
+          enum:
+            - RESIDENT
+            - VISITOR
+            - STAFF
+            - MAINTENANCE
+        id_proof_type:
+          type: string
+          description: Type of ID proof
+          example: AADHAR
+          enum:
+            - AADHAR
+            - PAN
+            - PASSPORT
+            - DRIVING_LICENSE
+            - VOTER_ID
+        id_proof_number:
+          type: string
+          description: ID proof number
+          example: '1234567890'
+      description: Guest update request
+    AccessUpdateRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Status of the access
+          example: ACTIVE
+          enum:
+            - ACTIVE
+            - EXPIRED
+            - REVOKED
+            - SUSPENDED
+        validity_type:
+          type: string
+          description: Type of validity for the access
+          example: TIMED
+          enum:
+            - PERMANENT
+            - TIMED
+            - ONETIME
+        start_time:
+          type: integer
+          description: Start time for access validity as Unix timestamp
+          format: int64
+          example: 1704067200
+        end_time:
+          type: integer
+          description: End time for access validity as Unix timestamp
+          format: int64
+          example: 1704153600
+        access_name:
+          maxLength: 100
+          type: string
+          description: Name or description for the access
+          example: Guest Room Access
+        max_usage:
+          type: integer
+          description: Maximum number of times this access can be used
+          format: int32
+          example: 10
+        upate_type:
+          type: integer
+          format: int32
+      description: Access update request details
+    AdminToggleRequest:
+      required:
+        - is_admin
+        - property_id
+        - room_id
+        - user_id
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: User ID from mg_sd_partner_users whose admin authority to toggle
+          example: user_123
+        property_id:
+          type: string
+          description: Property ID to fetch property context
+          example: prop_123
+        room_id:
+          type: string
+          description: Room ID to identify the IoT device
+          example: room_123
+        is_admin:
+          type: boolean
+          description: true to grant admin authority, false to revoke admin authority
+          example: true
+      description: Admin toggle request with user_id, property_id, room_id, and is_admin
+    PartnerUserCreateRequest:
+      required:
+        - mobile
+        - name
+        - role
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          minLength: 0
+          type: string
+          description: Full name of the user
+          example: Jane Smith
+        mobile:
+          pattern: ^[0-9]{10}$
+          type: string
+          description: Mobile number of the user
+          example: '9876543210'
+        email:
+          type: string
+          description: Email address of the user
+          format: email
+          example: jane.smith@abcproperties.com
+        role:
+          type: string
+          description: Role of the user within the partner organization
+          example: PARTNER_MANAGER
+          enum:
+            - PARTNER_ADMIN
+            - PARTNER_MANAGER
+        property_id:
+          type: string
+          description: Property ID to assign the manager to (optional, only applicable
+            for PARTNER_MANAGER role)
+          example: prop123
+      description: Partner user creation request
+    AttachLockRequest:
+      required:
+        - lock_serial_number
+      type: object
+      properties:
+        lock_serial_number:
+          type: string
+          description: Serial number of the lock to attach
+          example: MG123456
+      description: Attach lock request
+    RoomAccessCreateRequest:
+      required:
+        - access_type
+        - guest_id
+        - validity_type
+      type: object
+      properties:
+        guest_id:
+          type: string
+          description: Unique identifier of the guest
+          example: guest123
+        access_type:
+          type: string
+          description: Type of access to create
+          example: PASSCODE
+          enum:
+            - REMOTE
+            - PASSCODE
+            - FINGERPRINT
+            - RFID
+            - KEY
+            - REMOTEKEY
+            - HOME_AUTOMATION_ACCESS
+            - SYSTEM
+        validity_type:
+          type: string
+          description: Type of validity for the access
+          example: TIMED
+          enum:
+            - O
+            - P
+            - T
+            - PERMANENT
+            - TIMED
+            - ONETIME
+        start_time:
+          type: integer
+          description: Start time for access validity as Unix timestamp in seconds
+          format: int64
+          example: 1704067200
+        end_time:
+          type: integer
+          description: End time for access validity as Unix timestamp in seconds
+          format: int64
+          example: 1704153600
+        access_name:
+          maxLength: 100
+          type: string
+          description: Name or description for the access
+          example: Guest Room Access
+        passcode:
+          pattern: ^[0-9]{4,8}$
+          type: string
+          description: Custom passcode for PASSCODE access type (4-8 digits). If not
+            provided, system will generate one.
+          example: '123456'
+      description: Room access creation request
+    PropertyCreateRequest:
+      required:
+        - address
+        - area
+        - city
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the property
+          example: Sunset Residency
+        city:
+          type: string
+          description: City where the property is located
+          example: Mumbai
+        area:
+          type: string
+          description: Area where the property is located
+          example: Bandra
+        address:
+          type: string
+          description: Full address of the property
+          example: 456 Property Street, Bandra, Mumbai
+        description:
+          type: string
+          description: Additional description or notes about the property
+          example: Modern hostel with all amenities
+        manager_id:
+          type: string
+          description: ID of the user who will manage this property
+          example: user_456
+        property_type:
+          type: string
+          description: Type of property
+          example: HOSTEL
+          enum:
+            - HOSTEL
+            - HOTEL
+            - PG
+            - CO_LIVING
+            - STUDENT_HOUSING
+        total_floors:
+          minimum: 1
+          type: integer
+          description: Total number of floors in the property
+          format: int32
+          example: 3
+      description: Property creation request
+    RoomCreateRequest:
+      required:
+        - name
+        - room_number
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the room
+          example: Room 101
+        floor:
+          minimum: 0
+          type: integer
+          description: Floor number
+          format: int32
+          example: 1
+        capacity:
+          minimum: 1
+          type: integer
+          description: Room capacity
+          format: int32
+          example: 1
+        description:
+          type: string
+          description: Additional description or notes about the room
+          example: Corner room with balcony
+        room_number:
+          type: string
+          description: Room number
+          example: '101'
+        room_type:
+          type: string
+          description: Type of room
+          example: SINGLE
+          enum:
+            - SINGLE
+            - DOUBLE
+      description: Room creation request
+    AssignManagersRequest:
+      required:
+        - user_ids
+      type: object
+      properties:
+        user_ids:
+          maxItems: 10
+          minItems: 1
+          type: array
+          description: List of user IDs to assign as managers
+          example:
+            - user_123
+            - user_456
+          items:
+            type: string
+            description: List of user IDs to assign as managers
+            example: '["user_123","user_456"]'
+        create_admin:
+          type: boolean
+          description: Whether to create managers as IoT device admins. Defaults to
+            true.
+          example: true
+      description: Manager assignment request
+    GuestCreateRequest:
+      required:
+        - guest_type
+        - mobile
+        - name
+        - room_id
+      type: object
+      properties:
+        name:
+          type: string
+          description: Full name of the guest
+          example: Jane Smith
+        mobile:
+          type: string
+          description: Mobile number of the guest
+          example: '9876543211'
+        email:
+          type: string
+          description: Email address of the guest
+          example: jane@email.com
+        guest_type:
+          type: string
+          description: Type of guest
+          example: RESIDENT
+          enum:
+            - RESIDENT
+            - VISITOR
+            - STAFF
+            - MAINTENANCE
+        room_id:
+          type: string
+          description: ID of the room where guest will stay
+          example: room_123
+        check_in_date:
+          type: integer
+          description: Check-in date as epoch timestamp
+          format: int64
+          example: 1692109200
+        check_out_date:
+          type: integer
+          description: Expected check-out date as epoch timestamp
+          format: int64
+          example: 1692540000
+        id_proof_type:
+          type: string
+          description: Type of ID proof
+          example: AADHAR
+          enum:
+            - AADHAR
+            - PAN
+            - PASSPORT
+            - DRIVING_LICENSE
+            - VOTER_ID
+        id_proof_number:
+          type: string
+          description: ID proof number
+          example: '1234567890'
+      description: Guest creation request
+    AssignLocksRequest:
+      required:
+        - serial_numbers
+      type: object
+      properties:
+        serial_numbers:
+          maxItems: 2147483647
+          minItems: 1
+          type: array
+          description: List of lock serial numbers to assign to the partner
+          example:
+            - SN001234
+            - SN001235
+            - SN001236
+          items:
+            type: string
+            description: List of lock serial numbers to assign to the partner
+            example: '["SN001234","SN001235","SN001236"]'
+      description: JSON request with serial numbers
+    MgPartnerUsers:
+      type: object
+      properties:
+        id:
+          type: string
+        created:
+          type: integer
+          format: int64
+        createdBy:
+          type: integer
+          format: int32
+        updated:
+          type: integer
+          format: int64
+        updatedBy:
+          type: integer
+          format: int32
+        deleted:
+          type: integer
+          format: int32
+        ttl:
+          type: string
+          format: date-time
+        partnerId:
+          type: string
+        name:
+          type: string
+        mobile:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+        status:
+          type: string
+        lastLogin:
+          type: integer
+          format: int64
+    UserProfile:
+      type: object
+      properties:
+        imageUrl:
+          type: string
+        department:
+          type: string
+    ApiLoginRequest:
+      required:
+        - mobile
+      type: object
+      properties:
+        mobile:
+          pattern: ^[6-9][0-9]{9}$
+          type: string
+    ApiLoginResponse:
+      type: object
+      properties:
+        es:
+          type: integer
+          description: 'Error state indicator: 0=success, 1=error, 2=no data'
+          format: int32
+          example: 0
+          enum:
+            - 0
+            - 1
+            - 2
+        message:
+          type: string
+          description: Human-readable status message
+          example: Operation completed successfully
+        response:
+          type: string
+          description: Response data as JSON string
+          example: '{"id":"guest123","name":"John Doe"}'
+        errorCode:
+          type: integer
+          description: Application-specific error code
+          format: int32
+          example: 1001
+        statusCode:
+          type: integer
+          description: Internal status code
+          format: int32
+          example: 200
+        time:
+          type: integer
+          description: Response timestamp as Unix timestamp in seconds
+          format: int64
+          example: 1704067200
+        session_token:
+          type: string
+        user:
+          $ref: '#/components/schemas/MgPartnerUsers'
+        expires_in:
+          type: integer
+          format: int64
+    GenerateAccessRequest:
+      required:
+        - access_type
+        - property_id
+        - room_id
+        - validity_type
+      type: object
+      properties:
+        property_id:
+          type: string
+          description: Unique identifier of the property
+          example: property123
+        room_id:
+          type: string
+          description: Unique identifier of the room
+          example: room123
+        user_id:
+          type: string
+          description: Unique identifier of the user from mg_sd_partner_users. Required
+            for REMOTE access. If provided for PASSCODE, guest will be created with
+            user's mobile.
+          example: user123
+        access_type:
+          type: string
+          description: Type of access to create. PASSCODE supports all validity types.
+            REMOTE only supports PERMANENT and TIMED.
+          example: PASSCODE
+          enum:
+            - REMOTE
+            - PASSCODE
+            - FINGERPRINT
+            - RFID
+            - KEY
+            - REMOTEKEY
+            - HOME_AUTOMATION_ACCESS
+            - SYSTEM
+        validity_type:
+          type: string
+          description: Type of validity for the access. PASSCODE supports all types.
+            REMOTE only supports PERMANENT and TIMED.
+          example: TIMED
+          enum:
+            - O
+            - P
+            - T
+            - PERMANENT
+            - TIMED
+            - ONETIME
+        start_time:
+          type: integer
+          description: Start time for access validity as Unix timestamp in seconds.
+            Required for TIMED validity. Auto-set for ONETIME (PASSCODE only).
+          format: int64
+          example: 1704067200
+        end_time:
+          type: integer
+          description: End time for access validity as Unix timestamp in seconds.
+            Required for TIMED validity. Auto-set for ONETIME (PASSCODE only).
+          format: int64
+          example: 1704153600
+        access_name:
+          maxLength: 100
+          type: string
+          description: Name or description for the access. Required if user_id is
+            not provided.
+          example: Guest Room Access
+        passcode:
+          pattern: ^[0-9]{4,8}$
+          type: string
+          description: Custom passcode for PASSCODE access type (4-8 digits). Only
+            allowed for PASSCODE type. Not allowed for ONETIME validity.
+          example: '123456'
+        is_admin:
+          type: boolean
+          description: Grant admin authority to the user (optional, only for REMOTE
+            access type with user_id). Creates app access with admin role.
+          example: true
+      description: Access generation request details (PASSCODE or REMOTE)

@@ -1,0 +1,21 @@
+# Dependency directories
+node_modules/
+.pnp/
+.pnp.js
+
+# Environment variables
+.env
+
+# Testing
+coverage/
+
+# Build output
+build/
+dist/
+
+# OS and editor-related
+.DS_Store
+*.log
+
+backend/
+.github/

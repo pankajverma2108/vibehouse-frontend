@@ -4,11 +4,15 @@ import { SectionHeading } from "@/components/marketing/section-heading";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { FadeIn, Stagger, StaggerItem } from "@/components/shared/motion";
 import { eventPageContent, pastEventImages, weeklyLineup } from "@/content/events";
-import { getDefaultPropertyId, getPublicEvents } from "@/lib/cx-api";
+import { getPublicEvents } from "@/lib/cx-api";
+import { resolveServerPropertyId } from "@/lib/property-resolver";
+import { headers } from "next/headers";
 
 export default async function EventsPage() {
-  const propertyId = getDefaultPropertyId() || undefined;
-  const liveEvents = await getPublicEvents({ propertyId });
+  const headerList = await headers();
+  const hostname = headerList.get("host") || "";
+  const propertyId = resolveServerPropertyId({ hostname }) || undefined;
+  const liveEvents = propertyId ? await getPublicEvents({ propertyId }) : [];
 
   const eventGridClass =
     liveEvents.length <= 1

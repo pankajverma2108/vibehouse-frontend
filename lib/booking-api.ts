@@ -260,12 +260,13 @@ export type KycSubmitPayload = {
   consent_given: boolean;
 };
 
-export async function getStoreCatalog(propertyId?: string): Promise<StoreCatalogItem[]> {
+export async function getStoreCatalog(propertyId: string): Promise<StoreCatalogItem[]> {
   const normalizedPropertyId = propertyId?.trim();
-  const path = normalizedPropertyId
-    ? `/guest/store/catalog?property_id=${encodeURIComponent(normalizedPropertyId)}`
-    : "/guest/store/catalog";
+  if (!normalizedPropertyId) {
+    return [];
+  }
 
+  const path = `/guest/store/catalog?property_id=${encodeURIComponent(normalizedPropertyId)}`;
   return requestJson<StoreCatalogItem[]>(path, { method: "GET" });
 }
 

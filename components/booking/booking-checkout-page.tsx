@@ -53,6 +53,7 @@ import { getDefaultPropertyDestinationHref } from "@/lib/cx-api";
 import { getColivePropertyAddons } from "@/lib/colive-api";
 import { getStoredGuestToken } from "@/lib/guest-auth-api";
 import { isValidEmail, isValidPhone, normalizeEmail, normalizePhone } from "@/lib/guest-form-validation";
+import { usePropertyId } from "@/lib/property-resolver";
 import { propertyGuidelines, propertyHero } from "@/content/rooms";
 import { toast } from "sonner";
 
@@ -153,7 +154,6 @@ const POLICY_SECTIONS = [
 
 const ROOM_GST_RATE = 0.05;
 const STANDARD_ADDON_GST_RATE = 0.18;
-const ADDON_PROPERTY_ID = "60765";
 
 function normalizeCouponCode(value?: string | null): string {
   return (value ?? "").trim().toUpperCase();
@@ -582,6 +582,7 @@ function tabButtonClasses(isActive: boolean, isComplete: boolean) {
 
 export function BookingCheckoutPage() {
   const router = useRouter();
+  const propertyId = usePropertyId();
   const { guest, isAuthenticated, openAuthModal, updateGuestProfile } = useGuestAuth();
   const [draft, setDraft] = useState<BookingDraft | null>(null);
   const [activeTab, setActiveTab] = useState<ReviewTab>("guest");
@@ -652,7 +653,7 @@ export function BookingCheckoutPage() {
       setCatalogError(null);
 
       try {
-        const usedPropertyId = draft?.propertyId ?? ADDON_PROPERTY_ID;
+        const usedPropertyId = draft?.propertyId ?? propertyId;
         const isColive = coliveAddonPropertyId && coliveAddonDurationMonths;
 
         const response: unknown = isColive

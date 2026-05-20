@@ -4,12 +4,13 @@ import { HomeSections } from "@/components/marketing/pages/home-sections";
 import { BookingWidget } from "@/components/marketing/widgets/booking-widget";
 import { heroImages, homePageContent } from "@/content/home";
 import {
-  getDefaultPropertyId,
   getDefaultPropertyDestinationHref,
   getPublicEvents,
   getRoomAvailabilitySnapshot,
   roomTypesToHomeCards,
 } from "@/lib/cx-api";
+import { resolveServerPropertyId } from "@/lib/property-resolver";
+import { headers } from "next/headers";
 
 type HomePageProps = {
   searchParams?: Promise<{
@@ -21,7 +22,9 @@ type HomePageProps = {
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
-  const propertyId = params?.property_id || getDefaultPropertyId() || undefined;
+  const headerList = await headers();
+  const hostname = headerList.get("host") || "";
+  const propertyId = resolveServerPropertyId({ explicit: params?.property_id, hostname }) || undefined;
 
   if (!params?.checkin || !params?.checkout || !params?.property_id) {
     redirect(getDefaultPropertyDestinationHref(propertyId, "/"));

@@ -1,0 +1,14 @@
+﻿{
+    "access_token":  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNzMxOTgwMS1jZGNmLTQwZDctOWMxMi1jZTFkMmVjOTVhMzgiLCJndWVzdF9pZCI6IjI3MzE5ODAxLWNkY2YtNDBkNy05YzEyLWNlMWQyZWM5NWEzOCIsImVtYWlsIjoidGVzdEBhYmMuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsImlhdCI6MTc3ODc1OTkzOSwiZXhwIjoxNzc5MzY0NzM5fQ.1Tg9FHHIrBUfDxmduasYS6m6yNa1_IT3DOv927lsTEE",
+    "guest":  {
+                  "id":  "27319801-cdcf-40d7-9c12-ce1d2ec95a38",
+                  "name":  "Pankaj Verma",
+                  "email":  "test@abc.com",
+                  "phone":  "7477036148",
+                  "email_verified":  false,
+                  "phone_verified":  false,
+                  "two_fa_enabled":  false,
+                  "profile_photo_url":  null,
+                  "created_at":  "2026-04-16T10:46:47.614Z"
+              }
+}

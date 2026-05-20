@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getDefaultPropertyId, getRoomAvailabilitySnapshot, roomTypesToPropertyCategories } from "@/lib/cx-api";
+import { getRoomAvailabilitySnapshot, roomTypesToPropertyCategories } from "@/lib/cx-api";
 
 const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const PROPERTY_ID_REGEX = /^\d+$/;
@@ -37,9 +37,12 @@ function jsonError(status: number, code: string, message: string, requestId: str
 export async function GET(request: Request) {
   const requestId = crypto.randomUUID();
   const { searchParams } = new URL(request.url);
-  const configuredPropertyId = getDefaultPropertyId();
   const rawPropertyId = searchParams.get("property_id")?.trim() || "";
-  const propertyId = rawPropertyId || configuredPropertyId || undefined;
+  const propertyId = rawPropertyId || undefined;
+
+  if (!propertyId) {
+    return jsonError(400, "missing_property_id", "property_id query param is required.", requestId);
+  }
   const rawCheckin = searchParams.get("checkin")?.trim() || "";
   const rawCheckout = searchParams.get("checkout")?.trim() || "";
 
@@ -84,7 +87,7 @@ export async function GET(request: Request) {
       : "public, max-age=300, stale-while-revalidate=3600";
 
     const response = NextResponse.json({
-      property_id: snapshot.propertyId || propertyId || configuredPropertyId,
+      property_id: snapshot.propertyId || propertyId,
       checkin: snapshot.checkin || undefined,
       checkout: snapshot.checkout || undefined,
       mode: snapshot.mode,

@@ -1,0 +1,72 @@
+Method,Route,Description,Category,Role
+POST,/admin/auth/login,Admin login with email + password + role,Admin Auth,All Admin
+GET,/admin/auth/me,Get authenticated admin profile,Admin Auth,All Admin
+POST,/admin/users,Create new admin user,Admin Users,Admin (admin.create)
+GET,/admin/users,List all admin users,Admin Users,Admin (admin.manage)
+GET,/admin/users/roles,List all admin roles with permissions,Admin Users,Admin (admin.manage)
+GET,/admin/users/:id,Get single admin user detail,Admin Users,Admin (admin.manage)
+PATCH,/admin/users/:id/deactivate,Soft-deactivate an admin account,Admin Users,Admin (admin.manage)
+PATCH,/admin/users/:id/profile,Update admin profile (self or subordinate),Admin Users,All Admin (self) / Higher rank (others)
+DELETE,/admin/users/:id,Hard-delete an admin user,Admin Users,Admin (admin.manage)
+POST,/guest/auth/signup,Guest signup with email + password,Guest Auth,Public
+POST,/guest/auth/login,Guest login with email + password,Guest Auth,Public
+GET,/guest/auth/me,Get authenticated guest profile with bookings,Guest Auth,Guest
+POST,/admin/inventory/products,Create a product in catalog,Admin Inventory,Admin (inventory.edit)
+GET,/admin/inventory/products,List all products for property,Admin Inventory,Admin (inventory.view)
+GET,/admin/inventory/products/:id,Get single product detail,Admin Inventory,Admin (inventory.view)
+PATCH,/admin/inventory/products/:id,Update product details,Admin Inventory,Admin (inventory.edit)
+DELETE,/admin/inventory/products/:id,Hard-delete product (if no orders),Admin Inventory,Admin (inventory.edit)
+GET,/admin/inventory/stock,List all inventory stock rows,Admin Inventory,Admin (inventory.view)
+POST,/admin/inventory/stock/:productId/restock,Add units to stock,Admin Inventory,Admin (inventory.edit)
+POST,/admin/inventory/stock/:productId/damage,Mark units as damaged,Admin Inventory,Admin (inventory.edit)
+PATCH,/admin/inventory/stock/:id,Update stock config (low-stock threshold),Admin Inventory,Admin (inventory.edit)
+GET,/admin/inventory/borrowables,List borrowable inventory with active checkouts,Admin Inventory,Admin (borrowable.manage)
+GET,/admin/inventory/borrowables/checkouts,List all active borrowable checkouts,Admin Inventory,Admin (borrowable.manage)
+GET,/admin/inventory/borrowables/guests?q=,Search active guests for borrowable checkout,Admin Inventory,Admin (borrowable.manage)
+POST,/admin/inventory/borrowables/:productId/checkout,Lend borrowable item to guest,Admin Inventory,Admin (borrowable.manage)
+POST,/admin/inventory/borrowables/:id/verify-return,Verify borrowable item returned,Admin Inventory,Admin (borrowable.return_verify)
+GET,/guest/store/catalog?property_id=,Browse purchasable catalog (COMMODITY + paid SERVICE),Guest Store,Public
+GET,/guest/store/services?property_id=,Browse free in-house services,Guest Store,Public
+GET,/guest/store/borrowables?property_id=,Browse borrowable items with availability,Guest Store,Public
+GET,/guest/store/cart/:eri,Get guest cart for a booking,Guest Store,Guest (booking access)
+POST,/guest/store/cart/:eri/add,Add item to cart,Guest Store,Guest (booking access)
+PATCH,/guest/store/cart/:eri/item/:itemId,Update cart item quantity,Guest Store,Guest (booking access)
+DELETE,/guest/store/cart/:eri/item/:itemId,Remove item from cart,Guest Store,Guest (booking access)
+POST,/guest/store/cart/:eri/checkout,Checkout cart (review summary),Guest Store,Guest (booking access)
+POST,/guest/store/:eri/borrowable/request,Request a borrowable item,Guest Store,Guest (booking access)
+GET,/guest/store/:eri/borrowable/mine,List my borrowable checkouts,Guest Store,Guest (booking access)
+POST,/guest/store/:eri/service/request,Request free service (post-check-in only),Guest Store,Guest (checked-in)
+GET,/guest/store/:eri/orders,View order history for a booking,Guest Store,Guest (booking access)
+POST,/guest/booking/link,Link guest account to eZee reservation,Booking Linking,Guest
+GET,/guest/booking/mine,List all linked bookings,Booking Linking,Guest
+GET,/guest/kyc/:eri/slots,List booking slots with KYC status,KYC,Guest (booking access)
+GET,/guest/kyc/:eri/slots/:slotId,Get full KYC detail for a slot,KYC,Guest (booking access)
+POST,/guest/kyc/:eri/upload-url,Get presigned S3 upload URL for KYC doc,KYC,Guest (booking access)
+POST,/guest/kyc/:eri/slots/add,Add new empty slot to booking,KYC,Guest (booking access)
+DELETE,/guest/kyc/:eri/slots/:slotId,Delete a booking slot (unless VERIFIED),KYC,Guest (booking access)
+POST,/guest/kyc/:eri/slots/:slotId/ocr,Run OCR on uploaded ID document,KYC,Guest (booking access)
+POST,/guest/kyc/:eri/slots/:slotId/submit,Submit KYC form for a slot,KYC,Guest (booking access)
+POST,/admin/kyc/test-ocr,Test OCR on base64-encoded ID images,KYC (Admin),All Admin
+POST,/payment/create-order,Create Razorpay order for addon cart,Payment,Guest
+POST,/payment/verify,Verify Razorpay payment after checkout modal,Payment,Guest
+POST,/webhook/razorpay,Razorpay server-to-server webhook,Payment,Public (webhook signature)
+POST,/payment/dev/simulate-capture,Simulate successful payment (dev only),Payment,Public (dev only)
+POST,/payment/fail,Report payment failure from frontend,Payment,Guest
+POST,/payment/dev/simulate-fail,Simulate payment failure (dev only),Payment,Public (dev only)
+GET,/guest/booking/rooms,Browse available room types for property + dates,Guest Booking,Public
+POST,/guest/booking/create-order,Create pending booking with rooms + addons,Guest Booking,Guest
+POST,/payment/create-booking-order,Create Razorpay order for pending booking,Guest Booking,Guest
+POST,/admin/bookings/create-order,Create manual walk-in booking,Admin Bookings,Admin (bookings.create)
+POST,/admin/bookings/:eri/pay,Create Razorpay order for manual booking,Admin Bookings,Admin (bookings.create)
+GET,/admin/bookings,List all bookings with pagination,Admin Bookings,Admin (bookings.view)
+GET,/admin/bookings/:eri,Get full booking detail,Admin Bookings,Admin (bookings.view)
+GET,/admin/bookings/search-guests?q=,Search guests for manual booking form,Admin Bookings,Admin (bookings.create)
+POST,/admin/events,Create event for property,Admin Events,Admin (events.edit)
+GET,/admin/events,List all events (active + hidden),Admin Events,Admin (events.view)
+GET,/admin/events/:id,Get single event detail,Admin Events,Admin (events.view)
+PATCH,/admin/events/:id,Update event details,Admin Events,Admin (events.edit)
+DELETE,/admin/events/:id,Permanently delete event,Admin Events,Admin (events.edit)
+POST,/admin/events/upload-poster,Upload event poster image to S3,Admin Events,Admin (events.edit)
+GET,/public/events,List active events (upcoming/past filter),Public Events,Public
+GET,/public/events/:id,Get single active event,Public Events,Public
+GET,/public/events/poster?key=,Proxy event poster image from S3,Public Events,Public

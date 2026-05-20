@@ -1,0 +1,430 @@
+[
+  {
+    "Room_Name": "Bed in Dormitory - Room Only (EP)",
+    "Room_Description": "Bed in Dormitory - Room Only (EP)",
+    "Roomtype_Name": "4 Bed Mixed Dormitory",
+    "Roomtype_Short_code": "4 Bed Mixed Dormitory",
+    "Room_Max_adult": "2",
+    "Room_Max_child": "2",
+    "Package_Description": "",
+    "Specials_Desc": "",
+    "specialconditions": "",
+    "specialhighlightinclusion": "",
+    "hotelcode": "60765",
+    "roomtypeunkid": "6076500000000000001",
+    "ratetypeunkid": "6076500000000000001",
+    "roomrateunkid": "6076500000000000001",
+    "base_adult_occupancy": 1,
+    "base_child_occupancy": 1,
+    "max_adult_occupancy": 2,
+    "max_child_occupancy": 2,
+    "max_occupancy": "",
+    "inclusion": "",
+    "available_rooms": {
+      "2026-05-01": 61,
+      "2026-05-02": 61
+    },
+    "min_ava_rooms": 61,
+    "room_rates_info": {
+      "before_discount_inclusive_tax_adjustment": [],
+      "exclusive_tax": {
+        "2026-05-01": "500.0000",
+        "2026-05-02": "500.0000"
+      },
+      "exclusivetax_baserate": {
+        "2026-05-01": "500.0000",
+        "2026-05-02": "500.0000"
+      },
+      "tax": {
+        "2026-05-01": 25,
+        "2026-05-02": 25
+      },
+      "adjustment": {
+        "2026-05-01": 0,
+        "2026-05-02": 0
+      },
+      "inclusive_tax_adjustment": {
+        "2026-05-01": 525,
+        "2026-05-02": 525
+      },
+      "rack_rate": "599.0000",
+      "totalprice_room_only": 1000,
+      "totalprice_inclusive_all": 1050,
+      "avg_per_night_before_discount": "",
+      "avg_per_night_after_discount": 525,
+      "avg_per_night_without_tax": 500,
+      "day_wise_baserackrate": [
+        "500.0000",
+        "500.0000"
+      ],
+      "day_wise_beforediscount": [
+        "500.0000",
+        "500.0000"
+      ]
+    },
+    "extra_adult_rates_info": {
+      "exclusive_tax": {
+        "2026-05-01": "500.0000",
+        "2026-05-02": "500.0000"
+      },
+      "tax": {
+        "2026-05-01": 25,
+        "2026-05-02": 25
+      },
+      "adjustment": {
+        "2026-05-01": 0,
+        "2026-05-02": 0
+      },
+      "inclusive_tax_adjustment": {
+        "2026-05-01": 525,
+        "2026-05-02": 525
+      },
+      "rack_rate": "500.0000"
+    },
+    "extra_child_rates_info": {
+      "exclusive_tax": {
+        "2026-05-01": "500.0000",
+        "2026-05-02": "500.0000"
+      },
+      "tax": {
+        "2026-05-01": 25,
+        "2026-05-02": 25
+      },
+      "adjustment": {
+        "2026-05-01": 0,
+        "2026-05-02": 0
+      },
+      "inclusive_tax_adjustment": {
+        "2026-05-01": 525,
+        "2026-05-02": 525
+      },
+      "rack_rate": "0.0000"
+    },
+    "min_nights": {
+      "2026-05-01": "1",
+      "2026-05-02": "1"
+    },
+    "stopsells": {
+      "2026-05-01": "0",
+      "2026-05-02": "0"
+    },
+    "close_on_arrival": {
+      "2026-05-01": "0",
+      "2026-05-02": "0"
+    },
+    "close_on_dept": {
+      "2026-05-01": "0",
+      "2026-05-02": "0"
+    },
+    "Hotel_amenities": "[]",
+    "Hotel_amenitiesNew": [],
+    "Avg_min_nights": "1",
+    "max_nights": {
+      "2026-05-01": "",
+      "2026-05-02": ""
+    },
+    "Avg_max_nights": "",
+    "check_in_time": "12:00",
+    "check_out_time": "11:00",
+    "TaxName": {
+      "2026-05-01": {
+        "Taxname_0": "SGST",
+        "taxdate_0": "2026-03-21 03:00:29",
+        "exemptafter_0": "0",
+        "postingtype_0": "SLAB",
+        "postingrule_0": "",
+        "amount_0": "0.0000",
+        "slab_0": "0-7500.00-2.5,7500.01-1000000-9",
+        "discounttype_0": "AFTERDISCOUNT",
+        "entrydatetime_0": "2026-03-21 09:30:29",
+        "taxapplyafter_0": "",
+        "applyonrackrate_0": "0",
+        "applytaxdate_0": "2026-03-21",
+        "exchange_rate1_0": "1.0000",
+        "exchange_rate2_0": "1.0000",
+        "Taxname_1": "CGST",
+        "taxdate_1": "2026-03-21 03:00:29",
+        "exemptafter_1": "0",
+        "postingtype_1": "SLAB",
+        "postingrule_1": "",
+        "amount_1": "0.0000",
+        "slab_1": "0-7500.00-2.5,7500.01-1000000-9",
+        "discounttype_1": "AFTERDISCOUNT",
+        "entrydatetime_1": "2026-03-21 09:30:29",
+        "taxapplyafter_1": "",
+        "applyonrackrate_1": "0",
+        "applytaxdate_1": "2026-03-21",
+        "exchange_rate1_1": "1.0000",
+        "exchange_rate2_1": "1.0000"
+      },
+      "2026-05-02": {
+        "Taxname_0": "SGST",
+        "taxdate_0": "2026-03-21 03:00:29",
+        "exemptafter_0": "0",
+        "postingtype_0": "SLAB",
+        "postingrule_0": "",
+        "amount_0": "0.0000",
+        "slab_0": "0-7500.00-2.5,7500.01-1000000-9",
+        "discounttype_0": "AFTERDISCOUNT",
+        "entrydatetime_0": "2026-03-21 09:30:29",
+        "taxapplyafter_0": "",
+        "applyonrackrate_0": "0",
+        "applytaxdate_0": "2026-03-21",
+        "exchange_rate1_0": "1.0000",
+        "exchange_rate2_0": "1.0000",
+        "Taxname_1": "CGST",
+        "taxdate_1": "2026-03-21 03:00:29",
+        "exemptafter_1": "0",
+        "postingtype_1": "SLAB",
+        "postingrule_1": "",
+        "amount_1": "0.0000",
+        "slab_1": "0-7500.00-2.5,7500.01-1000000-9",
+        "discounttype_1": "AFTERDISCOUNT",
+        "entrydatetime_1": "2026-03-21 09:30:29",
+        "taxapplyafter_1": "",
+        "applyonrackrate_1": "0",
+        "applytaxdate_1": "2026-03-21",
+        "exchange_rate1_1": "1.0000",
+        "exchange_rate2_1": "1.0000"
+      }
+    },
+    "ShowPriceFormat": "Average Per Night Rate",
+    "DefaultDisplyCurrencyCode": "",
+    "deals": "",
+    "IsPromotion": false,
+    "Promotion_Code": null,
+    "Promotion_Description": null,
+    "Promotion_Name": null,
+    "Promotion_Id": null,
+    "Package_Name": "",
+    "Package_Id": "",
+    "currency_code": "INR",
+    "currency_sign": "Rs",
+    "localfolder": "vibehousekormangala",
+    "CalDateFormat": "dd-mm-yy",
+    "ShowTaxInclusiveExclusiveSettings": "1",
+    "hidefrommetasearch": "",
+    "prepaid_noncancel_nonrefundable": "0",
+    "cancellation_deadline": "",
+    "digits_after_decimal": "2",
+    "visiblity_nights": "false",
+    "BookingEngineURL": "https://live.ipms247.com/booking/book-rooms-vibehousekormangala",
+    "NewRoomAmenities": [],
+    "RoomAmenities": "",
+    "room_main_image": ""
+  },
+  {
+    "Room_Name": "Deluxe - Room Only (EP)",
+    "Room_Description": "Deluxe - Room Only (EP)",
+    "Roomtype_Name": "Deluxe",
+    "Roomtype_Short_code": "Deluxe",
+    "Room_Max_adult": "2",
+    "Room_Max_child": "2",
+    "Package_Description": "",
+    "Specials_Desc": "",
+    "specialconditions": "",
+    "specialhighlightinclusion": "",
+    "hotelcode": "60765",
+    "roomtypeunkid": "6076500000000000002",
+    "ratetypeunkid": "6076500000000000001",
+    "roomrateunkid": "6076500000000000002",
+    "base_adult_occupancy": 1,
+    "base_child_occupancy": 1,
+    "max_adult_occupancy": 2,
+    "max_child_occupancy": 2,
+    "max_occupancy": "",
+    "inclusion": "",
+    "available_rooms": {
+      "2026-05-01": "14",
+      "2026-05-02": "14"
+    },
+    "min_ava_rooms": 14,
+    "room_rates_info": {
+      "before_discount_inclusive_tax_adjustment": [],
+      "exclusive_tax": {
+        "2026-05-01": "1500.0000",
+        "2026-05-02": "1500.0000"
+      },
+      "exclusivetax_baserate": {
+        "2026-05-01": "1500.0000",
+        "2026-05-02": "1500.0000"
+      },
+      "tax": {
+        "2026-05-01": 75,
+        "2026-05-02": 75
+      },
+      "adjustment": {
+        "2026-05-01": 0,
+        "2026-05-02": 0
+      },
+      "inclusive_tax_adjustment": {
+        "2026-05-01": 1575,
+        "2026-05-02": 1575
+      },
+      "rack_rate": "1899.0000",
+      "totalprice_room_only": 3000,
+      "totalprice_inclusive_all": 3150,
+      "avg_per_night_before_discount": "",
+      "avg_per_night_after_discount": 1575,
+      "avg_per_night_without_tax": 1500,
+      "day_wise_baserackrate": [
+        "1500.0000",
+        "1500.0000"
+      ],
+      "day_wise_beforediscount": [
+        "1500.0000",
+        "1500.0000"
+      ]
+    },
+    "extra_adult_rates_info": {
+      "exclusive_tax": {
+        "2026-05-01": "1500.0000",
+        "2026-05-02": "1500.0000"
+      },
+      "tax": {
+        "2026-05-01": 75,
+        "2026-05-02": 75
+      },
+      "adjustment": {
+        "2026-05-01": 0,
+        "2026-05-02": 0
+      },
+      "inclusive_tax_adjustment": {
+        "2026-05-01": 1575,
+        "2026-05-02": 1575
+      },
+      "rack_rate": "1500.0000"
+    },
+    "extra_child_rates_info": {
+      "exclusive_tax": {
+        "2026-05-01": "1000.0000",
+        "2026-05-02": "1000.0000"
+      },
+      "tax": {
+        "2026-05-01": 50,
+        "2026-05-02": 50
+      },
+      "adjustment": {
+        "2026-05-01": 0,
+        "2026-05-02": 0
+      },
+      "inclusive_tax_adjustment": {
+        "2026-05-01": 1050,
+        "2026-05-02": 1050
+      },
+      "rack_rate": "1000.0000"
+    },
+    "min_nights": {
+      "2026-05-01": "1",
+      "2026-05-02": "1"
+    },
+    "stopsells": {
+      "2026-05-01": "0",
+      "2026-05-02": "0"
+    },
+    "close_on_arrival": {
+      "2026-05-01": "0",
+      "2026-05-02": "0"
+    },
+    "close_on_dept": {
+      "2026-05-01": "0",
+      "2026-05-02": "0"
+    },
+    "Hotel_amenities": "[]",
+    "Hotel_amenitiesNew": [],
+    "Avg_min_nights": "1",
+    "max_nights": {
+      "2026-05-01": "",
+      "2026-05-02": ""
+    },
+    "Avg_max_nights": "",
+    "check_in_time": "12:00",
+    "check_out_time": "11:00",
+    "TaxName": {
+      "2026-05-01": {
+        "Taxname_0": "SGST",
+        "taxdate_0": "2026-03-21 03:00:29",
+        "exemptafter_0": "0",
+        "postingtype_0": "SLAB",
+        "postingrule_0": "",
+        "amount_0": "0.0000",
+        "slab_0": "0-7500.00-2.5,7500.01-1000000-9",
+        "discounttype_0": "AFTERDISCOUNT",
+        "entrydatetime_0": "2026-03-21 09:30:29",
+        "taxapplyafter_0": "",
+        "applyonrackrate_0": "0",
+        "applytaxdate_0": "2026-03-21",
+        "exchange_rate1_0": "1.0000",
+        "exchange_rate2_0": "1.0000",
+        "Taxname_1": "CGST",
+        "taxdate_1": "2026-03-21 03:00:29",
+        "exemptafter_1": "0",
+        "postingtype_1": "SLAB",
+        "postingrule_1": "",
+        "amount_1": "0.0000",
+        "slab_1": "0-7500.00-2.5,7500.01-1000000-9",
+        "discounttype_1": "AFTERDISCOUNT",
+        "entrydatetime_1": "2026-03-21 09:30:29",
+        "taxapplyafter_1": "",
+        "applyonrackrate_1": "0",
+        "applytaxdate_1": "2026-03-21",
+        "exchange_rate1_1": "1.0000",
+        "exchange_rate2_1": "1.0000"
+      },
+      "2026-05-02": {
+        "Taxname_0": "SGST",
+        "taxdate_0": "2026-03-21 03:00:29",
+        "exemptafter_0": "0",
+        "postingtype_0": "SLAB",
+        "postingrule_0": "",
+        "amount_0": "0.0000",
+        "slab_0": "0-7500.00-2.5,7500.01-1000000-9",
+        "discounttype_0": "AFTERDISCOUNT",
+        "entrydatetime_0": "2026-03-21 09:30:29",
+        "taxapplyafter_0": "",
+        "applyonrackrate_0": "0",
+        "applytaxdate_0": "2026-03-21",
+        "exchange_rate1_0": "1.0000",
+        "exchange_rate2_0": "1.0000",
+        "Taxname_1": "CGST",
+        "taxdate_1": "2026-03-21 03:00:29",
+        "exemptafter_1": "0",
+        "postingtype_1": "SLAB",
+        "postingrule_1": "",
+        "amount_1": "0.0000",
+        "slab_1": "0-7500.00-2.5,7500.01-1000000-9",
+        "discounttype_1": "AFTERDISCOUNT",
+        "entrydatetime_1": "2026-03-21 09:30:29",
+        "taxapplyafter_1": "",
+        "applyonrackrate_1": "0",
+        "applytaxdate_1": "2026-03-21",
+        "exchange_rate1_1": "1.0000",
+        "exchange_rate2_1": "1.0000"
+      }
+    },
+    "ShowPriceFormat": "Average Per Night Rate",
+    "DefaultDisplyCurrencyCode": "",
+    "deals": "",
+    "IsPromotion": false,
+    "Promotion_Code": null,
+    "Promotion_Description": null,
+    "Promotion_Name": null,
+    "Promotion_Id": null,
+    "Package_Name": "",
+    "Package_Id": "",
+    "currency_code": "INR",
+    "currency_sign": "Rs",
+    "localfolder": "vibehousekormangala",
+    "CalDateFormat": "dd-mm-yy",
+    "ShowTaxInclusiveExclusiveSettings": "1",
+    "hidefrommetasearch": "",
+    "prepaid_noncancel_nonrefundable": "0",
+    "cancellation_deadline": "",
+    "digits_after_decimal": "2",
+    "visiblity_nights": "false",
+    "BookingEngineURL": "https://live.ipms247.com/booking/book-rooms-vibehousekormangala",
+    "NewRoomAmenities": [],
+    "RoomAmenities": "",
+    "room_main_image": ""
+  }
+]

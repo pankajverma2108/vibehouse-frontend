@@ -1,0 +1,263 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\geometry{margin=1in}
+
+% Code styling
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green},
+    stringstyle=\color{red},
+    numberstyle=\tiny\color{gray},
+    numbers=left,
+    frame=single,
+    breaklines=true,
+    showstringspaces=false
+}
+
+\title{Buteak Suites Dynamic Pricing API Documentation}
+\author{Development Team}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Overview}
+This document describes the implementation of dynamic pricing system for Buteak Suites website, including API integration, tax calculation logic, and CORS handling.
+
+\section{Price API Logic (priceApi.ts)}
+
+\subsection{Core Functionality}
+The \texttt{priceApi.ts} module handles:
+\begin{itemize}
+    \item Dynamic date generation (current date + tomorrow)
+    \item API authentication using environment variables
+    \item XML parsing for room prices
+    \item Tax calculation based on room rates
+    \item Fallback pricing mechanism
+\end{itemize}
+
+\subsection{Tax Calculation Logic}
+The system implements GST calculation based on Indian tax regulations:
+
+\begin{align}
+\text{Tax Rate} = \begin{cases}
+18\% & \text{if Base Price} \geq ₹7500 \\
+5\% & \text{if Base Price} < ₹7500
+\end{cases}
+\end{align}
+
+\begin{align}
+\text{Final Price} = \text{Base Price} \times (1 + \frac{\text{Tax Rate}}{100})
+\end{align}
+
+\subsection{Pseudocode}
+
+\begin{lstlisting}[language=JavaScript, caption=Price API Pseudocode]
+FUNCTION fetchRoomPrices():
+    // 1. Generate dynamic dates
+    today = getCurrentDate()
+    tomorrow = today + 1 day
+    fromDate = formatDate(today, "YYYY-MM-DD")
+    toDate = formatDate(tomorrow, "YYYY-MM-DD")
+    
+    // 2. Load credentials from environment
+    hotelCode = ENV.VITE_HOTEL_CODE || "55402"
+    authCode = ENV.VITE_AUTH_CODE || "fallback_auth"
+    
+    // 3. Prepare API request
+    apiConfig = {
+        url: "/api/prices",  // Proxy endpoint
+        method: "POST",
+        headers: { "Content-Type": "application/xml" },
+        body: buildXMLRequest(hotelCode, authCode, fromDate, toDate)
+    }
+    
+    TRY:
+        // 4. Make API call
+        response = fetch(apiConfig)
+        xmlData = parseXMLResponse(response)
+        
+        // 5. Extract prices from "https://buteak.in/ - WEB" source
+        webSource = findSourceByName(xmlData, "https://buteak.in/ - WEB")
+        roomPrices = []
+        
+        FOR each rateType in webSource.rateTypes:
+            roomTypeId = rateType.roomTypeID
+            basePrice = parseFloat(rateType.base)
+            
+            // 6. Apply tax calculation
+            taxInfo = calculateTax(basePrice)
+            
+            roomPrices.add({
+                roomTypeId: roomTypeId,
+                price: basePrice,
+                priceWithTax: taxInfo.priceWithTax,
+                taxRate: taxInfo.taxRate
+            })
+        
+        RETURN roomPrices
+        
+    CATCH error:
+        // 7. No fallback - return empty array to hide room cards
+        RETURN []
+
+FUNCTION calculateTax(basePrice):
+    IF basePrice >= 7500:
+        taxRate = 18
+    ELSE:
+        taxRate = 5
+    
+    priceWithTax = round(basePrice * (1 + taxRate/100))
+    
+    RETURN {
+        priceWithTax: priceWithTax,
+        taxRate: taxRate
+    }
+\end{lstlisting}
+
+\section{Environment Variables Configuration}
+
+\subsection{.env File Structure}
+\begin{lstlisting}[caption=Environment Variables]
+VITE_HOTEL_CODE=55402
+VITE_AUTH_CODE=40230910707e9e1bd2-7813-11f0-9
+\end{lstlisting}
+
+\subsection{Security Benefits}
+\begin{itemize}
+    \item Credentials not hardcoded in source code
+    \item Easy environment-specific configuration
+    \item Secure deployment practices
+    \item Variables prefixed with \texttt{VITE\_} for client-side access
+\end{itemize}
+
+\section{CORS Handling via Vite Configuration}
+
+\subsection{Problem}
+The external API (\texttt{https://live.ipms247.com}) does not include CORS headers, causing browser requests to fail with:
+\begin{verbatim}
+Access to fetch at 'https://live.ipms247.com/...' from origin 
+'http://localhost:8080' has been blocked by CORS policy
+\end{verbatim}
+
+\subsection{Solution: Vite Proxy Configuration}
+Modified \texttt{vite.config.ts} (not tailwind.config.ts) to include proxy settings:
+
+\begin{lstlisting}[language=JavaScript, caption=Vite Proxy Configuration]
+export default defineConfig(({ mode }) => {
+  return {
+    server: {
+      host: '::',
+      port: 8080,
+      strictPort: true,
+      proxy: {
+        '/api/prices': {
+          target: 'https://live.ipms247.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/prices/, 
+                                         '/pmsinterface/getdataAPI.php'),
+          configure: (proxy, options) => {
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              console.log('🔄 Proxying request to:', proxyReq.path);
+            });
+          }
+        }
+      }
+    }
+  };
+});
+\end{lstlisting}
+
+\subsection{Proxy Flow}
+\begin{enumerate}
+    \item Browser makes request to \texttt{http://localhost:8080/api/prices}
+    \item Vite development server intercepts the request
+    \item Proxy forwards request to \texttt{https://live.ipms247.com/pmsinterface/getdataAPI.php}
+    \item API response returns through proxy (no CORS issues)
+    \item Client receives data successfully
+\end{enumerate}
+
+\section{Tax Calculation Examples}
+
+\subsection{Current Room Rates}
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Room Type} & \textbf{Base Price} & \textbf{Tax Rate} & \textbf{Tax Amount} & \textbf{Final Price} \\
+\hline
+Medium Suite & ₹3,299 & 5\% & ₹165 & ₹3,464 \\
+Large Suite & ₹3,599 & 5\% & ₹180 & ₹3,779 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Tax Threshold Examples}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Base Price} & \textbf{Tax Rate} & \textbf{Final Price} \\
+\hline
+₹7,499 & 5\% & ₹7,874 \\
+₹7,500 & 18\% & ₹8,850 \\
+₹10,000 & 18\% & ₹11,800 \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{API Failure Handling}
+
+\subsection{User Experience During API Failure}
+When the pricing API fails to respond or returns an error, the system implements a "no misleading prices" policy:
+
+\begin{itemize}
+    \item \textbf{Room Cards Hidden}: No room cards are displayed on the website
+    \item \textbf{User Message}: A clear message is shown: "Room Information Unavailable - We're currently unable to fetch room pricing. Please try again later or contact us directly."
+    \item \textbf{No Fallback Prices}: System does not display outdated or hardcoded prices to avoid customer confusion
+    \item \textbf{Graceful Degradation}: Other website sections (amenities, location, FAQs) remain fully functional
+\end{itemize}
+
+\subsection{Administrative Notification System}
+When API failures occur, the system should implement an automated notification mechanism:
+
+\begin{itemize}
+    \item \textbf{Email Alert}: Automatic email sent to designated administrator (e.g., \texttt{admin@buteaksuites.com})
+    \item \textbf{Alert Content}: 
+    \begin{itemize}
+        \item Timestamp of failure
+        \item Error details and status code
+        \item Affected date range (current date + tomorrow)
+        \item Recommended actions for resolution
+    \end{itemize}
+    \item \textbf{Frequency Control}: Alerts sent at most once per hour to prevent spam
+    \item \textbf{Recovery Notification}: Success email when API connectivity is restored
+\end{itemize}
+
+\subsection{Business Impact Mitigation}
+\begin{itemize}
+    \item \textbf{Contact Information}: Prominent display of phone number and WhatsApp for direct bookings
+    \item \textbf{Alternative Booking}: Direct links to external booking platforms remain available
+    \item \textbf{Transparency}: Clear communication about temporary unavailability builds customer trust
+    \item \textbf{Quick Recovery}: Immediate restoration of room cards when API service resumes
+\end{itemize}
+
+\section{Implementation Benefits}
+
+\begin{itemize}
+    \item \textbf{Dynamic Pricing}: Real-time rates from client's PMS system
+    \item \textbf{Automatic Tax Compliance}: GST calculation per Indian regulations
+    \item \textbf{No Misleading Prices}: Room cards hidden when API fails
+    \item \textbf{Environment Security}: Credentials managed via environment variables
+    \item \textbf{CORS Resolution}: Seamless API integration without browser restrictions
+    \item \textbf{Date Automation}: Always fetches current and next day rates
+    \item \textbf{Proactive Monitoring}: Email notifications for API failures ensure quick response
+\end{itemize}
+
+\end{document}
