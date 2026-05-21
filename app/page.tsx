@@ -24,9 +24,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
   const headerList = await headers();
   const hostname = headerList.get("host") || "";
-  const propertyId = resolveServerPropertyId({ explicit: params?.property_id, hostname }) || undefined;
+  const propertyId = resolveServerPropertyId({ explicit: params?.property_id, hostname });
 
-  if (!params?.checkin || !params?.checkout || !params?.property_id) {
+  if (!params?.checkin || !params?.checkout || !params?.property_id || !propertyId) {
     redirect(getDefaultPropertyDestinationHref(propertyId, "/"));
   }
 
