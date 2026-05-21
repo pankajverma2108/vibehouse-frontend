@@ -2,117 +2,201 @@
 
 ## Purpose
 
-Document the audited authentication flow map used by `Vibehouse_frontend` for migration reference.
+Document the source-verified authentication flow map used by `Vibehouse_frontend`.
 
 ## Status
 
-Audited on 2026-05-20 from live source files only.
+Audited on 2026-05-21 from inspected source files only.
 
 ## Flow 1: Email Sign-Up
 
-- Evidence: `components/auth/guest-auth-provider.tsx` -> `onSignUp`, `components/auth/guest-auth-modal.tsx` -> `onSubmit`, `lib/guest-auth-api.ts` -> `signupGuest`, `getGuestMe`
-- Sequence:
-  1. `GuestAuthModal` validates name, email, password, optional phone, and terms acceptance client-side.
-  2. `onSignUp` calls `signupGuest(payload)`.
-  3. On success, the provider stores `access_token` in localStorage via `setStoredGuestToken(response.access_token)`.
-  4. The provider prefers `getGuestMe(response.access_token)` for the live guest payload and falls back to `response.guest` if `/guest/auth/me` fails.
-  5. If `response.otp_sent` is true, auth remains open and mode switches to `verify-otp`; otherwise the modal closes immediately.
+- Evidence: `components/auth/guest-auth-modal.tsx`, `components/auth/guest-auth-provider.tsx`, `lib/guest-auth-api.ts`
+- Confirmed sequence:
+  1. `components/auth/guest-auth-modal.tsx` validates full name, email, password, phone, and terms acceptance before calling provider sign-up.
+  2. `components/auth/guest-auth-provider.tsx` -> `onSignUp()` calls `lib/guest-auth-api.ts` -> `signupGuest(payload)`.
+  3. On success, `components/auth/guest-auth-provider.tsx` stores `response.access_token` through `setStoredGuestToken(response.access_token)`.
+  4. `components/auth/guest-auth-provider.tsx` then calls `getGuestMe(response.access_token).catch(() => response.guest)` and writes the resulting guest into provider state plus cache.
+  5. If `response.otp_sent` is truthy, the provider keeps auth open and switches mode to `verify-otp`; otherwise it closes the modal immediately.
 - Reuse: Conceptually reusable
-- Uncertainty: The backend rule that decides whether `otp_sent` is returned was not found during this pass.
+- Uncertainty: The backend rule that determines when `otp_sent` is returned was not found during this pass.
 
-## Flow 2: Email Sign-In Without 2FA
+```text
+GuestAuthModal(signup submit)
+  -> GuestAuthProvider.onSignUp()
+     -> POST /guest/auth/signup
+     -> setStoredGuestToken(access_token)
+     -> GET /guest/auth/me
+        -> success: guest state + cache updated
+        -> failure: fallback to signup response guest
+     -> otp_sent ? mode=verify-otp : close modal
+```
 
-- Evidence: `components/auth/guest-auth-provider.tsx` -> `onSignIn`, `lib/guest-auth-api.ts` -> `loginGuest`, `getGuestMe`
-- Sequence:
-  1. `GuestAuthModal` validates email/password format.
-  2. `onSignIn` calls `loginGuest({ email, password })`.
-  3. If the response includes an auth token, the provider stores it in localStorage or sessionStorage based on `rememberMe`.
-  4. The provider refreshes guest data with `/guest/auth/me`, falling back to `response.guest` if needed.
-  5. Auth state updates, cache is written, a success toast is shown, and the modal closes.
+## Flow 2: Email Sign-In
+
+- Evidence: `components/auth/guest-auth-modal.tsx`, `components/auth/guest-auth-provider.tsx`, `lib/guest-auth-api.ts`
+- Confirmed sequence:
+  1. `components/auth/guest-auth-modal.tsx` validates email/password before submit.
+  2. `components/auth/guest-auth-provider.tsx` -> `onSignIn()` calls `loginGuest({ email, password })`.
+  3. If the response contains `requires_2fa`, control moves to Flow 3.
+  4. Otherwise `setStoredGuestToken(response.access_token, rememberMe)` stores the token in localStorage or sessionStorage.
+  5. The provider then calls `getGuestMe(response.access_token).catch(() => response.guest)`, updates guest state and cache, clears restore state, shows success toast, and closes the modal.
 - Reuse: Directly reusable
-- Uncertainty: None in the audited source path.
+- Uncertainty: None in the audited frontend path.
 
-## Flow 3: Email Sign-In With 2FA
+## Flow 3: Login 2FA OTP
 
-- Evidence: `components/auth/guest-auth-provider.tsx` -> `onSignIn`, `onVerifyTwoFa`; `lib/guest-auth-api.ts` -> `loginGuest`, `verifyTwoFa`
-- Sequence:
-  1. `loginGuest` may return `{ requires_2fa: true }` instead of an auth token.
-  2. The provider switches modal mode to `verify-2fa` and shows a success toast that the OTP was sent.
-  3. `GuestAuthModal` collects a 6-digit code and calls `onVerifyTwoFa`.
-  4. `verifyTwoFa` returns an auth token, which is stored and validated via `/guest/auth/me`.
-  5. Auth state updates and the modal closes.
+- Evidence: `components/auth/guest-auth-provider.tsx`, `components/auth/guest-auth-modal.tsx`, `lib/guest-auth-api.ts`
+- Confirmed sequence:
+  1. `lib/guest-auth-api.ts` allows `loginGuest()` to return either `GuestAuthSuccessResponse` or `{ requires_2fa: true }`.
+  2. `components/auth/guest-auth-provider.tsx` detects `"requires_2fa" in response`, switches mode to `verify-2fa`, and shows a toast that the code was sent.
+  3. `components/auth/guest-auth-modal.tsx` collects the 6-digit OTP and calls provider `onVerifyTwoFa()`.
+  4. `components/auth/guest-auth-provider.tsx` -> `verifyTwoFa(payload)` stores the returned token, validates it with `getGuestMe()`, updates guest state, and closes the modal.
 - Reuse: Conceptually reusable
-- Uncertainty: No separate resend endpoint for 2FA was found; the modal tells the guest to sign in again to request a fresh code.
+- Uncertainty: No dedicated resend-2FA endpoint was found during this pass. The modal tells the guest to sign in again to request a fresh code.
 
-## Flow 4: Email Verification And Resend
+## Flow 4: Email Verification OTP
 
-- Evidence: `components/auth/guest-verification-banner.tsx`, `components/auth/guest-auth-provider.tsx` -> `onSendOtp`, `components/auth/guest-auth-modal.tsx` -> `onResendOtp`
-- Sequence:
-  1. When `guest.email_verified` is false, `GuestVerificationBanner` renders on pages that mount it.
-  2. "Verify Now" reopens the auth modal in `verify-otp` mode.
-  3. Resend actions call `sendOtp({ email })` through `resendVerificationCode`.
-  4. `verifyOtp` returns a new auth token and refreshes `guest`.
+- Evidence: `components/auth/guest-verification-banner.tsx`, `components/auth/guest-auth-provider.tsx`, `components/auth/guest-auth-modal.tsx`, `lib/guest-auth-api.ts`
+- Confirmed sequence:
+  1. `components/auth/guest-verification-banner.tsx` renders only when `isAuthenticated` is true and `guest.email_verified` is false.
+  2. Banner CTA opens the auth modal in `verify-otp` mode through `openAuthModal("verify-otp")`.
+  3. Resend calls provider `resendVerificationCode(email)` which delegates to `sendOtp({ email })`.
+  4. OTP submit calls provider `onVerifyOtp()`, which sends `verifyOtp({ email, otp })`, stores the fresh token, revalidates with `getGuestMe()`, updates guest state, and closes the modal.
 - Reuse: Conceptually reusable
-- Uncertainty: Server-side resend throttling behavior is only exposed through frontend message mapping, not a documented contract in this repo.
+- Uncertainty: No separate verify-email route was found during this pass. Email verification is modal-driven.
 
-## Flow 5: Forgot Password And Reset
+## Flow 5: Forgot Password And Reset Password
 
-- Evidence: `components/auth/guest-auth-provider.tsx` -> `onForgotPassword`, `onResetPassword`; `components/auth/guest-auth-modal.tsx` -> `switchMode("forgot-password")`; `lib/guest-auth-api.ts` -> `forgotPassword`, `resetPassword`
-- Sequence:
-  1. Guests enter forgot-password mode from the sign-in modal or from `/profile` via `openAuthModal("forgot-password")`.
-  2. `forgotPassword({ email })` sends the reset OTP and moves modal mode to `forgot-password-otp`.
-  3. The modal collects OTP plus new password and calls `resetPassword`.
-  4. On success, the provider stores the new auth token, refreshes guest data, closes the modal, and hard redirects to `/`.
+- Evidence: `components/auth/guest-auth-modal.tsx`, `components/auth/guest-auth-provider.tsx`, `app/profile/page.tsx`, `lib/guest-auth-api.ts`
+- Confirmed sequence:
+  1. `components/auth/guest-auth-modal.tsx` exposes a forgot-password switch from sign-in mode.
+  2. `app/profile/page.tsx` can also open the same flow through `openAuthModal("forgot-password")`.
+  3. Provider `onForgotPassword()` calls `forgotPassword({ email })` and switches modal mode to `forgot-password-otp`.
+  4. `components/auth/guest-auth-modal.tsx` collects OTP plus new password and calls provider `onResetPassword()`.
+  5. Provider `onResetPassword()` calls `resetPassword(payload)`, stores the returned token, revalidates with `getGuestMe()`, closes the modal, and then hard redirects to `/`.
 - Reuse: Conceptually reusable
-- Uncertainty: There is no separate audited password-reset route outside the modal-driven flow.
+- Uncertainty: No dedicated reset-password route or in-session change-password endpoint was found during this pass.
 
-## Flow 6: Google OAuth Callback
+## Flow 6: Google OAuth Success
 
-- Evidence: `components/auth/guest-auth-provider.tsx` -> `onGoogleAuth`; `lib/guest-auth-api.ts` -> `getGuestGoogleAuthUrl`, `rememberPostAuthRedirect`, `consumePostAuthRedirect`; `app/auth/google/success/page.tsx`
-- Sequence:
-  1. `onGoogleAuth` stores the current path via `rememberPostAuthRedirect()`, derives `return_to`, and sends the browser to the Google auth URL.
-  2. `app/auth/google/success/page.tsx` reads callback params.
-  3. If `reason` or `error` is present, the page redirects to `/auth/google/error?...`.
-  4. If no token is present, the page redirects to the error page with `missing_token`.
-  5. If a token is present, it is stored persistently via `setStoredGuestToken(token, true)`.
-  6. The callback validates the token with `/guest/auth/me`.
-  7. On success, the page redirects to the consumed stored redirect, then `return_to`, then `/`.
-  8. On `/guest/auth/me` failure, the token is cleared and the page redirects to `/auth/google/error?reason=session_validation_failed`.
+- Evidence: `components/auth/guest-auth-provider.tsx`, `lib/guest-auth-api.ts`, `app/auth/google/success/page.tsx`
+- Confirmed sequence:
+  1. `components/auth/guest-auth-provider.tsx` -> `onGoogleAuth()` stores the current relative path with `rememberPostAuthRedirect()` and builds a same-origin Google auth URL with `getGuestGoogleAuthUrl(returnPath)`.
+  2. The browser is redirected to the backend Google auth URL.
+  3. `app/auth/google/success/page.tsx` reads callback query params.
+  4. If a token is present, the page stores it with `setStoredGuestToken(token, true)`.
+  5. `app/auth/google/success/page.tsx` validates the token with `getGuestMe(token)`.
+  6. On success, the page redirects to `consumePostAuthRedirect()` first, then a valid `return_to`, then `/`.
 - Reuse: Directly reusable
-- Uncertainty: The backend Google auth handshake itself is out of repo scope; only the frontend callback handling is audited here.
+- Uncertainty: Backend-side OAuth exchange details are out of repo scope.
 
-## Flow 7: Session Restore On App Load
+```text
+modal Google CTA
+  -> rememberPostAuthRedirect()
+  -> getGuestGoogleAuthUrl(return_to)
+  -> browser leaves app
+  -> /auth/google/success
+     -> token present?
+        no  -> /auth/google/error?reason=missing_token
+        yes -> setStoredGuestToken(token, true)
+             -> GET /guest/auth/me
+                -> success: redirect to consumed stored path or return_to
+                -> failure: clear token and redirect to error page
+```
 
-- Evidence: `components/auth/guest-auth-provider.tsx` -> mount `useEffect`, `lib/guest-auth-api.ts` -> `getStoredGuestToken`
-- Sequence:
-  1. On first mount, `GuestAuthProvider` reads a stored token from localStorage or sessionStorage.
-  2. If no token exists, cached profile state is cleared and `isRestoringSession` becomes false.
-  3. If a token exists, cached profile data is applied first if present.
-  4. The provider validates the token via `getGuestMe(token)`.
-  5. On success, guest state/cache update; on failure, token and cached profile are cleared.
+## Flow 7: Google OAuth Error
+
+- Evidence: `app/auth/google/success/page.tsx`, `app/auth/google/error/google-auth-error-content.tsx`
+- Confirmed sequence:
+  1. `app/auth/google/success/page.tsx` treats callback `reason` or `error` query params as callback failure and redirects to `/auth/google/error`.
+  2. Missing token redirects to `/auth/google/error?reason=missing_token`.
+  3. Failed `/guest/auth/me` validation clears the token and redirects to `/auth/google/error?reason=session_validation_failed`.
+  4. `app/auth/google/error/google-auth-error-content.tsx` renders the mapped reason state and offers a retry CTA that rebuilds the Google auth URL using the remembered return path.
+- Reuse: Conceptually reusable
+- Uncertainty: `app/auth/google/error/google-auth-error-content.tsx` reads `getPostAuthRedirect()` rather than consuming it, so the retry/back link remains coupled to the current stored redirect behavior.
+
+## Flow 8: Session Restore On App Load
+
+- Evidence: `app/layout.tsx`, `components/auth/guest-auth-provider.tsx`, `lib/guest-auth-api.ts`
+- Confirmed sequence:
+  1. `app/layout.tsx` mounts `GuestAuthProvider` once around the full app shell.
+  2. On first client mount, `components/auth/guest-auth-provider.tsx` reads `getStoredGuestToken()`.
+  3. If no token exists, it clears cached guest profile and ends restore with `guest = null`.
+  4. If a token exists, it first reads cached guest data from `readCachedGuestProfile()`.
+  5. It then validates the session with `getGuestMe(token)`.
+  6. Success updates guest state and cache. Failure clears stored token and cached guest profile.
 - Reuse: Directly reusable
-- Uncertainty: No silent refresh or background re-auth path was found.
+- Uncertainty: Refresh-token behavior was not found during this pass.
 
-## Flow 8: Sign-Out
+## Flow 9: Logout
 
-- Evidence: `components/auth/guest-auth-provider.tsx` -> `signOut`, `components/marketing/navigation.tsx` -> profile menu logout
-- Sequence:
-  1. UI triggers `signOut()`.
-  2. Provider clears the stored token, cached profile, and local profile overrides.
-  3. `guest` becomes `null`.
+- Evidence: `components/auth/guest-auth-provider.tsx`, `components/marketing/navigation.tsx`, `app/profile/page.tsx`
+- Confirmed sequence:
+  1. Logout CTA in navigation and profile calls provider `signOut()`.
+  2. `components/auth/guest-auth-provider.tsx` clears stored token, cached guest profile, and `vh_guest_profile_overrides`.
+  3. Provider sets `guest` to `null`.
 - Reuse: Directly reusable
 - Uncertainty: No logout API request was found during this pass.
 
-## Post-Auth Route Restoration
+## Flow 10: Profile / Bookings / Guest-Hub Access
 
-| File | Symbol | What it does | Reuse | Uncertainty |
-| --- | --- | --- | --- | --- |
-| `lib/guest-auth-api.ts` | `rememberPostAuthRedirect` | Stores the current path in sessionStorage and localStorage after sanitizing it to same-origin relative paths. | Directly reusable | Confirmed for auth modal and Google auth entry only. |
-| `lib/guest-auth-api.ts` | `consumePostAuthRedirect` | Reads and clears the stored redirect after successful Google callback or other restore logic. | Directly reusable | None in the audited helper. |
-| `components/marketing/property.tsx` | `saveReviewResumeIntent`, `consumeReviewResumeIntent` usage | Separately restores a post-auth return into `/bookingreview` only if the saved room-selection signature still matches the current context. | Directly reusable | This is booking-specific, not a global auth redirect. |
-| `components/booking/booking-checkout-page.tsx` | `resumePaymentAfterAuthRef` | Retries `handlePayment()` after auth completes if the guest attempted to pay while signed out. | Directly reusable | Confirmed only for the booking review page. |
+- Evidence: `app/profile/page.tsx`, `app/bookings/page.tsx`, `components/guest/guest-route-gate.tsx`, `app/[bookingId]/guest/layout.tsx`
+- Confirmed behavior:
+  - `app/profile/page.tsx`: signed-out access opens the sign-in modal and then redirects to `/`.
+  - `app/bookings/page.tsx`: signed-out access keeps the route mounted and renders a sign-in-required state.
+  - `components/guest/guest-route-gate.tsx`: guest-hub access uses soft gates driven by `isAuthenticated`, `guest.bookings`, and booking eligibility.
+  - `app/[bookingId]/guest/layout.tsx`: booking-scoped guest routes wrap children in `GuestBookingGate`.
+- Reuse: Conceptually reusable
+- Uncertainty: No formal middleware-based protected-route system was found during this pass.
+
+## Flow 11: Booking-Specific Auth Resume
+
+- Evidence: `components/marketing/property.tsx`, `components/colive/colive-flow.tsx`, `components/booking/booking-checkout-page.tsx`, `lib/guest-auth-api.ts`
+- Confirmed behavior:
+  - `components/marketing/property.tsx`: saves review resume intent and opens sign-in before `/bookingreview`.
+  - `components/colive/colive-flow.tsx`: does the same for Colive review.
+  - `components/booking/booking-checkout-page.tsx`: uses `resumePaymentAfterAuthRef` to retry payment after auth completes.
+  - `lib/guest-auth-api.ts`: separately stores a generic post-auth redirect path via `rememberPostAuthRedirect()`.
+- Reuse: Directly reusable
+- Uncertainty: There is no single global auth-restoration contract. Booking review resume and generic post-auth redirect are separate mechanisms.
+
+## Redirect Restoration Map
+
+```text
+openAuthModal()
+  -> rememberPostAuthRedirect(current relative path)
+  -> auth modal flow
+     -> local sign-in/sign-up/verify path closes modal in place
+     -> Google path leaves app and later consumes stored redirect
+
+nightly property review
+  -> saveReviewResumeIntent()
+  -> openAuthModal("signin")
+  -> after auth, property page effect compares saved signature
+  -> router.push("/bookingreview") only if context still matches
+
+Colive review
+  -> saveReviewResumeIntent()
+  -> openAuthModal("signin")
+  -> after auth, Colive effect compares saved signature
+  -> router.push("/bookingreview") only if context still matches
+
+booking checkout payment
+  -> resumePaymentAfterAuthRef = true
+  -> openAuthModal("signin")
+  -> post-auth effect reruns handlePayment()
+```
+
+## Anonymous And Guest Behavior
+
+- `components/marketing/navigation.tsx`: signed-out guests can browse marketing routes and trigger auth only when a protected CTA is used.
+- `components/marketing/property.tsx` and `components/colive/colive-flow.tsx`: signed-out guests can build a room selection before auth is required for review.
+- `app/bookings/page.tsx`, `components/booking/booking-confirmed-page.tsx`, `components/booking/pre-arrival-page.tsx`, and guest-hub gates all confirm that booking-linked guest flows require an authenticated guest session before full access.
 
 ## Not Found During This Pass
 
-- No auth middleware or server-side protected-route layer was found.
-- No dedicated "refresh session" route or token rotation flow was found.
+- Refresh-token behavior: Not found during this pass.
+- Cookie-backed session exchange: Not found during this pass.
+- Separate passwordless login flow: Not found during this pass.
+- Separate email-verification route outside the auth modal: Not found during this pass.
+- Formal middleware-based protected-route system: Not found during this pass.

@@ -2,77 +2,156 @@
 
 ## Purpose
 
-Document the audited session lifecycle and persistence behavior used by `Vibehouse_frontend` for migration reference.
+Document the source-verified token, session, restore, and cleanup behavior used by `Vibehouse_frontend`.
 
 ## Status
 
-Audited on 2026-05-20 from live source files only.
+Audited on 2026-05-21 from inspected source files only.
 
 ## Auth Storage Map
 
-| Storage key | File | Symbol | Storage | What it stores | Reuse | Uncertainty |
-| --- | --- | --- | --- | --- | --- | --- |
-| `vh_guest_access_token` | `lib/guest-auth-api.ts` | `LOCAL_STORAGE_KEY` | `localStorage` | Persistent auth token when sign-in/sign-up/Google auth chooses persistent storage. | Directly reusable | No expiry metadata is stored next to the token. |
-| `vh_guest_access_token_session` | `lib/guest-auth-api.ts` | `SESSION_STORAGE_KEY` | `sessionStorage` | Session-scoped auth token when the guest signs in without persistent storage. | Directly reusable | None in the audited helper. |
-| `vh_guest_profile_cache` | `components/auth/guest-auth-provider.tsx` | `GUEST_PROFILE_CACHE_KEY` | local or session storage | Cached guest profile, written to the same storage family as the active token. | Directly reusable | Cache invalidation depends on explicit clears or a fresh `/guest/auth/me` response. |
-| `vh_guest_profile_overrides` | `components/auth/guest-auth-provider.tsx` | `PROFILE_OVERRIDES_KEY` | `localStorage` | Local-only profile edits applied on top of backend guest data. | Source-specific | No backend sync endpoint was found during this pass. |
-| `vh_post_auth_redirect` | `lib/guest-auth-api.ts` | `POST_AUTH_REDIRECT_KEY` | `sessionStorage` | Preferred post-auth return path. | Directly reusable | Sanitized to same-origin relative paths only. |
-| `vh_post_auth_redirect_fallback` | `lib/guest-auth-api.ts` | `POST_AUTH_REDIRECT_FALLBACK_KEY` | `localStorage` | Fallback copy of the post-auth return path. | Directly reusable | Cleared when `consumePostAuthRedirect()` runs. |
-
-## Booking And Resume Storage Map
-
-| Storage key | File | Symbol | Storage | What it stores | Reuse | Uncertainty |
-| --- | --- | --- | --- | --- | --- | --- |
-| `vh_property_selection_v1` | `lib/property-selection-session.ts` | `PROPERTY_SELECTION_KEY` | local and session storage | Property-page room counts, property/date context, age confirmation, and selection signature. | Directly reusable | Restored for the same property even if dates changed. |
-| `vh_review_resume_v1` | `lib/property-selection-session.ts` | `REVIEW_RESUME_KEY` | local and session storage | Pending redirect intent into `/bookingreview` after auth. | Directly reusable | Consumed and cleared on first read. |
-| `vh_booking_draft` | `lib/booking-session.ts` | `BOOKING_DRAFT_KEY` | `sessionStorage` | The booking draft plus optional pending order and review guest snapshot. | Directly reusable | Session-only; a full browser close can drop the draft if sessionStorage is cleared. |
-| `vh_confirmed_booking:<ezeeReservationId>` | `lib/booking-session.ts` | `CONFIRMED_BOOKING_PREFIX` | `localStorage` | Local confirmation fallback snapshot written after successful payment verification. | Directly reusable | Snapshot freshness depends on the last successful frontend checkout in this browser. |
-| `vh:guest-bookings:<guestId>` | `app/bookings/page.tsx` | `bookingsCacheKey` plus `lib/client-cache.ts` | `sessionStorage` | 3-minute TTL cache of `/guest/booking/mine` results. | Directly reusable | Exact key exists only when a guest ID is available. |
-| Generated KYC cache keys | `components/booking/pre-arrival-page.tsx` | `slotsCacheKey`, `slotDetailCacheKey` plus `lib/client-cache.ts` | `sessionStorage` | TTL cache for slot list and per-slot KYC detail in pre-arrival. | Conceptually reusable | Exact key strings were not extracted in this pass; the helper names were confirmed. |
-
-## Lifecycle: App Startup
-
-| File | Symbol | What it does | Reuse | Uncertainty |
+| Storage key | File path | Symbol | Storage medium | Confirmed purpose |
 | --- | --- | --- | --- | --- |
-| `components/auth/guest-auth-provider.tsx` | mount `useEffect` | Reads stored token on first client mount. If absent, clears cached guest state and ends restore. If present, optionally seeds cached guest data, then validates the token with `/guest/auth/me`. | Directly reusable | No background refresh or retry strategy was found. |
-| `components/auth/guest-auth-provider.tsx` | `readCachedGuestProfile` | Lets the UI render cached guest data before the live `/guest/auth/me` request completes. | Directly reusable | Cache staleness is tolerated until live validation finishes. |
-| `app/layout.tsx` | `RootLayout` | Ensures every client route enters under the same auth/session provider. | Directly reusable | None in the audited shell. |
+| `vh_guest_access_token` | `lib/guest-auth-api.ts` | `LOCAL_STORAGE_KEY` | `localStorage` | Persistent guest access token when sign-in or Google auth stores a durable session. |
+| `vh_guest_access_token_session` | `lib/guest-auth-api.ts` | `SESSION_STORAGE_KEY` | `sessionStorage` | Session-scoped guest access token when sign-in uses `rememberMe = false`. |
+| `vh_guest_profile_cache` | `components/auth/guest-auth-provider.tsx` | `GUEST_PROFILE_CACHE_KEY` | `localStorage` or `sessionStorage` | Cached guest profile written into the same storage family as the token. |
+| `vh_guest_profile_overrides` | `components/auth/guest-auth-provider.tsx` | `PROFILE_OVERRIDES_KEY` | `localStorage` | Local-only profile overrides applied on top of live backend guest data. |
+| `vh_post_auth_redirect` | `lib/guest-auth-api.ts` | `POST_AUTH_REDIRECT_KEY` | `sessionStorage` | Preferred same-origin relative path for post-auth return. |
+| `vh_post_auth_redirect_fallback` | `lib/guest-auth-api.ts` | `POST_AUTH_REDIRECT_FALLBACK_KEY` | `localStorage` | Fallback copy of the post-auth return path. |
 
-## Lifecycle: Auth Interruptions And Return Paths
+## Booking-Adjacent Resume Storage
 
-| File | Symbol | What it does | Reuse | Uncertainty |
+| Storage key | File path | Symbol | Storage medium | Confirmed purpose |
 | --- | --- | --- | --- | --- |
-| `lib/guest-auth-api.ts` | `rememberPostAuthRedirect`, `consumePostAuthRedirect` | Stores and later consumes the last same-origin path the guest was on when auth was triggered. | Directly reusable | Confirmed around modal auth and Google auth only. |
-| `components/marketing/property.tsx` | resume-review effects | Stores a review resume intent before opening auth, then resumes only when the saved selection signature still matches the current property/date/selection state. | Directly reusable | Confirmed for nightly property selection. |
-| `components/booking/booking-checkout-page.tsx` | `resumePaymentAfterAuthRef` effect | If payment is initiated while signed out, authentication resumes the same `handlePayment()` call once `isAuthenticated` becomes true. | Directly reusable | Confirmed only for review checkout. |
-| `app/auth/google/success/page.tsx` | callback finalizer | Persists Google token, validates it with `/guest/auth/me`, and then redirects to the consumed stored path or `return_to`. | Directly reusable | None in the audited frontend callback path. |
+| `vh_property_selection_v1` | `lib/property-selection-session.ts` | `PROPERTY_SELECTION_KEY` | `localStorage` and `sessionStorage` | Saves property or Colive room selection context before auth or navigation. |
+| `vh_review_resume_v1` | `lib/property-selection-session.ts` | `REVIEW_RESUME_KEY` | `localStorage` and `sessionStorage` | Saves booking-review resume intent for nightly and Colive flows. |
+| `vh_booking_draft` | `lib/booking-session.ts` | `BOOKING_DRAFT_KEY` | `sessionStorage` | Holds booking review draft and pending order state. |
 
-## Lifecycle: Booking Draft And Payment State
+## Where Auth Token Is Created
 
-| File | Symbol | What it does | Reuse | Uncertainty |
-| --- | --- | --- | --- | --- |
-| `components/marketing/property.tsx` | save/restore effects | Saves property selection with a 150 ms debounce and restores it on return to the same property. | Directly reusable | Selection restore is property-scoped, not draft-signature-scoped. |
-| `components/booking/booking-checkout-page.tsx` | mount rehydrate | Restores `draft`, saved review guest form, and then merges current auth identity when available. | Directly reusable | None in the audited path. |
-| `components/booking/booking-checkout-page.tsx` | `savePendingBookingOrder` usage | Persists the created booking order before payment so retry/resume can skip duplicate order creation for the same draft signature. | Directly reusable | Confirmed only for the nightly branch. |
-| `components/booking/booking-checkout-page.tsx` | verification success path | Clears draft and pending order, then writes `ConfirmedBookingSnapshot` into localStorage. | Directly reusable | None in the audited success path. |
+| File path | Symbol | Confirmed creation point |
+| --- | --- | --- |
+| `components/auth/guest-auth-provider.tsx` | `onSignUp()` | Stores `response.access_token` after `signupGuest()` succeeds. |
+| `components/auth/guest-auth-provider.tsx` | `onSignIn()` | Stores `response.access_token` after `loginGuest()` succeeds without 2FA. |
+| `components/auth/guest-auth-provider.tsx` | `onVerifyOtp()` | Stores `response.access_token` after verify-email OTP succeeds. |
+| `components/auth/guest-auth-provider.tsx` | `onResetPassword()` | Stores `response.access_token` after password reset succeeds. |
+| `components/auth/guest-auth-provider.tsx` | `onVerifyTwoFa()` | Stores `response.access_token` after `verifyTwoFa()` succeeds. |
+| `app/auth/google/success/page.tsx` | callback finalizer | Stores the returned Google token before validating it with `/guest/auth/me`. |
 
-## Lifecycle: Bookings And Pre-Arrival Cache Hydration
+## Session Hydration Timing
 
-| File | Symbol | What it does | Reuse | Uncertainty |
-| --- | --- | --- | --- | --- |
-| `app/bookings/page.tsx` | bookings load effect | Uses fallback `guest.bookings`, then session TTL cache, then live `/guest/booking/mine` data. | Directly reusable | If live sync fails, fallback data may be stale. |
-| `components/booking/pre-arrival-page.tsx` | `loadSlots`, `loadSlotDetail` | Uses session TTL caches for slot list/detail before refreshing from live KYC endpoints. | Directly reusable | Exact TTL value exists in this file but was not separately extracted for this document. |
+- `app/layout.tsx` mounts `GuestAuthProvider` around the full app shell, so auth hydration begins at the top-level client shell.
+- `components/auth/guest-auth-provider.tsx` starts in `isRestoringSession = true`.
+- During the mount effect, the provider reads `getStoredGuestToken()`.
+- If a cached guest profile exists, the provider can set `guest` from cache before the live `/guest/auth/me` request returns.
+- The restore effect always ends by setting `isRestoringSession = false` unless the component unmounts first.
 
-## Logout And Failure Cleanup
+## Session Hydration Map
 
-| File | Symbol | What it does | Reuse | Uncertainty |
-| --- | --- | --- | --- | --- |
-| `components/auth/guest-auth-provider.tsx` | `signOut` | Clears auth token, cached profile, and profile overrides, then sets `guest` to `null`. | Directly reusable | No backend logout call was found. |
-| `components/auth/guest-auth-provider.tsx` | session-restore catch block | Clears token and cached profile if `/guest/auth/me` rejects during restore. | Directly reusable | None in the audited catch path. |
-| `components/booking/booking-checkout-page.tsx` | payment failure handling | Calls `/payment/fail` when possible, clears pending order, and leaves the draft available until verification success. | Directly reusable | Colive failure handling differs and is source-specific. |
+```text
+app/layout.tsx
+  -> GuestAuthProvider mounts
+     -> getStoredGuestToken()
+        no token
+          -> clearCachedGuestProfile()
+          -> guest = null
+          -> isRestoringSession = false
+        token found
+          -> readCachedGuestProfile()
+             -> cached guest may render first
+          -> GET /guest/auth/me
+             -> success: merge overrides, set guest, write cache
+             -> failure: clear token + clear cache + guest = null
+          -> isRestoringSession = false
+```
+
+## Session Restore And Validation Behavior
+
+| File path | Symbol | Confirmed behavior |
+| --- | --- | --- |
+| `components/auth/guest-auth-provider.tsx` | mount `useEffect` | Reads stored token, applies cached guest if available, validates with `getGuestMe(token)`, then either restores or clears auth state. |
+| `lib/guest-auth-api.ts` | `getStoredGuestToken()` | Reads persistent token from localStorage first, then session token from sessionStorage. |
+| `lib/guest-auth-api.ts` | `getGuestMe(token)` | Uses `GET /guest/auth/me` as the session-validation endpoint. |
+| `app/auth/google/success/page.tsx` | Google callback validation | Calls `getGuestMe(token)` immediately after storing the returned Google token. |
+
+## Expired Or Invalid Session Behavior
+
+| File path | Symbol | Confirmed behavior |
+| --- | --- | --- |
+| `components/auth/guest-auth-provider.tsx` | restore `catch` branch | Clears stored token and cached guest profile if `/guest/auth/me` rejects during session restore. |
+| `app/auth/google/success/page.tsx` | Google callback `catch` branch | Clears stored token and redirects to `/auth/google/error?reason=session_validation_failed` if `/guest/auth/me` rejects. |
+| `components/booking/pre-arrival-page.tsx` | KYC action guards | Uses session-ended messaging such as `Your session ended. Please sign in again.` when token-gated calls fail or no token is present. |
+| `modules/guest/services.tsx`, `modules/guest/addons.tsx`, `modules/guest/checkout.tsx`, `modules/guest/dashboard.tsx` | token checks before actions | Open the auth modal again when an authenticated action needs a token but none is available. |
+
+## Logout Cleanup Behavior
+
+| File path | Symbol | Confirmed behavior |
+| --- | --- | --- |
+| `components/auth/guest-auth-provider.tsx` | `signOut()` | Calls `clearStoredGuestToken()`, clears cached guest profile, removes `vh_guest_profile_overrides`, and sets `guest` to `null`. |
+| `components/marketing/navigation.tsx` | profile-menu logout | Invokes provider `signOut()` from the live navigation menu. |
+| `app/profile/page.tsx` | profile logout | Invokes provider `signOut()` from the profile page. |
+
+## Redirect Restoration Behavior
+
+| File path | Symbol | Confirmed behavior |
+| --- | --- | --- |
+| `lib/guest-auth-api.ts` | `rememberPostAuthRedirect(path?)` | Stores a normalized same-origin relative path in sessionStorage and localStorage. |
+| `lib/guest-auth-api.ts` | `getPostAuthRedirect()` | Reads and normalizes the stored redirect path without consuming it. |
+| `lib/guest-auth-api.ts` | `consumePostAuthRedirect()` | Reads the normalized redirect path and clears both redirect keys. |
+| `app/auth/google/success/page.tsx` | callback success redirect | Uses `consumePostAuthRedirect()` first, then `return_to`, then `/`. |
+| `components/marketing/property.tsx` | nightly review resume | Uses booking-specific selection signature restore, separate from generic post-auth redirect storage. |
+| `components/colive/colive-flow.tsx` | Colive review resume | Uses the same booking-specific review-resume pattern for Colive. |
+| `components/booking/booking-checkout-page.tsx` | payment resume | Uses in-memory `resumePaymentAfterAuthRef`, not storage-backed redirect restore. |
+
+## Redirect Restoration Map
+
+```text
+Generic auth modal / Google auth
+  -> rememberPostAuthRedirect(current path)
+  -> later Google success consumes stored redirect
+
+Nightly property booking
+  -> saveReviewResumeIntent(selection signature)
+  -> auth modal
+  -> property page effect verifies signature
+  -> /bookingreview only if selection context still matches
+
+Colive booking
+  -> saveReviewResumeIntent(selection signature)
+  -> auth modal
+  -> Colive effect verifies signature
+  -> /bookingreview only if selection context still matches
+
+Checkout payment
+  -> resumePaymentAfterAuthRef = true
+  -> auth modal
+  -> effect reruns handlePayment() after auth
+```
+
+## Auth State Dependency Map
+
+```text
+stored token
+  -> GuestAuthProvider restore
+     -> guest
+        -> guest.bookings
+           -> /bookings fallback list
+           -> guest route gates
+           -> GuestExperienceProvider.selectedBookingId
+              -> guest dashboard / services / addons / checkout
+```
+
+## Session Persistence Risks
+
+- `components/auth/guest-auth-provider.tsx`: guest cache and local profile overrides can temporarily mask backend state until `/guest/auth/me` finishes.
+- `components/auth/guest-auth-provider.tsx`: local profile overrides survive sign-in cycles until explicit logout or overwrite, because they are stored in `localStorage`.
+- `lib/guest-auth-api.ts`: generic post-auth redirect storage is path-only and independent from booking-review resume storage. Copying one without the other would change behavior.
+- `components/marketing/property.tsx`, `components/colive/colive-flow.tsx`, and `components/booking/booking-checkout-page.tsx`: booking continuation after auth relies on three separate resume patterns.
 
 ## Not Found During This Pass
 
-- No cookie-backed auth session lifecycle was found.
-- No refresh-token lifecycle or server-issued session expiry metadata was found.
-- No central cache invalidation layer beyond TTL expiry and explicit overwrite/remove helpers was found.
+- Cookie-based auth session lifecycle: Not found during this pass.
+- Refresh-token lifecycle: Not found during this pass.
+- Server-issued expiry metadata stored beside the token: Not found during this pass.
+- Logout API endpoint: Not found during this pass.
+- Central cross-module session invalidation bus: Not found during this pass.
