@@ -11,7 +11,7 @@ import { headers } from "next/headers";
 export default async function EventsPage() {
   const headerList = await headers();
   const hostname = headerList.get("host") || "";
-  const propertyId = resolveServerPropertyId({ hostname }) || undefined;
+  const propertyId = resolveServerPropertyId({ hostname });
   const liveEvents = propertyId ? await getPublicEvents({ propertyId }) : [];
 
   const eventGridClass =

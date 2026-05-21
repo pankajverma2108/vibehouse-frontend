@@ -42,9 +42,9 @@ export default async function PropertyPage({ searchParams }: PropertyPageProps) 
 
   const headerList = await headers();
   const hostname = headerList.get("host") || "";
-  const requestedPropertyId = resolveServerPropertyId({ explicit: params?.property_id, hostname }) || undefined;
-  const requestedCheckin = readValidIsoDate(params?.checkin);
-  const requestedCheckout = readValidIsoDate(params?.checkout);
+  const requestedPropertyId = resolveServerPropertyId({ explicit: params?.property_id, hostname }) || "";
+  const requestedCheckin = readValidIsoDate(params?.checkin) || "";
+  const requestedCheckout = readValidIsoDate(params?.checkout) || "";
   const hasRequestedDateWindow = Boolean(
     requestedCheckin && requestedCheckout && requestedCheckout > requestedCheckin,
   );
