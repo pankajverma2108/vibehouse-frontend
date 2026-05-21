@@ -6,11 +6,11 @@ Document the audited booking state transitions used by `Vibehouse_frontend` for 
 
 ## Status
 
-Audited on 2026-05-20 from live source files only.
+Audited on 2026-05-21 from inspected source files only.
 
 ## Important Scope Note
 
-- `components/booking/booking-checkout-page.tsx` contains the only explicit booking flow stage union found during this pass:
+- The only explicit booking flow-state union found in source is in `components/booking/booking-checkout-page.tsx`:
   - `idle`
   - `creating-order`
   - `creating-payment-order`
@@ -18,44 +18,303 @@ Audited on 2026-05-20 from live source files only.
   - `verifying-payment`
   - `confirmed`
   - `failed`
-- The wider state machine below is derived from route guards, storage helpers, and page effects. It is a documented behavioral model, not a dedicated source enum.
+- The wider state machine below is derived from route wrappers, storage helpers, and page effects. It is a behavior map, not a dedicated central statechart file.
 
-## Audited Behavioral States
+## Current Confirmed Nightly Booking State Machine
 
-| State | Evidence | Entry condition | Exit transitions | Persistence | Reuse | Uncertainty |
-| --- | --- | --- | --- | --- | --- | --- |
-| `property_ready` | `app/property/page.tsx`, `components/marketing/property.tsx` | `/property` loads with a resolved `property_id` and either catalog or availability data. | `selection_restored`, `selection_updated`, `review_blocked`, `draft_saved` | None by itself | Directly reusable | None in the audited route. |
-| `selection_restored` | `components/marketing/property.tsx`, `lib/property-selection-session.ts` | A saved nightly selection exists for the same property and is restored into UI state. | `selection_updated`, `review_resume_consumed`, `draft_saved` | `vh_property_selection_v1` | Directly reusable | Restore is property-scoped rather than exact-date-scoped. |
-| `selection_updated` | `components/marketing/property.tsx`, `lib/property-selection-session.ts` | Room counts or age confirmation change on the property page. | `draft_saved` or more `selection_updated` | `vh_property_selection_v1` | Directly reusable | Save is debounced by 150 ms. |
-| `review_blocked` | `components/marketing/property.tsx` | Guest tries to continue without property context, date range, room selection, valid inventory, or age confirmation. | Returns to `property_ready` after correction | None | Directly reusable | Error UX is toast-based and source-specific. |
-| `draft_saved` | `components/marketing/property.tsx`, `lib/booking-session.ts` | Valid selection is normalized into `BookingDraft` and stored. | `awaiting_auth_for_review` or `review_ready` | `vh_booking_draft` | Directly reusable | None in the audited save path. |
-| `awaiting_auth_for_review` | `components/marketing/property.tsx`, `lib/property-selection-session.ts` | Draft is saved but guest is signed out when continuing to review. | `review_ready` if the saved resume intent signature still matches; otherwise back to `property_ready` | `vh_review_resume_v1` plus auth redirect keys | Directly reusable | Resume fails closed when the selection signature no longer matches. |
-| `review_ready` | `components/booking/booking-checkout-page.tsx` | `/bookingreview` or `/booking` rehydrates a valid draft and guest form. | `addons_review`, `awaiting_auth_for_payment`, `creating_order`, `no_active_draft` | `vh_booking_draft` | Directly reusable | None in the audited page mount. |
-| `addons_review` | `components/booking/booking-checkout-page.tsx` | Guest detail validation passes and the review UI switches to the add-ons tab. | `creating_order`, more add-on edits, or back to `review_ready` | `vh_booking_draft` plus saved review guest form | Directly reusable | Catalog fetch failure silently empties add-ons and keeps checkout alive. |
-| `awaiting_auth_for_payment` | `components/booking/booking-checkout-page.tsx` | Guest clicks payment while signed out; `resumePaymentAfterAuthRef` is set and auth modal opens. | `creating_order` once `isAuthenticated` flips true | In-memory ref only | Directly reusable | This resume flag is not durable across a full reload. |
-| `creating_order` | `components/booking/booking-checkout-page.tsx` -> `flowStage` | Nightly checkout starts and either reuses a matching pending order or calls `createGuestBookingOrder(...)`. | `pending_order_saved`, `failed` | Pending order may already exist in session storage | Directly reusable | Explicit `flowStage` state. |
-| `pending_order_saved` | `components/booking/booking-checkout-page.tsx`, `lib/booking-session.ts` | Booking order summary is saved by draft signature before payment order creation. | `creating_payment_order`, `failed` | `vh_booking_draft.pendingOrder` | Directly reusable | Confirmed for nightly flow only. |
-| `creating_payment_order` | `components/booking/booking-checkout-page.tsx` -> `flowStage` | Checkout calls `createBookingPaymentOrder(...)`. | `opening_razorpay`, `failed` | Pending order remains stored | Directly reusable | Explicit `flowStage` state. |
-| `opening_razorpay` | `components/booking/booking-checkout-page.tsx` -> `flowStage` | Razorpay script loads and the modal is opened. | `verifying_payment`, `failed` | Pending order remains stored until verify success or fail clear | Directly reusable | Explicit `flowStage` state. |
-| `verifying_payment` | `components/booking/booking-checkout-page.tsx` -> `flowStage` | Razorpay success handler calls `/payment/verify`. | `confirmed_snapshot_saved` or `failed` | Pending order still present until verify success | Directly reusable | Explicit `flowStage` state. |
-| `confirmed_snapshot_saved` | `components/booking/booking-checkout-page.tsx`, `lib/booking-session.ts` | Payment verification succeeded; pending order and draft are cleared and a local confirmation snapshot is written. | `bookings_indexed` | `vh_confirmed_booking:<eri>` | Directly reusable | Confirmation detail richness depends on the checkout-time snapshot shape. |
-| `failed` | `components/booking/booking-checkout-page.tsx` -> `flowStage` | Order, payment-order, Razorpay, or verification failure occurs. | Retry from `review_ready` or `addons_review` | Draft may remain; pending order is cleared on nightly fail/cancel paths | Directly reusable | Explicit `flowStage` state, but error copy is source-specific. |
-| `bookings_indexed` | `app/bookings/page.tsx` | `/bookings` loads fallback bookings, session cache, or fresh `/guest/booking/mine` data. | `booking_confirmed_view`, `web_checkin_open`, `bookings_empty` | `vh:guest-bookings:<guestId>` session TTL cache | Directly reusable | Live sync can fail while fallback bookings still render. |
-| `booking_confirmed_view` | `components/booking/booking-confirmed-page.tsx` | Booking card routes to confirmed view because all KYC slots are complete, or the guest opens confirmation directly. | `receipt_download_requested`, `web_checkin_open`, or sign-in gating | Local confirmation snapshot fallback | Directly reusable | Live detail refresh may fail and fall back to local snapshot. |
-| `web_checkin_open` | `components/booking/pre-arrival-page.tsx` | Booking card routes to web check-in because KYC is incomplete. | `payment_pending_gate`, `kyc_slots_loading`, `booking_confirmed_view`, or sign-in gating | sessionStorage TTL caches for slots/detail | Conceptually reusable | KYC editor details are source-specific. |
-| `payment_pending_gate` | `components/booking/pre-arrival-page.tsx` | Pre-arrival discovers payment-pending booking status. | `booking_confirmed_view` after payment completes and route is reopened | sessionStorage slot cache may store empty slots plus booking status | Conceptually reusable | Exact pending-status helpers are internal to this file. |
-| `kyc_slots_loading` | `components/booking/pre-arrival-page.tsx` | Slot list/detail are loading from cache and live APIs. | `kyc_editing`, `booking_confirmed_view`, `no_slots_available`, `no_editable_slot` | sessionStorage TTL caches | Conceptually reusable | Exact TTL constants were not separately extracted. |
-| `kyc_editing` | `components/booking/pre-arrival-page.tsx` | An editable slot is active and the guest is in step 1/2/3 of the KYC editor. | `kyc_submitting`, `booking_confirmed_view`, or back to `bookings_indexed` | In-memory editor state plus cached slot detail | Conceptually reusable | Step labels and field rules are source-specific. |
-| `kyc_submitting` | `components/booking/pre-arrival-page.tsx` | Validated KYC payload is being submitted. | `booking_confirmed_view` on completion modal path or back to `kyc_editing` on validation failure | Cached slot detail is refreshed after success | Conceptually reusable | Final backend approval timing beyond submission was not audited here. |
+```text
+route_normalized
+  entry: `/` or `/rooms` normalize into `/property?...`
+  exit: property_ready
 
-## Source-Specific Branches
+property_ready
+  entry: `PropertyPage` resolves `property_id` and preloads catalog or live availability
+  exit:
+    -> selection_restored
+    -> selection_updated
+    -> review_blocked
+    -> draft_saved
 
-| File | Symbol | What it does | Reuse | Uncertainty |
+selection_restored
+  entry: `vh_property_selection_v1` matches the current property
+  exit:
+    -> selection_updated
+    -> draft_saved
+    -> review_resume_ready
+
+selection_updated
+  entry: room counts or age confirmation changed
+  exit:
+    -> selection_updated
+    -> draft_saved
+
+review_blocked
+  entry: missing property, invalid dates, zero rooms, sold-out room, price unavailable, or age unchecked
+  exit:
+    -> property_ready
+
+draft_saved
+  entry: `saveBookingDraft()` writes `vh_booking_draft`
+  exit:
+    -> awaiting_auth_for_review
+    -> review_ready
+
+awaiting_auth_for_review
+  entry: signed-out user clicked continue on `/property`
+  exit:
+    -> review_resume_ready
+    -> property_ready
+
+review_resume_ready
+  entry: post-auth `vh_review_resume_v1` matches the current selection signature
+  exit:
+    -> review_ready
+
+review_ready
+  entry: `/booking` or `/bookingreview` rehydrates a valid draft
+  exit:
+    -> guest_details_invalid
+    -> addons_review
+    -> awaiting_auth_for_payment
+    -> no_active_draft
+
+guest_details_invalid
+  entry: guest-form validation fails
+  exit:
+    -> review_ready
+
+addons_review
+  entry: guest details validated and the checkout UI opened the add-ons tab
+  exit:
+    -> addons_review
+    -> awaiting_auth_for_payment
+    -> creating_order
+
+awaiting_auth_for_payment
+  entry: signed-out user clicked payment; `resumePaymentAfterAuthRef = true`
+  exit:
+    -> creating_order
+    -> no_active_draft
+
+creating_order
+  entry: nightly checkout started and creates or reuses `/guest/booking/create-order`
+  exit:
+    -> pending_order_saved
+    -> failed
+
+pending_order_saved
+  entry: matching `pendingOrder.signature` stored inside `vh_booking_draft`
+  exit:
+    -> creating_payment_order
+    -> failed
+
+creating_payment_order
+  entry: `/payment/create-booking-order` in progress
+  exit:
+    -> opening_razorpay
+    -> failed
+
+opening_razorpay
+  entry: Razorpay script loaded and modal opened
+  exit:
+    -> verifying_payment
+    -> payment_cancelled
+    -> payment_failed
+
+verifying_payment
+  entry: Razorpay success handler calls `/payment/verify`
+  exit:
+    -> confirmed_snapshot_saved
+    -> verification_pending
+    -> failed
+
+payment_cancelled
+  entry: modal `ondismiss`
+  exit:
+    -> addons_review
+
+payment_failed
+  entry: Razorpay `payment.failed`
+  exit:
+    -> addons_review
+
+verification_pending
+  entry: `/payment/verify` rejects after a successful Razorpay callback
+  exit:
+    -> addons_review
+
+confirmed_snapshot_saved
+  entry: `saveConfirmedBookingSnapshot()` writes `vh_confirmed_booking:<eri>`
+  exit:
+    -> bookings_indexed
+
+bookings_indexed
+  entry: router pushes `/bookings?fresh=<eri>`
+  exit:
+    -> booking_confirmed_view
+    -> web_checkin_gate
+```
+
+## Confirmation / Pre-Arrival / Guest-Hub State Machine
+
+```text
+bookings_indexed
+  entry: `/bookings` renders fallback auth bookings, cached live bookings, or fresh `/guest/booking/mine`
+  exit:
+    -> bookings_empty
+    -> booking_confirmed_view
+    -> web_checkin_gate
+
+bookings_empty
+  entry: no bookings match the active tab/date filters
+  exit:
+    -> bookings_indexed
+    -> property_ready
+
+booking_confirmed_view
+  entry: booking card routes to `/bookings/[eri]/confirmed`
+  exit:
+    -> receipt_download_requested
+    -> web_checkin_gate
+    -> guest_hub_entry
+
+receipt_download_requested
+  entry: confirmation page triggers `useDownloadReceipt()`
+  exit:
+    -> booking_confirmed_view
+    -> receipt_download_failed
+
+receipt_download_failed
+  entry: receipt fetch or PDF generation failed
+  exit:
+    -> booking_confirmed_view
+
+web_checkin_gate
+  entry: booking card routes to `/bookings/[eri]/web-check-in`
+  exit:
+    -> sign_in_required_for_kyc
+    -> payment_pending_gate
+    -> kyc_slots_loading
+    -> booking_confirmed_view
+
+sign_in_required_for_kyc
+  entry: guest token missing while opening pre-arrival
+  exit:
+    -> kyc_slots_loading
+
+payment_pending_gate
+  entry: `linkGuestBooking()` reports `PENDING_PAYMENT`, `PAYMENT_PENDING`, or `UNPAID`
+  exit:
+    -> booking_confirmed_view
+
+kyc_slots_loading
+  entry: slots/detail load from sessionStorage cache and live APIs
+  exit:
+    -> no_slots_available
+    -> no_editable_slot
+    -> kyc_editing
+    -> booking_confirmed_view
+
+no_slots_available
+  entry: slot list empty
+  exit:
+    -> bookings_indexed
+
+no_editable_slot
+  entry: all visible slots are locked or already verified
+  exit:
+    -> booking_confirmed_view
+
+kyc_editing
+  entry: editable slot selected
+  exit:
+    -> kyc_uploading_document
+    -> kyc_running_ocr
+    -> kyc_submitting
+    -> bookings_indexed
+
+kyc_uploading_document
+  entry: `getBookingKycUploadUrl()` + presigned upload in progress
+  exit:
+    -> kyc_editing
+    -> failed
+
+kyc_running_ocr
+  entry: `runBookingKycOcr()` in progress
+  exit:
+    -> kyc_editing
+    -> failed
+
+kyc_submitting
+  entry: `submitBookingKyc()` in progress
+  exit:
+    -> completion_modal_open
+    -> failed
+
+completion_modal_open
+  entry: submit succeeded and slots were reloaded
+  exit:
+    -> booking_confirmed_view
+
+guest_hub_entry
+  entry: `/guest` or `/:bookingId/guest/*`
+  exit:
+    -> guest_hub_active
+    -> guest_hub_not_yet_open
+    -> guest_hub_denied
+
+guest_hub_active
+  entry: booking is guest-hub eligible and linked to the current guest
+  exit:
+    -> guest_hub_denied
+
+guest_hub_not_yet_open
+  entry: booking linked but stay is upcoming
+  exit:
+    -> guest_hub_active
+    -> guest_hub_denied
+
+guest_hub_denied
+  entry: unauthenticated, unlinked, or past stay
+  exit:
+    -> guest_hub_entry
+```
+
+## State Notes
+
+| State | Evidence | Entry condition | Exit / recovery behavior | Persistence |
 | --- | --- | --- | --- | --- |
-| `components/booking/booking-checkout-page.tsx` | `isColiveDraft(draft)` branch | Runs a separate quote/draft/payment/verify state path for `source === "colive"`. | Source-specific | Not the primary nightly migration target. |
-| `lib/guest-hub.ts` | `TEMPORARY_ALLOW_DATE_RANGE_ONLY_GUEST_HUB_ACCESS` | Temporarily treats date-window-active bookings as guest-hub eligible even if backend in-house statuses are not yet reliable. | Source-specific | Explicitly marked temporary in source comments. |
+| `property_ready` | `app/property/page.tsx`, `components/marketing/property.tsx` | `PropertyPage` resolved a property and rendered the client selection surface. | Can move into restore, selection, or validation-blocked states. | None |
+| `selection_restored` | `components/marketing/property.tsx`, `lib/property-selection-session.ts` | `vh_property_selection_v1` matched the same property. | Re-clamped against live room availability. | `vh_property_selection_v1` |
+| `draft_saved` | `components/marketing/property.tsx`, `lib/booking-session.ts` | Valid nightly selection saved as `BookingDraft`. | Routes to auth or review. | `vh_booking_draft` |
+| `review_ready` | `components/booking/booking-checkout-page.tsx` | Stored draft rehydrated successfully. | Missing draft falls back to `/property`. | `vh_booking_draft` |
+| `pending_order_saved` | `components/booking/booking-checkout-page.tsx`, `lib/booking-session.ts` | Nightly order summary stored by signature. | Cleared on fail/cancel or verify success. | `vh_booking_draft.pendingOrder` |
+| `confirmed_snapshot_saved` | `components/booking/booking-checkout-page.tsx`, `lib/booking-session.ts` | Payment verified successfully. | Used by confirmation fallback later. | `vh_confirmed_booking:<eri>` |
+| `bookings_indexed` | `app/bookings/page.tsx`, `lib/client-cache.ts` | `/bookings` rendered fallback, cached, or live booking data. | Can route to confirmation or pre-arrival. | `vh:guest-bookings:<guestId>` |
+| `kyc_slots_loading` | `components/booking/pre-arrival-page.tsx`, `lib/client-cache.ts` | Web check-in route opened with a token. | Can redirect to confirmation, empty states, or slot editing. | `vh:web-checkin:slots:<eri>`, `vh:web-checkin:slot:<eri>:<slotId>` |
+| `guest_hub_active` | `app/guest/page.tsx`, `components/guest/guest-route-gate.tsx`, `lib/guest-hub.ts` | Active stay matched guest-hub eligibility rules. | Future backend status fixes may narrow this eligibility. | `guest.bookings`, `/guest/booking/mine`, `/guest/booking/link` |
 
-## Not Found During This Pass
+## Failure And Recovery States
 
-- No standalone reducer, XState machine, or centralized booking statechart file was found.
-- No server-driven order-status polling loop was found in the nightly booking checkout path.
+| Failure / pending state | Evidence | Verified recovery path |
+| --- | --- | --- |
+| `review_blocked` | `components/marketing/property.tsx` | User corrects property/date/room/age inputs and clicks continue again. |
+| `guest_details_invalid` | `components/booking/booking-checkout-page.tsx` | User fixes guest fields; no route change required. |
+| `payment_cancelled` | `components/booking/booking-checkout-page.tsx` | Pending order is cleared and the user stays in checkout for retry. |
+| `payment_failed` | `components/booking/booking-checkout-page.tsx` | `/payment/fail` runs, pending order is cleared, and the user retries manually. |
+| `verification_pending` | `components/booking/booking-checkout-page.tsx` | User is told to check `My Bookings` later; no automatic retry or polling exists. |
+| `no_active_draft` | `components/booking/booking-checkout-page.tsx` | User returns to `/property` and rebuilds the draft. |
+| `payment_pending_gate` | `components/booking/pre-arrival-page.tsx` | User goes back to confirmation/status and waits for payment completion. |
+| `no_slots_available` | `components/booking/pre-arrival-page.tsx` | User reopens `/bookings` or the booking link later. |
+| `no_editable_slot` | `components/booking/pre-arrival-page.tsx` | User returns to confirmation or uses a different linked guest account. |
+| `guest_hub_denied` | `components/guest/guest-route-gate.tsx` | User signs in with the linked guest account or waits for the stay to become active. |
+
+## Pending / Unknown States
+
+| Area | Status |
+| --- | --- |
+| Formal centralized booking reducer or statechart | Not found during this pass. |
+| Server-side abandoned-order reconciliation | Not found during this pass. |
+| Automatic retry/backoff for `/payment/verify` | Not found during this pass. |
+| Dedicated booking-expiry endpoint or explicit order timeout state in frontend | Not found during this pass. |
+| Guest-hub final eligibility rules after backend status fixes | Pending deeper audit. The current source still uses `TEMPORARY_ALLOW_DATE_RANGE_ONLY_GUEST_HUB_ACCESS = true`. |

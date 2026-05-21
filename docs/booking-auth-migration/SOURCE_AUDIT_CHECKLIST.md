@@ -6,7 +6,7 @@ Provide a source-repo-only checklist for extracting audited auth and booking arc
 
 ## Status
 
-Auth audit updated on 2026-05-21 from inspected source files only.
+Auth and booking audit updated on 2026-05-21 from inspected source files only.
 
 ## Source Audit Checklist
 
@@ -108,3 +108,68 @@ Auth audit updated on 2026-05-21 from inspected source files only.
 
 - [ ] Verify a formal server-side protected-route system or middleware guard
   Not found during this pass.
+
+## Booking System Audit Checklist
+
+- [x] Identify booking entry points, booking CTAs, and navigation triggers
+  Verified in `app/page.tsx`, `app/rooms/page.tsx`, `app/property/page.tsx`, `components/marketing/widgets/booking-widget.tsx`, `components/marketing/navigation.tsx`, `components/marketing/mobile-staggered-menu.tsx`, `components/marketing/pages/home-sections.tsx`, `components/marketing/property.tsx`, `components/standalone/partner-upcoming-pages.tsx`, and `content/nav-menu.ts`.
+
+- [x] Identify direct booking routes, booking review routes, checkout routes, confirmation routes, and guest or pre-arrival routes
+  Verified in `app/property/page.tsx`, `app/booking/page.tsx`, `app/bookingreview/page.tsx`, `app/reviewnew/page.tsx`, `app/bookings/page.tsx`, `app/bookings/[eri]/confirmed/page.tsx`, `app/bookings/[eri]/web-check-in/page.tsx`, `app/guest/page.tsx`, and `app/[bookingId]/guest/layout.tsx`.
+
+- [x] Identify room and property data sources plus property_id propagation rules
+  Verified in `components/marketing/property.tsx`, `app/api/cx/rooms/route.ts`, `lib/cx-api.ts`, and `lib/property-resolver.ts`.
+
+- [x] Identify selection ownership, selected-room shape, selected-property shape, and route or search-param coupling
+  Verified in `components/marketing/property.tsx`.
+
+- [x] Identify selection persistence, restore logic, and fallback behavior
+  Verified in `components/marketing/property.tsx` and `lib/property-selection-session.ts`.
+
+- [x] Identify nightly booking draft creation, draft shape, persistence medium, hydration, mutation, and confirmation snapshot behavior
+  Verified in `components/marketing/property.tsx`, `components/booking/booking-checkout-page.tsx`, and `lib/booking-session.ts`.
+
+- [x] Identify checkout page ownership, form-state ownership, guest-data collection, add-on handling, and validation
+  Verified in `app/booking/page.tsx`, `app/bookingreview/page.tsx`, `components/booking/booking-checkout-page.tsx`, `components/auth/guest-auth-provider.tsx`, and `lib/booking-api.ts`.
+
+- [x] Identify pricing recalculation, booking-order submission, payment-order submission, Razorpay orchestration, and failure handling
+  Verified in `components/booking/booking-checkout-page.tsx` and `lib/booking-api.ts`.
+
+- [x] Identify booking recovery and resume behavior across reload, auth interruption, missing draft, pending order, and duplicate submission protection
+  Verified in `components/marketing/property.tsx`, `components/booking/booking-checkout-page.tsx`, `components/auth/guest-auth-provider.tsx`, `lib/booking-session.ts`, and `lib/property-selection-session.ts`.
+
+- [x] Identify bookings-list retrieval, confirmation lifecycle, receipt handling, and post-confirmation routing
+  Verified in `app/bookings/page.tsx`, `app/bookings/[eri]/confirmed/page.tsx`, `components/booking/booking-confirmed-page.tsx`, `hooks/use-download-receipt.ts`, `lib/receipt-api.ts`, and `lib/booking-api.ts`.
+
+- [x] Identify pre-arrival KYC API usage, cache behavior, submit flow, and completion routing
+  Verified in `app/bookings/[eri]/web-check-in/page.tsx`, `components/booking/pre-arrival-page.tsx`, `lib/booking-api.ts`, and `lib/client-cache.ts`.
+
+- [x] Identify booking-scoped guest access dependency and guest-hub eligibility coupling
+  Verified in `app/guest/page.tsx`, `app/[bookingId]/guest/layout.tsx`, `components/guest/guest-route-gate.tsx`, `state/guest-experience-provider.tsx`, and `lib/guest-hub.ts`.
+
+- [x] Identify booking API wrapper files, endpoint usage, visible request shapes, visible response shapes, normalization, and error behavior
+  Verified in `lib/vibehouse-api.ts`, `lib/cx-api.ts`, `app/api/cx/rooms/route.ts`, `lib/booking-api.ts`, `lib/receipt-api.ts`, and `components/booking/booking-checkout-page.tsx`.
+
+- [x] Add text-based booking flow and booking state-machine diagrams
+  Documented in `docs/booking-auth-migration/BOOKING_FLOW_MAP.md` and `docs/booking-auth-migration/BOOKING_STATE_MACHINE.md`.
+
+- [x] Document booking coupling, dependency analysis, and migration risks
+  Documented in `docs/booking-auth-migration/BOOKING_ARCHITECTURE.md`, `docs/booking-auth-migration/SESSION_LIFECYCLE.md`, and `docs/booking-auth-migration/API_PATTERNS.md`.
+
+- [x] Mark uncertain or missing booking behavior explicitly
+  `Not found during this pass.` or `Pending deeper audit` notes were added where server-side nightly draft expiry, backend coupon validation, asynchronous payment reconciliation, invoice-specific delivery, and backend ownership of temporary guest-hub rules were not confirmed.
+
+- [ ] Verify a server-side abandoned-draft expiry or cleanup process for nightly booking
+  Not found during this pass.
+
+- [ ] Verify a backend coupon or promo validation endpoint for nightly booking
+  Not found during this pass.
+
+- [ ] Verify webhook or asynchronous payment reconciliation beyond `POST /payment/verify` and `POST /payment/fail`
+  Not found during this pass.
+
+- [ ] Verify invoice or email-delivery implementation beyond the receipt fetch and UI copy
+  Not found during this pass.
+
+- [ ] Verify the backend rule set behind temporary guest-hub eligibility widening
+  Pending deeper audit. The frontend override is visible in `lib/guest-hub.ts`, but backend alignment was not proven from inspected frontend source.
