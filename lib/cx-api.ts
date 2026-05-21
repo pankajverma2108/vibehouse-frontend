@@ -1,7 +1,6 @@
 import type { EventCardProps, RoomCardProps } from "@/content/types";
 import { getApiBaseUrl } from "@/lib/vibehouse-api";
 import { formatINRPlain } from "@/lib/format-price";
-import { sanitizePropertyId as sanitizePropertyIdFromResolver } from "@/lib/property-resolver";
 const CANONICAL_PROPERTY_ID_REGEX = /^\d+$/;
 const FALLBACK_EVENT_IMAGE =
   "https://images.unsplash.com/photo-1647649644192-af6183269fa4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200";
@@ -638,14 +637,22 @@ export async function getRoomAvailability(options?: {
   checkin?: string;
   checkout?: string;
 }): Promise<NormalizedRoomType[]> {
-  const snapshot = await getRoomAvailabilitySnapshot(options);
+  const normalizedOptions = {
+    propertyId: options?.propertyId ?? "",
+    checkin: options?.checkin,
+    checkout: options?.checkout,
+  };
+  const snapshot = await getRoomAvailabilitySnapshot(normalizedOptions);
   return snapshot.roomTypes;
 }
 
 export async function getRoomCatalog(options?: {
   propertyId?: string;
 }): Promise<NormalizedRoomType[]> {
-  const snapshot = await getRoomCatalogSnapshot(options);
+  const normalizedOptions = {
+    propertyId: options?.propertyId ?? "",
+  };
+  const snapshot = await getRoomCatalogSnapshot(normalizedOptions);
   return snapshot.roomTypes;
 }
 
@@ -764,8 +771,8 @@ export async function getRoomAvailabilitySnapshot(options: {
   const path = `/guest/booking/availability?${params.toString()}`;
   const raw = (await fetchUnknownJson(path)) as RawRoomAvailability | null;
 
-  let resolvedLivePropertyId = ensureString(raw?.property_id, resolvedPropertyId);
-  let availabilitySource = normalizeAvailabilitySource(raw?.availability_source, "unknown");
+  const resolvedLivePropertyId = ensureString(raw?.property_id, resolvedPropertyId);
+  const availabilitySource = normalizeAvailabilitySource(raw?.availability_source, "unknown");
 
   if (!raw) {
     recordTelemetry({ type: "null_payload", source: "room" });
