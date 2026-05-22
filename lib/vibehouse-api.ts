@@ -48,6 +48,20 @@ export function parseApiError(data: unknown, fallback: string): string {
   return fallback;
 }
 
+function getRequestContextHeaders(): Record<string, string> {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  const host = window.location.host?.trim();
+  const proto = window.location.protocol.replace(/:$/, "").trim();
+
+  return {
+    ...(host ? { "X-Forwarded-Host": host } : {}),
+    ...(proto ? { "X-Forwarded-Proto": proto } : {}),
+  };
+}
+
 export async function requestJson<T>(
   path: string,
   options?: {
@@ -61,6 +75,7 @@ export async function requestJson<T>(
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
+      ...getRequestContextHeaders(),
       ...(options?.token ? { Authorization: `Bearer ${options.token}` } : {}),
     },
     body: options?.body ? JSON.stringify(options.body) : undefined,

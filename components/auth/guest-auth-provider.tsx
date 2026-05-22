@@ -79,6 +79,10 @@ function mapAuthErrorMessage(action: AuthAction, error: unknown): string {
 
   const backendMessage = error.message;
 
+  if (action === "signup" && error.status === 409) {
+    return "An account with these details already exists. Sign in to access your bookings.";
+  }
+
   if (action === "forgot-password-request") {
     if (error.status === 503) {
       return "We couldn't send the email right now. Please try again.";

@@ -7,6 +7,9 @@
  */
 
 const PROPERTY_ID_REGEX = /^\d+$/;
+const DEFAULT_BRAND: Brand = "TDS";
+
+export type Brand = "TDS" | "BUTEAK";
 
 // Host-to-property mapping (must match backend's property-resolver.ts)
 // See: docs/multi_property/13_multi_property.md
@@ -15,8 +18,15 @@ const HOST_TO_PROPERTY: Record<string, string> = {
   "thedailysocial.co.in": "60765",
   "www.buteak.in": "55402",
   "buteak.in": "55402",
+  "www.dev.buteak.in": "55402",
+  "dev.buteak.in": "55402",
   "localhost": "60765",
   "127.0.0.1": "60765",
+};
+
+const PROPERTY_ID_TO_BRAND: Record<string, Brand> = {
+  "60765": "TDS",
+  "55402": "BUTEAK",
 };
 
 // Property ID to property name mapping
@@ -67,6 +77,66 @@ export function resolvePropertyIdFromHost(hostname: string): string {
   }
 
   return "";
+}
+
+/**
+ * Resolve brand from a hostname.
+ * Unknown hosts intentionally default to TDS to match backend brand isolation behavior.
+ */
+export function resolveBrandFromHost(hostname: string): Brand {
+  const propertyId = resolvePropertyIdFromHost(hostname);
+  return PROPERTY_ID_TO_BRAND[propertyId] ?? DEFAULT_BRAND;
+}
+
+/**
+ * Resolve brand from a property_id.
+ */
+export function resolveBrandFromPropertyId(propertyId: string | null | undefined): Brand {
+  const sanitized = sanitizePropertyId(propertyId);
+  return PROPERTY_ID_TO_BRAND[sanitized] ?? DEFAULT_BRAND;
+}
+
+function getSearchParamFromPath(path: string | null | undefined, key: string): string | null {
+  if (!path) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(path, "https://www.thedailysocial.co.in");
+    return parsed.searchParams.get(key);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Client-side brand resolver.
+ * Priority: explicit property_id > return path property_id > current URL property_id > host > TDS.
+ */
+export function resolveClientBrand(options?: {
+  explicitPropertyId?: string | null;
+  returnTo?: string | null;
+}): Brand {
+  const explicitBrand = PROPERTY_ID_TO_BRAND[sanitizePropertyId(options?.explicitPropertyId)];
+  if (explicitBrand) {
+    return explicitBrand;
+  }
+
+  const returnToBrand = PROPERTY_ID_TO_BRAND[sanitizePropertyId(getSearchParamFromPath(options?.returnTo, "property_id"))];
+  if (returnToBrand) {
+    return returnToBrand;
+  }
+
+  if (typeof window !== "undefined") {
+    const currentUrlBrand = PROPERTY_ID_TO_BRAND[sanitizePropertyId(new URLSearchParams(window.location.search).get("property_id"))];
+    if (currentUrlBrand) {
+      return currentUrlBrand;
+    }
+
+    return resolveBrandFromHost(window.location.hostname);
+  }
+
+  return DEFAULT_BRAND;
 }
 
 /**

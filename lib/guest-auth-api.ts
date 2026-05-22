@@ -1,4 +1,5 @@
 import { getApiBaseUrl, requestJson } from "@/lib/vibehouse-api";
+import { resolveClientBrand } from "@/lib/property-resolver";
 
 export type GuestProfile = {
   id: string;
@@ -207,9 +208,11 @@ export function consumePostAuthRedirect(): string | null {
 export function getGuestGoogleAuthUrl(returnTo?: string): string {
   const baseUrl = resolveGoogleAuthBaseUrl();
   const redirectPath = normalizeRedirectPath(returnTo);
+  const brand = resolveClientBrand({ returnTo: redirectPath });
 
   try {
     const url = new URL(baseUrl);
+    url.searchParams.set("brand", brand);
     if (redirectPath && redirectPath !== "/") {
       url.searchParams.set("return_to", redirectPath);
     }

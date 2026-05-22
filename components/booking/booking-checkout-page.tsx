@@ -1215,7 +1215,11 @@ export function BookingCheckoutPage() {
       });
 
       setFlowStage("creating-payment-order");
-      const payableGrandTotal = Math.max(0, Math.round(estimatedGrandTotal));
+      const payableGrandTotal = Number(orderSummary.grand_total);
+      if (!Number.isFinite(payableGrandTotal) || payableGrandTotal < 0) {
+        throw new Error("Booking order returned an invalid grand total.");
+      }
+
       const paymentOrder = await createBookingPaymentOrder(token, {
         ezee_reservation_id: orderSummary.ezee_reservation_id,
         grand_total: payableGrandTotal,
@@ -1256,7 +1260,7 @@ export function BookingCheckoutPage() {
           amount: paymentOrder.amount_paise,
           currency: paymentOrder.currency,
           order_id: paymentOrder.razorpay_order_id,
-          name: "The Daily Social",
+          name: orderSummary.property_name || propertyHero.title,
           description: `${orderSummary.property_name} booking`,
           prefill: {
             name: `${guestForm.firstName} ${guestForm.lastName}`.trim(),
