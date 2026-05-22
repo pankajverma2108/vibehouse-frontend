@@ -1,4 +1,4 @@
-# Payment Logging Enrichment — End-to-End Verification
+# Payment Logging Enrichment — End-to-End Verification.
 
 **Date:** 2026-05-21  
 **Backend:** `https://api.thedailysocial.co.in` (prod, revision 29, post commit [`e4c80fe`](https://github.com/Emagicor/deta/commit/e4c80fe) for payment enrichment + commit [`f83f03d`](https://github.com/Emagicor/deta/commit/f83f03d) for brand isolation)  
