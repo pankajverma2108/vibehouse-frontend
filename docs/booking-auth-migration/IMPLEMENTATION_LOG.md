@@ -48,6 +48,16 @@ Use the following format for future updates:
 - blockers:
 - next step:
 
+### 2026-05-26 - Source route and API reference for Buteak canonical routing
+
+- status: completed
+- objective: create a docs-only source-reference note explaining how `Vibehouse_frontend` currently handles property, room, booking, auth, payment, confirmation, and guest APIs so `buteak_website` can adapt the backend-facing behavior while keeping its own canonical route set.
+- files reviewed: `docs/booking-auth-migration/BOOKING_ARCHITECTURE.md`, `docs/booking-auth-migration/BOOKING_FLOW_MAP.md`, `docs/booking-auth-migration/API_PATTERNS.md`, `docs/booking-auth-migration/BOOKING_STATE_MACHINE.md`, `docs/booking-auth-migration/SESSION_LIFECYCLE.md`, `docs/booking-auth-migration/IMPLEMENTATION_LOG.md`, `app/page.tsx`, `app/rooms/page.tsx`, `app/property/page.tsx`, `app/bookingreview/page.tsx`, `app/bookings/page.tsx`, `app/guest/page.tsx`, `app/[bookingId]/guest/layout.tsx`, `app/auth/google/success/page.tsx`, `components/auth/guest-auth-provider.tsx`, `components/guest/guest-route-gate.tsx`, `components/marketing/property.tsx`, `components/booking/booking-checkout-page.tsx`, `lib/vibehouse-api.ts`, `lib/guest-auth-api.ts`, `lib/property-resolver.ts`, `lib/cx-api.ts`, `app/api/cx/rooms/route.ts`, `lib/booking-api.ts`, `lib/booking-session.ts`, and `lib/property-selection-session.ts`
+- findings: Vibehouse source behavior remains centered on numeric `property_id` resolution, frontend-persisted nightly booking drafts, `POST /guest/booking/create-order` followed by `POST /payment/create-booking-order`, Razorpay modal checkout, frontend-triggered `POST /payment/verify`, and booking-identity-driven post-booking routes using `ezee_reservation_id`; Buteak can reuse the sequencing, identity boundaries, and persistence patterns conceptually, but must not copy Vibehouse route names, source host and brand mappings, hardcoded property defaults, Colive branches, or temporary guest-hub override behavior directly.
+- docs changed: `docs/booking-auth-migration/SOURCE_ROUTE_API_REFERENCE_FOR_BUTEAK.md` and `docs/booking-auth-migration/IMPLEMENTATION_LOG.md`
+- blockers: no runtime blockers; remaining unknowns are backend-owned details already called out in the source docs, including coupon validation ownership, webhook reconciliation, and any future target-side route rewiring decisions.
+- next step: use `SOURCE_ROUTE_API_REFERENCE_FOR_BUTEAK.md` as the source-side bridge doc when mapping Buteak canonical routes onto the shared backend flow, without treating Vibehouse route names as canonical target requirements.
+
 ### 2026-05-20 - Source auth and booking architecture audit
 
 - status: completed
