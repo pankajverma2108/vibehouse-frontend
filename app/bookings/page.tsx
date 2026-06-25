@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { getDefaultPropertyDestinationHref } from "@/lib/cx-api";
-import { CalendarDays, ChevronDown, LoaderCircle, MapPin, RefreshCcw, Ticket } from "lucide-react";
+import { CalendarDays, ChevronDown, MapPin, RefreshCcw, Ticket } from "lucide-react";
 import { toast } from "sonner";
 
 import { useGuestAuth } from "@/components/auth/guest-auth-provider";
@@ -13,6 +13,7 @@ import { GuestVerificationBanner } from "@/components/auth/guest-verification-ba
 import { BookingPageShell } from "@/components/booking/booking-shell";
 import { StickerTag } from "@/components/shared/sticker-tag";
 import { Button } from "@/components/ui/button";
+import { ButtonSpinner } from "@/components/ui/button-spinner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -557,7 +558,7 @@ export default function BookingsPage() {
               aria-label="Refresh bookings"
             >
               {bookingLoadState === "loading" ? (
-                <LoaderCircle className="h-4 w-4 animate-spin" />
+                <ButtonSpinner className="h-4 w-4" />
               ) : (
                 <RefreshCcw className="h-4 w-4" />
               )}

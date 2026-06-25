@@ -167,8 +167,8 @@ export function GuestServices() {
                 <p className="mt-2 text-sm leading-6 text-[#cbd5e1]">Ticketed concierge request with desk follow-up.</p>
                 <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
                   <span className="text-xs font-bold uppercase text-white/52">{getServiceMeta(service)}</span>
-                  <Button className={primaryCtaClass} disabled={submittingId === service.id || !available} onClick={() => void onRequestService(service.id)} type="button">
-                    {submittingId === service.id ? "Sending..." : "Request"}
+                  <Button className={primaryCtaClass} disabled={!available} loading={submittingId === service.id} loadingText="Sending request" onClick={() => void onRequestService(service.id)} type="button">
+                    Request
                   </Button>
                 </div>
               </article>

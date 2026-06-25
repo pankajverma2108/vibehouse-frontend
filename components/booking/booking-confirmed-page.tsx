@@ -9,13 +9,12 @@ import {
   CheckCircle2,
   Download,
   ExternalLink,
-  Loader2,
   MapPin,
   ShieldCheck,
   TriangleAlert,
   WalletCards,
 } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import gsap from "gsap";
 
 import { useGuestAuth } from "@/components/auth/guest-auth-provider";
@@ -28,6 +27,7 @@ import { linkGuestBooking, type LinkGuestBookingResponse } from "@/lib/booking-a
 import { withBrandName, toAbsoluteBrandCheckinLink, toBrandCheckinLink } from "@/lib/branding";
 import { getConfirmedBookingSnapshot } from "@/lib/booking-session";
 import { getStoredGuestToken } from "@/lib/guest-auth-api";
+import { MOTION_DISTANCE, MOTION_DURATION, MOTION_SCALE, MOTION_STAGGER, getHoverLift } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { toSafeErrorMessage } from "@/lib/ui-error";
 import { useDownloadReceipt } from "@/hooks/use-download-receipt";
@@ -173,6 +173,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 
 export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId: string }) {
   const { isAuthenticated, isRestoringSession, openAuthModal } = useGuestAuth();
+  const reducedMotion = useReducedMotion() ?? false;
   const [bookingDetail, setBookingDetail] = useState<LinkGuestBookingResponse | null>(null);
   const [snapshotFallback, setSnapshotFallback] = useState(() => getConfirmedBookingSnapshot(ezeeReservationId));
   const [isLoading, setIsLoading] = useState(true);
@@ -185,13 +186,17 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
     }
 
     if (!isAuthenticated) {
-      setIsLoading(false);
+      queueMicrotask(() => {
+        setIsLoading(false);
+      });
       return;
     }
 
     const token = getStoredGuestToken();
     if (typeof token !== "string" || token.length === 0) {
-      setIsLoading(false);
+      queueMicrotask(() => {
+        setIsLoading(false);
+      });
       return;
     }
     const authToken = token;
@@ -231,21 +236,21 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
       return;
     }
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (reducedMotion || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
         "[data-confirmation-tile]",
-        { opacity: 0, y: 20, scale: 0.985 },
+        { opacity: 0, y: MOTION_DISTANCE.lg, scale: MOTION_SCALE.subtleEnter },
         {
           opacity: 1,
           y: 0,
           scale: 1,
-          duration: 0.7,
+          duration: MOTION_DURATION.slow,
           ease: "power3.out",
-          stagger: 0.08,
+          stagger: MOTION_STAGGER.standard,
         },
       );
     }, tilesRef);
@@ -253,7 +258,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
     return () => {
       ctx.revert();
     };
-  }, []);
+  }, [reducedMotion]);
 
   const booking = bookingDetail?.booking;
   const propertyName = withBrandName(snapshotFallback?.propertyName ?? booking?.property_id ?? locationMap.title);
@@ -266,6 +271,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
   const absoluteCheckinLink = toAbsoluteBrandCheckinLink(ezeeReservationId);
   const { downloadReceipt, isGenerating: isReceiptGenerating, error: receiptError } = useDownloadReceipt(ezeeReservationId);
   const supportPhoneDigits = siteMeta.contact.phoneDisplay.replace(/\D/g, "");
+  const tileHoverMotion = getHoverLift(reducedMotion, MOTION_DISTANCE.xs);
 
   const whatsappShareHref = useMemo(() => {
     const message = `Bring your vibe, bring your playlist. ${propertyName} is locked in. Tap this to finish your pre-arrival bits: ${absoluteCheckinLink}`;
@@ -347,7 +353,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
           </header>
 
           <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
-            <motion.article className="lg:col-span-7" initial={false} whileHover={{ y: -4 }} data-confirmation-tile>
+            <motion.article className="lg:col-span-7" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
               <div className="flex h-full flex-col rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
                 <div className="space-y-2">
                   <StickerTag bg="#f9cb37" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" label="Share the vibe" rotate="rotate-[-2deg]" text="#111111" />
@@ -387,7 +393,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
               </div>
             </motion.article>
 
-            <motion.article className="lg:col-span-5" initial={false} whileHover={{ y: -4 }} data-confirmation-tile>
+            <motion.article className="lg:col-span-5" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
               <div className="flex h-full flex-col rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
                 <div className="flex items-center gap-3">
                   <StickerTag bg="#f9cb37" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" label="Stay timeline" rotate="rotate-[1deg]" text="#111111" />
@@ -428,7 +434,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
               </div>
             </motion.article>
 
-            <motion.article className="lg:col-span-5" initial={false} whileHover={{ y: -4 }} data-confirmation-tile>
+            <motion.article className="lg:col-span-5" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
               <div className="h-full rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -459,20 +465,21 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
 
                 {/* Download Receipt CTA */}
                 <div className="mt-5 pt-4 border-t border-white/10">
-                  <button
+                  <Button
                     id="download-receipt-btn"
-                    type="button"
-                    onClick={() => void downloadReceipt()}
-                    disabled={isReceiptGenerating}
                     className="vh-cta-button w-full justify-center gap-2 disabled:pointer-events-none disabled:opacity-60"
+                    loading={isReceiptGenerating}
+                    loadingText="Generating receipt..."
+                    onClick={() => void downloadReceipt()}
+                    type="button"
                   >
                     {isReceiptGenerating ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      null
                     ) : (
                       <Download className="h-4 w-4" />
                     )}
                     {isReceiptGenerating ? "Generating receipt…" : "Download Receipt"}
-                  </button>
+                  </Button>
                   {receiptError ? (
                     <p className="mt-2 text-center text-xs leading-6 text-[#ffd9d4]">
                       {receiptError}
@@ -485,7 +492,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
               </div>
             </motion.article>
 
-            <motion.article className="lg:col-span-7" initial={false} whileHover={{ y: -4 }} data-confirmation-tile>
+            <motion.article className="lg:col-span-7" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
               <div className="h-full rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -532,7 +539,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
               </div>
             </motion.article>
 
-            <motion.article className="lg:col-span-5" initial={false} whileHover={{ y: -4 }} data-confirmation-tile>
+            <motion.article className="lg:col-span-5" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
               <div className="h-full rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -578,7 +585,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
               </div>
             </motion.article>
 
-            <motion.article className="lg:col-span-7" initial={false} whileHover={{ y: -4 }} data-confirmation-tile>
+            <motion.article className="lg:col-span-7" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
               <div className="h-full rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>

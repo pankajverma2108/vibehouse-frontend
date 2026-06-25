@@ -365,9 +365,9 @@ export function GuestCheckout() {
         <div className="mt-4 rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-3 text-sm leading-6 text-white/72">
           {checkoutStatus}
         </div>
-        <Button className="mt-4 h-11 w-full rounded-[4px] bg-[var(--vh-pink)] font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]" disabled={isPaying || loading || !selectedBookingId} onClick={() => void openPaymentFlow()} type="button">
-          <ClipboardCheck className="mr-2 h-4 w-4" />
-          {isPaying ? "Processing..." : "Continue to payment"}
+        <Button className="mt-4 h-11 w-full rounded-[4px] bg-[var(--vh-pink)] font-black uppercase text-white hover:bg-[var(--vh-pink-soft)]" disabled={loading || !selectedBookingId} loading={isPaying} loadingText="Processing payment" onClick={() => void openPaymentFlow()} type="button">
+          {!isPaying ? <ClipboardCheck className="mr-2 h-4 w-4" /> : null}
+          Continue to payment
         </Button>
       </aside>
     </div>

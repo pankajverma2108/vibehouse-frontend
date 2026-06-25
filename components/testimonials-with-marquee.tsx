@@ -196,14 +196,15 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
     <div ref={rootRef} className="w-[160px] h-[210px] md:w-[280px] md:h-[240px] rounded-xl border border-white/12 bg-[rgba(15,16,26,0.95)] p-3 flex flex-col tile transition-all duration-300 flex-shrink-0">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
-          <Image
-            src={PLATFORM_RATINGS.find((item) => item.name === review.source)?.logo || '/testimonials logos/icons8-google-logo-96.png'}
-            alt="logo"
-            width={20}
-            height={20}
-            className="object-contain"
-            style={{ width: "auto", height: "auto" }}
-          />
+          <div className="relative h-5 w-5 shrink-0">
+            <Image
+              src={PLATFORM_RATINGS.find((item) => item.name === review.source)?.logo || '/testimonials logos/icons8-google-logo-96.png'}
+              alt="logo"
+              fill
+              sizes="20px"
+              className="object-contain"
+            />
+          </div>
           <span className="text-xs text-white/70 hidden md:block">{review.source}</span>
         </div>
         <div className="flex gap-1">
@@ -268,14 +269,15 @@ const PlatformCard: React.FC<{ platform: PlatformRating }> = ({ platform }) => {
 
   return (
     <div className="w-[160px] h-[210px] md:w-[280px] md:h-[240px] rounded-xl border border-white/12 bg-[rgba(15,16,26,0.95)] p-4 flex flex-col items-center justify-center tile transition-all duration-300 flex-shrink-0" onMouseEnter={() => setAnimateNumber(true)} onTouchStart={() => setAnimateNumber(true)}>
-      <Image
-        src={platform.logo}
-        alt={`${platform.name} logo`}
-        width={78}
-        height={68}
-        className="mb-2 object-contain transition-transform duration-300"
-        style={{ width: "auto", height: "auto" }}
-      />
+      <div className="relative mb-2 h-[68px] w-[78px]">
+        <Image
+          src={platform.logo}
+          alt={`${platform.name} logo`}
+          fill
+          sizes="78px"
+          className="object-contain transition-transform duration-300"
+        />
+      </div>
       <h3 className="text-sm md:text-lg font-bold text-white mb-1">{platform.name}</h3>
       <div className="flex items-baseline gap-1 mb-2">
         <span className="text-lg md:text-2xl font-bold transition-transform" style={{ color: platform.color, transform: animateNumber ? 'scale(1.5)' : 'scale(1)', transition: 'transform 300ms ease' }}>{platform.rating}</span>
@@ -305,14 +307,15 @@ const CountCard: React.FC<{ count: RatingCount }> = ({ count }) => {
     <div className="w-[160px] h-[210px] md:w-[280px] md:h-[240px] rounded-xl border border-white/12 p-4 flex flex-col items-center justify-center tile transition-all duration-300 flex-shrink-0" style={{ backgroundColor: count.bgColor }} onMouseEnter={() => setAnimateNumber(true)} onTouchStart={() => setAnimateNumber(true)}>
       <div className="relative mb-2 flex items-center justify-center" style={{ width: 150, height: 90 }}>
         <div style={{ position: 'absolute', width: 84, height: 84, borderRadius: 9999, backgroundColor: count.color, opacity: 0.18, transform: 'translateY(-6px)' }} />
-        <Image
-          src={count.logo}
-          alt={`${count.platform} logo`}
-          width={96}
-          height={72}
-          className="object-contain transition-transform duration-300"
-          style={{ zIndex: 2, width: "auto", height: "auto" }}
-        />
+        <div className="relative h-[72px] w-24" style={{ zIndex: 2 }}>
+          <Image
+            src={count.logo}
+            alt={`${count.platform} logo`}
+            fill
+            sizes="96px"
+            className="object-contain transition-transform duration-300"
+          />
+        </div>
       </div>
 
       <div className="text-2xl md:text-3xl font-extrabold transition-transform duration-200" style={{ color: count.color, transform: animateNumber ? 'scale(1.5)' : 'scale(1)', textShadow: '0 10px 28px rgba(0,0,0,0.12)', transition: 'transform 300ms ease' }}>{count.countLabel}</div>

@@ -26,6 +26,7 @@ import { SectionBlock } from "@/components/guest/section-block";
 import { guestStickerTags } from "@/components/guest/guest-sticker-tags";
 import { StickerTag } from "@/components/shared/sticker-tag";
 import { Button } from "@/components/ui/button";
+import { MOTION_DISTANCE, MOTION_DURATION, MOTION_SCALE, MOTION_STAGGER } from "@/lib/motion";
 import { getGuestPropertyLocation } from "@/content/guest-properties";
 import { nearbyAttractions, propertyGallery, propertyGuidelines } from "@/content/rooms";
 import { siteMeta } from "@/content/site";
@@ -344,8 +345,8 @@ export function GuestDashboard() {
     const context = gsap.context(() => {
       gsap.fromTo(
         "[data-guest-reveal]",
-        { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.68, stagger: 0.08, ease: "power3.out" },
+        { y: MOTION_DISTANCE.xl, opacity: 0, scale: MOTION_SCALE.subtleEnter },
+        { y: 0, opacity: 1, scale: 1, duration: MOTION_DURATION.slow, stagger: MOTION_STAGGER.standard, ease: "power3.out" },
       );
     }, rootRef);
 
@@ -438,9 +439,9 @@ export function GuestDashboard() {
             Raise a care-desk ticket from here. The property team can track it against this stay and follow up with the useful details.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button className={primaryCtaClass} disabled={lostFoundSubmitting || !lostFoundService} onClick={() => void onSubmitLostFound()} type="button">
-              <Search className="mr-2 h-4 w-4" />
-              {lostFoundSubmitting ? "Submitting..." : "Report item"}
+            <Button className={primaryCtaClass} disabled={!lostFoundService} loading={lostFoundSubmitting} loadingText="Submitting ticket" onClick={() => void onSubmitLostFound()} type="button">
+              {!lostFoundSubmitting ? <Search className="mr-2 h-4 w-4" /> : null}
+              Report item
             </Button>
             {catalogError ? (
               <Button className="vh-cta-button h-10 rounded-[4px] bg-white px-4 text-xs text-[#07070a] hover:bg-white/90" onClick={() => void reloadCatalog()} type="button" variant="secondary">

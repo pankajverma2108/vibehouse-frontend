@@ -1,5 +1,4 @@
-import { ColiveFlow } from "@/components/colive/colive-flow";
-import { Property } from "@/components/marketing/property";
+import dynamic from "next/dynamic";
 import {
   getRoomCatalogSnapshot,
   getRoomAvailabilitySnapshot,
@@ -7,6 +6,14 @@ import {
 } from "@/lib/cx-api";
 import { resolveServerPropertyId } from "@/lib/property-resolver";
 import { headers } from "next/headers";
+
+const Property = dynamic(() => import("@/components/marketing/property").then((mod) => mod.Property), {
+  loading: () => <div className="min-h-screen bg-[#07070a]" />,
+});
+
+const ColiveFlow = dynamic(() => import("@/components/colive/colive-flow").then((mod) => mod.ColiveFlow), {
+  loading: () => <div className="min-h-screen bg-[#07070a]" />,
+});
 
 const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -65,6 +72,7 @@ export default async function PropertyPage({ searchParams }: PropertyPageProps) 
       initialCheckIn={hasRequestedDateWindow ? requestedCheckin! : undefined}
       initialCheckOut={hasRequestedDateWindow ? requestedCheckout! : undefined}
       initialAvailabilityEnabled={hasRequestedDateWindow}
+      initialRoomError={snapshot.availabilityError}
       initialRoomCategories={roomTypesToPropertyCategories(snapshot.roomTypes)}
     />
   );

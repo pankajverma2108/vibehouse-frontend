@@ -1,13 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { ArrowUpRight, CircleUserRound } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useGuestAuth } from "@/components/auth/guest-auth-provider";
 import { MobileStaggeredMenu } from "./mobile-staggered-menu";
+import {
+  MOTION_DISTANCE,
+  createMotionTransition,
+  createReducedMotionTransition,
+  createRevealVariants,
+  createStaggerContainerVariants,
+} from "@/lib/motion";
 import { hostelNavItems } from "@/content/nav-menu";
 import { siteMeta } from "@/content/site";
 import { navFontStyles } from "@/content/typography";
@@ -97,6 +104,7 @@ function isGuestHubRoute(pathname: string): boolean {
 export function Navigation() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const reducedMotion = useReducedMotion() ?? false;
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const { guest, isAuthenticated, isRestoringSession, openAuthModal, signOut } = useGuestAuth();
@@ -192,10 +200,10 @@ export function Navigation() {
 
   return (
     <motion.nav
-      animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : -110 }}
-      className="fixed inset-x-0 top-4 z-50"
+      animate={reducedMotion ? { opacity: isVisible ? 1 : 0 } : { opacity: isVisible ? 1 : 0, y: isVisible ? 0 : -MOTION_DISTANCE.xxl }}
+      className={cn("fixed inset-x-0 top-4 z-50", !isVisible && "pointer-events-none")}
       initial={false}
-      transition={{ duration: 0.28, ease: "easeOut" }}
+      transition={reducedMotion ? createReducedMotionTransition() : createMotionTransition("moderate", "standard")}
     >
       <div className="vh-container">
         <div className="mx-auto hidden max-w-7xl lg:block">
@@ -306,30 +314,20 @@ export function Navigation() {
                   className="overflow-hidden border-t border-white/10"
                   exit={{ height: 0, opacity: 0 }}
                   initial={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
+                  transition={reducedMotion ? createReducedMotionTransition() : createMotionTransition("route", "enter")}
                 >
                   <motion.div
                     animate="show"
                     className="grid grid-cols-3 gap-3 p-3"
                     initial="hidden"
-                    variants={{
-                      hidden: {},
-                      show: {
-                        transition: {
-                          staggerChildren: 0.08,
-                        },
-                      },
-                    }}
+                    variants={createStaggerContainerVariants({ reducedMotion })}
                   >
                     {desktopNavCards.map((card) => (
                       <motion.article
                         key={card.label}
                         className="flex min-h-[206px] flex-col rounded-[14px] border border-black/15 p-4"
                         style={{ backgroundColor: card.bgColor, color: card.textColor }}
-                        variants={{
-                          hidden: { opacity: 0, y: 18 },
-                          show: { opacity: 1, y: 0 },
-                        }}
+                        variants={createRevealVariants({ reducedMotion, y: MOTION_DISTANCE.lg })}
                       >
                         <h3 className="text-[30px] leading-[34px]" style={navFontStyles.desktopCardTitle}>
                           {card.label}

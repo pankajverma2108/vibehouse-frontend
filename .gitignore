@@ -8,6 +8,12 @@ dist/
 .env.example
 .env.*
 .local/
+.agents/
+.codex/
+.foundry/
+.vscode/
+docs/
+guidelines/
 
 # Internal planning and workflow docs (not for remote repo)
 # guidelines/finalised_workflows/

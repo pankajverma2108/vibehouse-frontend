@@ -4,7 +4,7 @@ import { SectionHeading } from "@/components/marketing/section-heading";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { FadeIn, Stagger, StaggerItem } from "@/components/shared/motion";
 import { eventPageContent, pastEventImages, weeklyLineup } from "@/content/events";
-import { getPublicEvents } from "@/lib/cx-api";
+import { getPublicEventsResult } from "@/lib/cx-api";
 import { resolveServerPropertyId } from "@/lib/property-resolver";
 import { headers } from "next/headers";
 
@@ -12,7 +12,10 @@ export default async function EventsPage() {
   const headerList = await headers();
   const hostname = headerList.get("host") || "";
   const propertyId = resolveServerPropertyId({ hostname });
-  const liveEvents = propertyId ? await getPublicEvents({ propertyId }) : [];
+  const eventsResult = propertyId
+    ? await getPublicEventsResult({ propertyId })
+    : { events: [], error: "Property ID is required." };
+  const liveEvents = eventsResult.events;
 
   const eventGridClass =
     liveEvents.length <= 1
@@ -51,13 +54,27 @@ export default async function EventsPage() {
       <section className="vh-section">
         <div className="vh-container">
           <SectionHeading align="center" subtitle={eventPageContent.upcomingSubtitle} title="This Week" />
-          <Stagger className={eventGridClass}>
-            {liveEvents.map((event) => (
-              <StaggerItem key={`${event.title}-${event.date}-${event.time}`}>
-                <EventCard {...event} />
-              </StaggerItem>
-            ))}
-          </Stagger>
+          {eventsResult.error ? (
+            <FadeIn className="rounded-[18px] border border-dashed border-white/20 bg-white/5 px-6 py-8 text-center text-white">
+              <p className="font-['Geologica'] text-xl font-semibold">Events did not load</p>
+              <p className="mx-auto mt-2 max-w-[560px] text-sm leading-7 text-white/72">{eventsResult.error}</p>
+            </FadeIn>
+          ) : liveEvents.length === 0 ? (
+            <FadeIn className="rounded-[18px] border border-dashed border-white/20 bg-white/5 px-6 py-8 text-center text-white">
+              <p className="font-['Geologica'] text-xl font-semibold">No upcoming events</p>
+              <p className="mx-auto mt-2 max-w-[560px] text-sm leading-7 text-white/72">
+                No events are scheduled right now.
+              </p>
+            </FadeIn>
+          ) : (
+            <Stagger className={eventGridClass}>
+              {liveEvents.map((event) => (
+                <StaggerItem key={`${event.title}-${event.date}-${event.time}`}>
+                  <EventCard {...event} />
+                </StaggerItem>
+              ))}
+            </Stagger>
+          )}
         </div>
       </section>
 

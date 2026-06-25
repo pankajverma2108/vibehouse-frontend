@@ -1153,11 +1153,15 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
     }
 
     if (!isAuthenticated) {
-      setIsLoading(false);
+      queueMicrotask(() => {
+        setIsLoading(false);
+      });
       return;
     }
 
-    void loadSlots();
+    queueMicrotask(() => {
+      void loadSlots();
+    });
   }, [isAuthenticated, isRestoringSession, loadSlots]);
 
   async function handleSelectedFile(event: ChangeEvent<HTMLInputElement>) {
@@ -1993,12 +1997,14 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                       <div className="mt-3 flex justify-center">
                         <Button
                           className="w-[80%] rounded-[10px] bg-[var(--vh-pink)] text-white hover:bg-[var(--vh-pink-soft)]"
-                          disabled={!canEditActiveSlot || !editorState.document_file_key || isRunningOcr}
+                          disabled={!canEditActiveSlot || !editorState.document_file_key}
+                          loading={isRunningOcr}
+                          loadingText="Scanning ID"
                           onClick={() => void handleRunOcr()}
                           type="button"
                         >
-                          {isRunningOcr ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <FileSearch className="h-4 w-4" />}
-                          {isRunningOcr ? "Scanning ID" : "Scan ID"}
+                          {!isRunningOcr ? <FileSearch className="h-4 w-4" /> : null}
+                          Scan ID
                         </Button>
                       </div>
 
@@ -2086,11 +2092,13 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                 ) : (
                   <Button
                     className="rounded-[10px] bg-[var(--vh-pink)] text-white hover:bg-[var(--vh-pink-soft)]"
-                    disabled={!canEditActiveSlot || isSubmitting}
+                    disabled={!canEditActiveSlot}
+                    loading={isSubmitting}
+                    loadingText="Finishing check-in"
                     onClick={() => void handleSubmit()}
                     type="button"
                   >
-                    {isSubmitting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                    {!isSubmitting ? <CheckCircle2 className="h-4 w-4" /> : null}
                     Finish Check-in
                   </Button>
                 )}

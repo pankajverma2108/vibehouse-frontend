@@ -55,7 +55,6 @@ import { getStoredGuestToken } from "@/lib/guest-auth-api";
 import { isValidEmail, isValidPhone, normalizeEmail, normalizePhone } from "@/lib/guest-form-validation";
 import { usePropertyId } from "@/lib/property-resolver";
 import { propertyGuidelines, propertyHero } from "@/content/rooms";
-import { toast } from "sonner";
 
 type RazorpaySuccessResponse = {
   razorpay_order_id: string;
@@ -337,28 +336,6 @@ function getColiveDurationDays(durationMonths: number): number {
   return Math.min(730, Math.max(30, Math.round(durationMonths * 30)));
 }
 
-function getColiveRoomOptionId(room: { roomTypeId: string; slug?: string; title: string; roomType?: string }): string {
-  const haystack = `${room.roomTypeId} ${room.slug ?? ""} ${room.title} ${room.roomType ?? ""}`.toLowerCase();
-
-  if (haystack.includes("deluxe") || haystack.includes("queen") || haystack.includes("private")) {
-    return "rt-ka-queen";
-  }
-
-  if (haystack.includes("6") && haystack.includes("female")) {
-    return "rt-ka-6dorm-female";
-  }
-
-  if (haystack.includes("4") && haystack.includes("female")) {
-    return "rt-ka-4dorm-female";
-  }
-
-  if (haystack.includes("6")) {
-    return "rt-ka-6dorm";
-  }
-
-  return "rt-ka-4dorm";
-}
-
 function splitGuestName(name?: string | null): Pick<BookingReviewGuest, "firstName" | "lastName"> {
   const clean = (name || "").trim();
   if (!clean) {
@@ -597,6 +574,7 @@ export function BookingCheckoutPage() {
   const [inventoryMessageById, setInventoryMessageById] = useState<Record<string, string>>({});
   const [showMobileSummary, setShowMobileSummary] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [, setFlowStage] = useState<
     "idle" | "creating-order" | "creating-payment-order" | "opening-razorpay" | "verifying-payment" | "confirmed" | "failed"
   >("idle");
@@ -970,10 +948,11 @@ export function BookingCheckoutPage() {
     setGuestErrors(errors);
 
     if (Object.keys(errors).length > 0) {
-      toast.error("Complete the guest details before continuing.");
+      setCheckoutError("Complete the guest details before continuing.");
       return false;
     }
 
+    setCheckoutError(null);
     updateGuestProfile({
       name: `${guestForm.firstName} ${guestForm.lastName}`.trim(),
       email: normalizeEmail(guestForm.email),
@@ -1008,6 +987,7 @@ export function BookingCheckoutPage() {
       return;
     }
 
+    setCheckoutError(null);
     const token = getStoredGuestToken();
     if (!token || !isAuthenticated) {
       resumePaymentAfterAuthRef.current = true;
@@ -1026,13 +1006,13 @@ export function BookingCheckoutPage() {
 
       if (isColiveDraft(draft)) {
         if (activeRooms.length !== 1 || activeRooms[0]?.quantity !== 1) {
-          toast.error("Select one Colive room for this checkout.");
+          setCheckoutError("Select one Colive room for this checkout.");
           setFlowStage("failed");
           return;
         }
 
         const activeRoom = activeRooms[0];
-        const coliveRoomTypeId = getColiveRoomOptionId(activeRoom);
+        const coliveRoomTypeId = activeRoom.roomTypeId;
         const selectedColiveAddons = selectedAddons.map((addon) => ({
           addon_id: addon.productId,
           quantity: addon.quantity,
@@ -1092,6 +1072,7 @@ export function BookingCheckoutPage() {
 
             paymentHandledRef.current = true;
             setFlowStage("failed");
+            setCheckoutError(message);
             reject(new CheckoutFlowAbortError(message, reason));
           };
 
@@ -1117,7 +1098,6 @@ export function BookingCheckoutPage() {
             },
             modal: {
               ondismiss: () => {
-                toast.error("Payment was cancelled before confirmation.");
                 markFailed("Payment was cancelled before confirmation.", "payment-cancelled");
               },
             },
@@ -1139,20 +1119,18 @@ export function BookingCheckoutPage() {
 
                 clearBookingDraft();
                 setFlowStage("confirmed");
-                toast.success("Payment successful! Redirecting to My Bookings...");
                 router.push(`/bookings?fresh=${encodeURIComponent(verification.booking_reference || verification.booking_id)}`);
                 resolve();
               } catch (error) {
                 console.error("Failed to verify Colive payment", error);
                 setFlowStage("failed");
-                toast.error("Payment verification is still pending. Please check My Bookings in a moment.");
+                setCheckoutError("Payment verification is still pending. Please check My Bookings in a moment.");
                 reject(new CheckoutFlowAbortError("Colive payment verification failed.", "verification-pending"));
               }
             },
           });
 
           razorpay.on("payment.failed", () => {
-            toast.error("Razorpay reported a payment failure. Please try again.");
             markFailed("Razorpay reported a payment failure. Please try again.", "payment-failed");
           });
 
@@ -1244,6 +1222,7 @@ export function BookingCheckoutPage() {
 
           paymentHandledRef.current = true;
           setFlowStage("failed");
+          setCheckoutError(message);
 
           try {
             await failBookingPayment(token, paymentOrder.razorpay_order_id);
@@ -1277,7 +1256,6 @@ export function BookingCheckoutPage() {
           },
           modal: {
             ondismiss: () => {
-              toast.error("Payment was cancelled before confirmation.");
               void markFailed("Payment was cancelled before confirmation.", "payment-cancelled");
             },
           },
@@ -1344,21 +1322,19 @@ export function BookingCheckoutPage() {
                 createdAt: Date.now(),
               });
               setFlowStage("confirmed");
-              toast.success("Payment successful! Redirecting to My Bookings...");
               router.push(`/bookings?fresh=${encodeURIComponent(orderSummary.ezee_reservation_id)}`);
               resolve();
             } catch (error) {
               clearPendingBookingOrder();
               console.error("Failed to verify booking payment", error);
               setFlowStage("failed");
-              toast.error("Payment verification is still pending. Please check My Bookings in a moment.");
+              setCheckoutError("Payment verification is still pending. Please check My Bookings in a moment.");
               reject(new CheckoutFlowAbortError("Payment verification failed.", "verification-pending"));
             }
           },
         });
 
         razorpay.on("payment.failed", () => {
-          toast.error("Razorpay reported a payment failure. Please try again.");
           void markFailed("Razorpay reported a payment failure. Please try again.", "payment-failed");
         });
 
@@ -1371,7 +1347,7 @@ export function BookingCheckoutPage() {
 
       setFlowStage("failed");
       console.error("Failed to start booking checkout", error);
-      toast.error("Unable to start checkout right now. Please try again.");
+      setCheckoutError("Unable to start checkout right now. Please try again.");
     } finally {
       setIsPaying(false);
     }
@@ -1531,6 +1507,7 @@ export function BookingCheckoutPage() {
         </div>
 
         <div className="p-6 pt-4">
+          {checkoutError ? <p className="mb-3 text-sm text-[#ff8b8b]">{checkoutError}</p> : null}
           {activeTab === "guest" ? (
             <button
               className="vh-cta-button w-full justify-center text-base"
@@ -1540,14 +1517,16 @@ export function BookingCheckoutPage() {
               Continue to add-ons
             </button>
           ) : (
-            <button
+            <Button
               className="vh-cta-button w-full justify-center text-base disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isPaying}
+              loading={isPaying}
+              loadingText="Continue to payment"
               onClick={openPaymentFlow}
               type="button"
             >
-              {isPaying ? "Opening Razorpay..." : "Continue to payment"}
-            </button>
+              Continue to payment
+            </Button>
           )}
         </div>
       </div>
@@ -2008,6 +1987,7 @@ export function BookingCheckoutPage() {
         <div className="flex items-center justify-between gap-4 px-5 py-4">
           <div>
             <p className="text-xl font-bold text-white">{formatCurrency(estimatedGrandTotal)}</p>
+            {checkoutError ? <p className="mt-1 max-w-[180px] text-xs text-[#ff8b8b]">{checkoutError}</p> : null}
             <button className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.08em] text-white/72" onClick={() => setShowMobileSummary(true)} type="button">
               Price breakup
               <Info className="h-3.5 w-3.5" />
@@ -2019,14 +1999,16 @@ export function BookingCheckoutPage() {
               Continue
             </button>
           ) : (
-            <button
+            <Button
               className="vh-cta-button px-5 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isPaying}
+              loading={isPaying}
+              loadingText="Pay now"
               onClick={openPaymentFlow}
               type="button"
             >
-              {isPaying ? "Opening..." : "Pay now"}
-            </button>
+              Pay now
+            </Button>
           )}
         </div>
       </div>

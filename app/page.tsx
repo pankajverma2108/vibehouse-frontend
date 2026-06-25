@@ -1,16 +1,20 @@
+import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { HeroCarousel } from "@/components/marketing/widgets/hero-carousel";
-import { HomeSections } from "@/components/marketing/pages/home-sections";
 import { BookingWidget } from "@/components/marketing/widgets/booking-widget";
 import { heroImages, homePageContent } from "@/content/home";
 import {
   getDefaultPropertyDestinationHref,
-  getPublicEvents,
+  getPublicEventsResult,
   getRoomAvailabilitySnapshot,
   roomTypesToHomeCards,
 } from "@/lib/cx-api";
 import { resolveServerPropertyId } from "@/lib/property-resolver";
 import { headers } from "next/headers";
+
+const HomeSections = dynamic(() =>
+  import("@/components/marketing/pages/home-sections").then((mod) => mod.HomeSections),
+);
 
 type HomePageProps = {
   searchParams?: Promise<{
@@ -37,7 +41,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   // checkin/checkout are guaranteed by the redirect guard above — always present here.
   // getRoomAvailabilitySnapshot fetches /guest/booking/availability with the given dates,
   // returning date-specific total prices + live inventory (available / limited / sold out).
-  // It internally falls back to the catalog if the availability endpoint is unavailable.
+  // No frontend room fallback is injected if the availability call fails.
   const snapshot = await getRoomAvailabilitySnapshot({
     propertyId,
     checkin: params.checkin,
@@ -45,7 +49,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   });
 
   const dynamicHomeRooms = roomTypesToHomeCards(snapshot.roomTypes, { destinationHref: propertyDestinationHref });
-  const dynamicHomeEvents = await getPublicEvents({ propertyId, limit: 3 });
+  const eventsResult = await getPublicEventsResult({ propertyId, limit: 3 });
 
   return (
     <>
@@ -65,9 +69,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </section>
 
       <HomeSections
-        homeEvents={dynamicHomeEvents}
+        eventError={eventsResult.error}
+        homeEvents={eventsResult.events}
         homeRooms={dynamicHomeRooms}
         propertyDestinationHref={propertyDestinationHref}
+        roomError={snapshot.availabilityError}
       />
     </>
   );

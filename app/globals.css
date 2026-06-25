@@ -138,6 +138,48 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --motion-duration-instant: 0ms;
+  --motion-duration-feedback: 100ms;
+  --motion-duration-fast: 150ms;
+  --motion-duration-standard: 200ms;
+  --motion-duration-moderate: 250ms;
+  --motion-duration-slow: 300ms;
+  --motion-duration-route: 350ms;
+  --motion-duration-expressive: 400ms;
+  --motion-duration-max: 500ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-enter: cubic-bezier(0, 0, 0, 1);
+  --motion-ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --motion-ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --motion-ease-linear: linear;
+  --motion-distance-2xs: 2px;
+  --motion-distance-xs: 4px;
+  --motion-distance-sm: 8px;
+  --motion-distance-md: 12px;
+  --motion-distance-lg: 16px;
+  --motion-distance-xl: 24px;
+  --motion-distance-2xl: 32px;
+  --motion-scale-press: 0.98;
+  --motion-scale-enter-subtle: 0.98;
+  --motion-scale-enter-emphasized: 0.96;
+  --motion-scale-exit: 0.98;
+  --motion-stagger-dense: 20ms;
+  --motion-stagger-standard: 40ms;
+  --motion-stagger-relaxed: 60ms;
+  --motion-stagger-expressive: 80ms;
+  --motion-button-press-duration: var(--motion-duration-feedback);
+  --motion-button-press-ease: var(--motion-ease-standard);
+  --motion-menu-enter-duration: var(--motion-duration-standard);
+  --motion-menu-exit-duration: var(--motion-duration-fast);
+  --motion-menu-enter-ease: var(--motion-ease-enter);
+  --motion-menu-exit-ease: var(--motion-ease-exit);
+  --motion-dialog-enter-duration: var(--motion-duration-moderate);
+  --motion-dialog-exit-duration: var(--motion-duration-standard);
+  --motion-sheet-enter-duration: var(--motion-duration-moderate);
+  --motion-sheet-exit-duration: var(--motion-duration-standard);
+  --motion-toast-enter-duration: var(--motion-duration-standard);
+  --motion-toast-exit-duration: var(--motion-duration-fast);
+  --motion-spinner-duration: 700ms;
 }
 
 html {
@@ -546,12 +588,12 @@ button,
 input,
 select {
   transition:
-    color 160ms ease,
-    background-color 160ms ease,
-    border-color 160ms ease,
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    opacity 160ms ease;
+    color var(--motion-duration-standard) var(--motion-ease-standard),
+    background-color var(--motion-duration-standard) var(--motion-ease-standard),
+    border-color var(--motion-duration-standard) var(--motion-ease-standard),
+    transform var(--motion-duration-feedback) var(--motion-button-press-ease),
+    box-shadow var(--motion-duration-standard) var(--motion-ease-standard),
+    opacity var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 select {
@@ -657,6 +699,25 @@ select optgroup {
     font-family: var(--font-geologica);
     box-shadow: 4px 4px 0 0 rgba(128, 128, 128, 0.5);
     letter-spacing: 0.9px;
+  }
+
+  .vh-motion-press {
+    transform-origin: center;
+  }
+
+  .vh-motion-press:not(:disabled):active {
+    transform: scale(var(--motion-scale-press));
+  }
+
+  .vh-button-spinner {
+    display: inline-flex;
+    height: 1em;
+    width: 1em;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    animation: vh-spin var(--motion-spinner-duration) var(--motion-ease-linear) infinite;
   }
 
   .font-caption {
@@ -772,27 +833,27 @@ select optgroup {
   }
 
   .animate-accordion-down {
-    animation: vh-accordion-down 280ms ease-out;
+    animation: vh-accordion-down var(--motion-duration-slow) var(--motion-ease-enter);
   }
 
   .animate-accordion-up {
-    animation: vh-accordion-up 220ms ease-out;
+    animation: vh-accordion-up var(--motion-duration-standard) var(--motion-ease-exit);
   }
 
   .animate-vh-fade-in {
-    animation: vh-fade-in 180ms ease-out;
+    animation: vh-fade-in var(--motion-duration-standard) var(--motion-ease-enter);
   }
 
   .animate-vh-fade-out {
-    animation: vh-fade-out 160ms ease-in;
+    animation: vh-fade-out var(--motion-duration-fast) var(--motion-ease-exit);
   }
 
   .animate-vh-scale-in {
-    animation: vh-scale-in 180ms ease-out;
+    animation: vh-scale-in var(--motion-duration-standard) var(--motion-ease-enter);
   }
 
   .animate-vh-slide-up {
-    animation: vh-slide-up 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: vh-slide-up var(--motion-duration-slow) var(--motion-ease-emphasized) forwards;
   }
 
   .animate-vh-pulse-glow {
@@ -800,11 +861,11 @@ select optgroup {
   }
 
   .vh-reveal {
-    animation: vh-slide-up 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: vh-slide-up var(--motion-duration-route) var(--motion-ease-emphasized) both;
   }
 
   .vh-field-enter {
-    animation: vh-slide-up 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: vh-slide-up var(--motion-duration-slow) var(--motion-ease-emphasized) both;
   }
 
   .vh-delay-1 {
@@ -827,11 +888,17 @@ select optgroup {
 @keyframes vh-slide-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(var(--motion-distance-lg));
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes vh-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -894,7 +961,7 @@ select optgroup {
 @keyframes vh-scale-in {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.98);
+    transform: translateY(var(--motion-distance-sm)) scale(var(--motion-scale-enter-subtle));
   }
 
   to {
@@ -1111,5 +1178,47 @@ select optgroup {
   }
   html {
     @apply font-sans;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
+  a,
+  button,
+  input,
+  select {
+    transition-duration: var(--motion-duration-instant);
+  }
+
+  .vh-motion-press:not(:disabled):active {
+    transform: none;
+  }
+
+  .vh-button-spinner {
+    animation: none;
+  }
+
+  .vh-rating-track,
+  .vh-rating-track-reverse,
+  .vh-amenity-track,
+  .vh-scan-line,
+  .vh-flicker,
+  .vh-flicker-sign,
+  .animate-canopy-horizontal,
+  .animate-canopy-vertical,
+  .animate-vh-pulse-glow,
+  .animate-vh-slide-up,
+  .vh-reveal,
+  .vh-field-enter {
+    animation: none !important;
   }
 }

@@ -4,10 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState, useEffect, useContext } from "react";
 import { createPortal } from "react-dom";
-import { Loader2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { OTPInput, OTPInputContext, REGEXP_ONLY_DIGITS } from "input-otp";
 
 import { isValidEmail, isValidPhone, normalizeEmail, normalizePhone } from "@/lib/guest-form-validation";
+import { ButtonSpinner } from "@/components/ui/button-spinner";
 
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
@@ -436,6 +437,7 @@ export function GuestAuthModal({
           ) : null}
 
           <button
+            aria-busy={pending || undefined}
             className={`inline-flex h-14 w-full items-center justify-center rounded-[10px] border-2 border-[#0F172A] text-lg font-extrabold uppercase tracking-[0.4px] shadow-[4px_4px_0px_rgba(0,0,0,0.30)] transition hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed ${
               mode === "signin" ? "bg-[var(--vh-pink)] text-white" : "bg-[var(--vh-lime)] text-[#0F172A]"
             }`}
@@ -444,7 +446,7 @@ export function GuestAuthModal({
           >
             {pending ? (
               <span className="inline-flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <ButtonSpinner className="h-4 w-4" />
                 Please wait
               </span>
             ) : (

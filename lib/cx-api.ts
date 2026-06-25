@@ -72,51 +72,12 @@ const STATIC_ROOM_GALLERIES = [
   ["/images/rooms/room-4.jpg", "/images/rooms/room-1.jpg", "/images/rooms/room-3.webp"],
 ];
 
-type HardcodedRoomPresentation = {
+type RoomPresentation = {
   shortTitle: string;
   guestText: string;
   features: string[];
   amenitiesLegend: string[];
 };
-
-const HARDCODED_ROOM_PRESENTATION: Array<{
-  match: (room: NormalizedRoomType) => boolean;
-  presentation: HardcodedRoomPresentation;
-}> = [
-  {
-    match: (room) => {
-      const haystack = `${room.name} ${room.slug}`.toLowerCase();
-      return haystack.includes("deluxe") || haystack.includes("queen") || haystack.includes("private");
-    },
-    presentation: {
-      shortTitle: "Private Room",
-      guestText: "x 2 Guests",
-      features: ["Queen bed", "En-suite bathroom", "Work desk", "Mini-fridge"],
-      amenitiesLegend: ["AC", "Private bath", "Fresh linen", "Housekeeping"],
-    },
-  },
-  {
-    match: (room) => {
-      const haystack = `${room.name} ${room.slug}`.toLowerCase();
-      return haystack.includes("female");
-    },
-    presentation: {
-      shortTitle: "4-Bed Female Dorm",
-      guestText: "x 1 Guest",
-      features: ["Women-only floor", "En-suite access", "Reading light", "Secure locker"],
-      amenitiesLegend: ["AC", "Locker", "Fresh linen", "Housekeeping"],
-    },
-  },
-  {
-    match: () => true,
-    presentation: {
-      shortTitle: "4-Bed Mixed Dorm",
-      guestText: "x 1 Guest",
-      features: ["Privacy curtain", "Reading light", "USB charging", "Personal locker"],
-      amenitiesLegend: ["AC", "Locker", "Fresh linen", "Housekeeping"],
-    },
-  },
-];
 
 function pickStaticRoomGallery(slugOrName: string, index: number): string[] {
   const id = slugOrName.toLowerCase();
@@ -136,8 +97,16 @@ function pickStaticRoomGallery(slugOrName: string, index: number): string[] {
   return STATIC_ROOM_GALLERIES[index % STATIC_ROOM_GALLERIES.length];
 }
 
-function getHardcodedRoomPresentation(room: NormalizedRoomType): HardcodedRoomPresentation {
-  return HARDCODED_ROOM_PRESENTATION.find((entry) => entry.match(room))!.presentation;
+function buildRoomPresentation(room: NormalizedRoomType): RoomPresentation {
+  const amenityLabels = Array.from(new Set(room.amenities.map((item) => ensureString(item)).filter(Boolean)));
+  const guestCount = Math.max(1, room.bedsPerRoom);
+
+  return {
+    shortTitle: room.name,
+    guestText: `x ${guestCount} Guest${guestCount === 1 ? "" : "s"}`,
+    features: amenityLabels.slice(0, 4),
+    amenitiesLegend: amenityLabels.slice(4, 8),
+  };
 }
 
 type RawEvent = {
@@ -184,6 +153,11 @@ type RawRoomAvailability = {
 };
 
 export type AvailabilitySource = "catalog" | "ezee_live" | "live_provider" | "local_db_estimate" | "unknown";
+
+export type PublicEventsResult = {
+  events: EventCardProps[];
+  error: string | null;
+};
 
 export type RoomAvailabilitySnapshot = {
   propertyId: string;
@@ -374,25 +348,6 @@ async function fetchUnknownJson(path: string): Promise<unknown> {
   }
 }
 
-function fallbackEvents(count = 3): EventCardProps[] {
-  return Array.from({ length: count }, (_, index) => ({
-    title: index === 0 ? "Details TBA" : `Experience Drop ${index + 1}`,
-    description: "Event details will be available from API soon. Stay tuned for full lineup info.",
-    date: "TBA",
-    time: "Details on arrival",
-    location: "The Daily Social",
-    price: "Details on arrival",
-    image: FALLBACK_EVENT_IMAGE,
-    capacity: "Limited slots",
-    href: "/events",
-    badge: {
-      label: "Stay Tuned",
-      color: "#00d1ff",
-      textColor: "#0f172a",
-    },
-  }));
-}
-
 function normalizeEvent(event: RawEvent): EventCardProps {
   const title = ensureString(event.title, "Details TBA");
   if (!event.title) recordTelemetry({ type: "missing_field", source: "event", field: "title" });
@@ -444,40 +399,63 @@ function normalizeEvent(event: RawEvent): EventCardProps {
  * propertyId is now required (multi-property model).
  * Backend will return 400 if property_id is missing or invalid.
  */
-export async function getPublicEvents(options: {
+export async function getPublicEventsResult(options: {
   propertyId: string;
   limit?: number;
-}): Promise<EventCardProps[]> {
+}): Promise<PublicEventsResult> {
   const propertyId = sanitizePropertyId(options.propertyId);
   if (!propertyId) {
-    return fallbackEvents(options.limit ?? 3);
+    return {
+      events: [],
+      error: "Property ID is required.",
+    };
   }
 
   const limit = options.limit;
   const path = `/public/events?property_id=${encodeURIComponent(propertyId)}`;
   const raw = await fetchUnknownJson(path);
-  
+
   if (!raw) {
     recordTelemetry({ type: "null_payload", source: "event" });
+    return {
+      events: [],
+      error: "Unable to load events right now. Please retry.",
+    };
+  }
+
+  if (!Array.isArray(raw)) {
+    recordTelemetry({ type: "type_mismatch", source: "event", field: "response" });
+    return {
+      events: [],
+      error: "Unable to load events right now. Please retry.",
+    };
   }
 
   const list = ensureArray(raw) as RawEvent[];
 
   if (list.length === 0) {
     recordTelemetry({ type: "empty_array", source: "event" });
+    return {
+      events: [],
+      error: null,
+    };
   }
 
   const normalized = list.map(normalizeEvent);
-  if (normalized.length === 0) {
-    recordTelemetry({ type: "fallback_used", source: "event" });
-    return fallbackEvents(limit ?? 3);
-  }
+  const events = typeof limit === "number" && limit > 0 ? normalized.slice(0, limit) : normalized;
 
-  if (typeof limit === "number" && limit > 0) {
-    return normalized.slice(0, limit);
-  }
+  return {
+    events,
+    error: null,
+  };
+}
 
-  return normalized;
+export async function getPublicEvents(options: {
+  propertyId: string;
+  limit?: number;
+}): Promise<EventCardProps[]> {
+  const result = await getPublicEventsResult(options);
+  return result.events;
 }
 
 function hasValue(value: unknown): boolean {
@@ -597,41 +575,6 @@ function normalizeRoomType(
   };
 }
 
-function fallbackRoomTypes(): NormalizedRoomType[] {
-  return [
-    {
-      id: "fallback-dorm",
-      name: "Dorm Room",
-      slug: "dorm-room",
-      type: "DORM",
-      inventoryState: "unknown",
-      hasLiveAvailability: false,
-      bedsPerRoom: 4,
-      totalBeds: 0,
-      availableBeds: 0,
-      basePricePerNight: 599,
-      isPriceUnavailable: false,
-      totalPrice: 599,
-      amenities: ["AC", "WiFi", "Locker"],
-    },
-    {
-      id: "fallback-private",
-      name: "Private Room",
-      slug: "private-room",
-      type: "PRIVATE",
-      inventoryState: "unknown",
-      hasLiveAvailability: false,
-      bedsPerRoom: 1,
-      totalBeds: 0,
-      availableBeds: 0,
-      basePricePerNight: 1299,
-      isPriceUnavailable: false,
-      totalPrice: 1299,
-      amenities: ["AC", "WiFi", "Attached Bathroom"],
-    },
-  ];
-}
-
 export async function getRoomAvailability(options?: {
   propertyId?: string;
   checkin?: string;
@@ -675,8 +618,8 @@ export async function getRoomCatalogSnapshot(options: {
       mode: "catalog",
       availabilitySource: "catalog",
       hasLiveAvailability: false,
-      availabilityError: null,
-      roomTypes: fallbackRoomTypes(),
+      availabilityError: "Property ID is required.",
+      roomTypes: [],
     };
   }
 
@@ -689,6 +632,16 @@ export async function getRoomCatalogSnapshot(options: {
 
   if (!raw) {
     recordTelemetry({ type: "null_payload", source: "room" });
+    return {
+      propertyId,
+      checkin: "",
+      checkout: "",
+      mode: "catalog",
+      availabilitySource: "catalog",
+      hasLiveAvailability: false,
+      availabilityError: "Unable to load rooms right now. Please retry.",
+      roomTypes: [],
+    };
   }
 
   const resolvedPropertyId = ensureString(raw?.property_id, propertyId);
@@ -704,7 +657,7 @@ export async function getRoomCatalogSnapshot(options: {
       availabilitySource: "catalog",
       hasLiveAvailability: false,
       availabilityError: null,
-      roomTypes: fallbackRoomTypes(),
+      roomTypes: [],
     };
   }
 
@@ -744,7 +697,7 @@ export async function getRoomAvailabilitySnapshot(options: {
       availabilitySource: "unknown",
       hasLiveAvailability: false,
       availabilityError: "Property ID is required.",
-      roomTypes: fallbackRoomTypes(),
+      roomTypes: [],
     };
   }
 
@@ -776,6 +729,16 @@ export async function getRoomAvailabilitySnapshot(options: {
 
   if (!raw) {
     recordTelemetry({ type: "null_payload", source: "room" });
+    return {
+      propertyId: resolvedPropertyId,
+      checkin,
+      checkout,
+      mode: "availability",
+      availabilitySource: "unknown",
+      hasLiveAvailability: false,
+      availabilityError: "Unable to load live availability right now. Please retry.",
+      roomTypes: [],
+    };
   }
 
   const list = ensureArray(raw?.room_types) as RawRoomType[];
@@ -786,48 +749,24 @@ export async function getRoomAvailabilitySnapshot(options: {
   if (list.length === 0) {
     recordTelemetry({ type: "empty_array", source: "room" });
 
-    const soldOutFallback = catalogSnapshot.roomTypes.map((room) => ({
-      ...room,
-      hasLiveAvailability: true,
-      inventoryState: "sold_out" as const,
-      availableBeds: 0,
-      totalPrice: Math.max(room.basePricePerNight, room.totalPrice),
-    }));
-
     return {
       propertyId: resolvedLivePropertyId,
       checkin,
       checkout,
       mode: "availability",
       availabilitySource,
-      hasLiveAvailability: false,
-      availabilityError: "Live availability is temporarily unavailable.",
-      roomTypes: soldOutFallback,
+      hasLiveAvailability: true,
+      availabilityError: null,
+      roomTypes: [],
     };
   }
 
   const liveRooms = list.map((room) => normalizeRoomType(room, { assumeLiveAvailability: true }));
-  const liveMapById = new Map(liveRooms.map((room) => [room.id, room]));
-  const liveMapBySlug = new Map(liveRooms.map((room) => [room.slug, room]));
+  const mergedLiveRooms = liveRooms.map((liveRoom) => {
+    const catalogRoom = catalogMapById.get(liveRoom.id) || catalogMapBySlug.get(liveRoom.slug);
 
-  const mergedCatalog = catalogSnapshot.roomTypes.map((catalogRoom) => {
-    const liveRoom = liveMapById.get(catalogRoom.id) || liveMapBySlug.get(catalogRoom.slug);
-
-    if (!liveRoom) {
-      recordTelemetry({
-        type: "fallback_used",
-        source: "room",
-        field: "catalog_room_missing_in_availability",
-        value: catalogRoom.id,
-      });
-
-      return {
-        ...catalogRoom,
-        hasLiveAvailability: true,
-        inventoryState: "sold_out" as const,
-        availableBeds: 0,
-        totalPrice: Math.max(catalogRoom.basePricePerNight, catalogRoom.totalPrice),
-      };
+    if (!catalogRoom) {
+      return liveRoom;
     }
 
     const resolvedBasePricePerNight =
@@ -842,10 +781,10 @@ export async function getRoomAvailabilitySnapshot(options: {
     return {
       ...catalogRoom,
       ...liveRoom,
-      id: catalogRoom.id,
-      slug: catalogRoom.slug,
-      name: catalogRoom.name || liveRoom.name,
-      type: catalogRoom.type || liveRoom.type,
+      id: liveRoom.id,
+      slug: liveRoom.slug,
+      name: liveRoom.name || catalogRoom.name,
+      type: liveRoom.type || catalogRoom.type,
       bedsPerRoom: Math.max(catalogRoom.bedsPerRoom, liveRoom.bedsPerRoom),
       totalBeds: Math.max(catalogRoom.totalBeds, liveRoom.totalBeds),
       basePricePerNight: resolvedBasePricePerNight,
@@ -855,10 +794,6 @@ export async function getRoomAvailabilitySnapshot(options: {
     };
   });
 
-  const liveOnlyRooms = liveRooms.filter(
-    (room) => !catalogMapById.has(room.id) && !catalogMapBySlug.has(room.slug),
-  );
-
   return {
     propertyId: resolvedLivePropertyId,
     checkin,
@@ -867,7 +802,7 @@ export async function getRoomAvailabilitySnapshot(options: {
     availabilitySource: normalizeAvailabilitySource(raw?.availability_source, "ezee_live"),
     hasLiveAvailability: true,
     availabilityError: null,
-    roomTypes: [...mergedCatalog, ...liveOnlyRooms],
+    roomTypes: mergedLiveRooms,
   };
 }
 
@@ -880,7 +815,7 @@ export function roomTypesToHomeCards(
       ? `${Math.max(room.bedsPerRoom, 1)} Guests`
       : `${Math.max(room.bedsPerRoom, 1)} Bed${room.bedsPerRoom > 1 ? "s" : ""}`;
     const images = pickStaticRoomGallery(room.slug || room.name, index);
-    const presentation = getHardcodedRoomPresentation(room);
+    const presentation = buildRoomPresentation(room);
 
     // Price hierarchy:
     // 1. Live availability with a real price → show totalPrice (date-specific rate from eZee)
@@ -898,7 +833,7 @@ export function roomTypesToHomeCards(
       displayPrice = `₹${formatINRPlain(room.basePricePerNight)}`;
     } else {
       // Absolute fallback — never show "Price unavailable".
-      displayPrice = room.type.toUpperCase() === "PRIVATE" ? `₹${formatINRPlain(1500)}` : `₹${formatINRPlain(500)}`;
+      displayPrice = "Price unavailable";
     }
 
     return {
@@ -948,7 +883,7 @@ function inventoryLabel(
 export function roomTypesToPropertyCategories(roomTypes: NormalizedRoomType[]): CxRoomCategory[] {
   return roomTypes.map((room, index) => {
     const images = pickStaticRoomGallery(room.slug || room.name, index);
-    const presentation = getHardcodedRoomPresentation(room);
+    const presentation = buildRoomPresentation(room);
 
     return {
       roomTypeId: room.id,

@@ -2,12 +2,20 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createPortal } from "react-dom";
 
+import {
+  MOTION_DISTANCE,
+  MOTION_SCALE,
+  createMotionTransition,
+  createReducedMotionTransition,
+  createRevealVariants,
+  createStaggerContainerVariants,
+} from "@/lib/motion";
 import { StickerTag } from "@/components/shared/sticker-tag";
 import { hostelNavItems } from "@/content/nav-menu";
 import { navFontStyles } from "@/content/typography";
@@ -229,9 +237,11 @@ const hostelProperties = hostelNavItems;
 function MenuToggleButton({
   open,
   onClick,
+  reducedMotion,
 }: {
   open: boolean;
   onClick: () => void;
+  reducedMotion: boolean;
 }) {
   const dotIndexes = [0, 1, 2, 3] as const;
 
@@ -275,7 +285,7 @@ function MenuToggleButton({
               }}
               className="absolute left-0 top-0 h-[5px] w-[5px] rounded-full bg-white"
               initial={false}
-              transition={{ duration: 0.24, ease: "easeOut" }}
+              transition={reducedMotion ? createReducedMotionTransition() : createMotionTransition("standard", "standard")}
             />
           );
         })}
@@ -292,6 +302,7 @@ type MobileStaggeredMenuProps = {
 
 export function MobileStaggeredMenu({ activeGuestHubBookingId = null, isAuthenticated, onOpenSignIn }: MobileStaggeredMenuProps) {
   const searchParams = useSearchParams();
+  const reducedMotion = useReducedMotion() ?? false;
   const [open, setOpen] = useState(false);
   const [hostelsExpanded, setHostelsExpanded] = useState(false);
   const resolveHostelHref = (href: string, propertyId: string) => {
@@ -314,6 +325,11 @@ export function MobileStaggeredMenu({ activeGuestHubBookingId = null, isAuthenti
   );
   const activeGuestHubHref = activeGuestHubBookingId ? getScopedGuestHubHref(activeGuestHubBookingId) : null;
   const navTiles = buildNavTiles(propertyHref, activeGuestHubHref);
+  const tileVariants = createRevealVariants({
+    reducedMotion,
+    y: MOTION_DISTANCE.lg,
+    scale: MOTION_SCALE.subtleEnter,
+  });
 
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
@@ -351,6 +367,7 @@ export function MobileStaggeredMenu({ activeGuestHubBookingId = null, isAuthenti
     <div className="md:hidden">
       <MenuToggleButton
         open={open}
+        reducedMotion={reducedMotion}
         onClick={() => {
           if (open) {
             closeMenu();
@@ -372,14 +389,15 @@ export function MobileStaggeredMenu({ activeGuestHubBookingId = null, isAuthenti
                     exit={{ opacity: 0 }}
                     initial={{ opacity: 0 }}
                     onClick={closeMenu}
+                    transition={reducedMotion ? createReducedMotionTransition() : createMotionTransition("standard", "standard")}
                   />
 
                   <motion.aside
-                    animate={{ opacity: 1, y: 0 }}
+                    animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                     className="fixed inset-0 z-[100] overflow-hidden bg-[#07070a]"
-                    exit={{ opacity: 0, y: "-10%" }}
-                    initial={{ opacity: 0, y: "-8%" }}
-                    transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+                    exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: "-10%" }}
+                    initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: "-8%" }}
+                    transition={reducedMotion ? createReducedMotionTransition() : createMotionTransition("route", "enter")}
                   >
                     <div className="mx-auto flex h-[100dvh] w-full max-w-[430px] flex-col overflow-y-auto px-4 pb-[max(20px,env(safe-area-inset-bottom))] pt-[max(8px,env(safe-area-inset-top))]">
                       <div className="pb-2 pt-1">
@@ -410,15 +428,11 @@ export function MobileStaggeredMenu({ activeGuestHubBookingId = null, isAuthenti
                         animate="show"
                         className="w-full"
                         initial="hidden"
-                        variants={{
-                          hidden: {},
-                          show: {
-                            transition: {
-                              staggerChildren: 0.05,
-                              delayChildren: 0.06,
-                            },
-                          },
-                        }}
+                        variants={createStaggerContainerVariants({
+                          reducedMotion,
+                          stagger: "standard",
+                          delayChildren: reducedMotion ? 0 : 0.06,
+                        })}
                       >
                         <div className="grid grid-cols-2 gap-x-3 gap-y-3 pb-6">
                           {navTiles.map((tile) => {
@@ -466,7 +480,7 @@ export function MobileStaggeredMenu({ activeGuestHubBookingId = null, isAuthenti
                               <motion.div
                                 key={tile.id}
                                 className={cn(spanClass, tile.rotationClass)}
-                                variants={{ hidden: { opacity: 0, scale: 0.92, y: 18 }, show: { opacity: 1, scale: 1, y: 0 } }}
+                                variants={tileVariants}
                               >
                                 <div className={cn("relative rounded-[4px] p-1 shadow-lg", tile.bgClass)}>
                                   <div className={cn("relative rounded-[2px] px-[15px] pb-[15px] pt-[15px]", tile.overlayClass, tile.borderClass, minHeightClass)}>
@@ -515,6 +529,7 @@ export function MobileStaggeredMenu({ activeGuestHubBookingId = null, isAuthenti
                                             className="overflow-hidden"
                                             exit={{ height: 0, opacity: 0 }}
                                             initial={{ height: 0, opacity: 0 }}
+                                            transition={reducedMotion ? createReducedMotionTransition() : createMotionTransition("moderate", "standard")}
                                           >
                                             <div className="pb-1 pt-3">
                                               <div className="mb-3 h-px w-full bg-white/25" />

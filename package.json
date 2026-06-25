@@ -5,12 +5,16 @@
   "type": "module",
   "scripts": {
     "build": "npm run typecheck && next build",
-    "dev": "next dev",
+    "dev": "next dev --webpack",
+    "dev:turbo": "next dev --turbopack",
     "start": "next start",
     "typecheck": "tsgo --project tsconfig.json --noEmit",
     "typecheck:legacy": "tsc --project tsconfig.json --noEmit",
     "lint": "eslint . && npm run lint:loading-copy",
     "lint:loading-copy": "node scripts/check-visible-loading-copy.mjs"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

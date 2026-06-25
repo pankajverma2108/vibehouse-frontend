@@ -60,11 +60,10 @@ type RoomApiPayload = {
   categories?: unknown;
   property_id?: unknown;
   availability_source?: unknown;
+  availability_error?: unknown;
   has_live_availability?: unknown;
   message?: unknown;
 };
-
-type AvailabilitySource = "catalog" | "ezee_live" | "live_provider" | "local_db_estimate" | "unknown";
 
 type RoomCategory = CxRoomCategory;
 
@@ -99,45 +98,8 @@ function getRoomSelectionKey(room: RoomCategory): string {
   return room.roomTypeId?.trim() || room.slug;
 }
 
-function getColiveRoomOptionId(room: Pick<RoomCategory, "roomTypeId" | "slug" | "title">): string {
-  const haystack = `${room.roomTypeId} ${room.slug} ${room.title}`.toLowerCase();
-
-  if (haystack.includes("deluxe") || haystack.includes("queen") || haystack.includes("private")) {
-    return "rt-ka-queen";
-  }
-
-  if (haystack.includes("6") && haystack.includes("female")) {
-    return "rt-ka-6dorm-female";
-  }
-
-  if (haystack.includes("4") && haystack.includes("female")) {
-    return "rt-ka-4dorm-female";
-  }
-
-  if (haystack.includes("6")) {
-    return "rt-ka-6dorm";
-  }
-
-  return "rt-ka-4dorm";
-}
-
 function readCategories(payload: RoomApiPayload): RoomCategory[] {
   return Array.isArray(payload.categories) ? (payload.categories as RoomCategory[]) : [];
-}
-
-function readAvailabilitySource(payload: RoomApiPayload): AvailabilitySource | null {
-  if (typeof payload.availability_source !== "string") {
-    return null;
-  }
-
-  const normalized = payload.availability_source.trim().toLowerCase();
-  return normalized === "catalog" ||
-    normalized === "ezee_live" ||
-    normalized === "live_provider" ||
-    normalized === "local_db_estimate" ||
-    normalized === "unknown"
-    ? normalized
-    : null;
 }
 
 function parseRoomsApiError(payload: unknown, fallback: string): string {
@@ -147,6 +109,15 @@ function parseRoomsApiError(payload: unknown, fallback: string): string {
 
   const message = (payload as { message?: unknown }).message;
   return typeof message === "string" && message.trim() ? message : fallback;
+}
+
+function readAvailabilityError(payload: RoomApiPayload): string | null {
+  if (typeof payload.availability_error !== "string") {
+    return null;
+  }
+
+  const message = payload.availability_error.trim();
+  return message ? message : null;
 }
 
 function hasUnavailableRoomPrice(room: RoomCategory): boolean {
@@ -211,10 +182,11 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
   const [duration, setDuration] = useState(1);
   const [stayType, setStayType] = useState<ColiveStayType>("solo");
   const [rooms, setRooms] = useState<RoomCategory[]>([]);
-  const [availabilitySource, setAvailabilitySource] = useState<AvailabilitySource | null>(null);
   const [isLoadingRooms, setIsLoadingRooms] = useState(true);
   const [isRefreshingRooms, setIsRefreshingRooms] = useState(false);
   const [roomError, setRoomError] = useState<string | null>(null);
+  const [continueError, setContinueError] = useState<string | null>(null);
+  const [isContinuing, setIsContinuing] = useState(false);
   const [selectedCounts, setSelectedCounts] = useState<Record<string, number>>({});
   const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
   const didRestoreSelectionRef = useRef(false);
@@ -228,7 +200,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
       rooms
         .filter((room) => (selectedCounts[getRoomSelectionKey(room)] ?? 0) > 0)
         .map((room) => ({
-          roomTypeId: getColiveRoomOptionId(room),
+          roomTypeId: room.roomTypeId,
           slug: room.slug,
           title: room.title,
           roomType: room.roomType,
@@ -268,12 +240,15 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
         throw new Error(parseRoomsApiError(payload, "Unable to load Colive rooms right now."));
       }
 
-      const nextRooms = readCategories(payload ?? {});
-      setRooms(nextRooms);
-      setAvailabilitySource(readAvailabilitySource(payload ?? {}) ?? null);
+      const safePayload = payload ?? {};
+      const nextError = readAvailabilityError(safePayload);
+      const nextRooms = readCategories(safePayload);
+
+      setRooms(nextError ? [] : nextRooms);
+      setRoomError(nextError);
       setSelectedCounts((current) => {
         const allowed = new Map(
-          nextRooms.map((room) => [
+          (nextError ? [] : nextRooms).map((room) => [
             getRoomSelectionKey(room),
             room.inventoryState !== "sold_out" && !hasUnavailableRoomPrice(room) ? Math.max(0, room.availableCount) : 0,
           ]),
@@ -286,6 +261,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
         );
       });
     } catch (error) {
+      setRooms([]);
       setRoomError(error instanceof Error ? error.message : "Unable to load Colive rooms right now.");
     } finally {
       setIsLoadingRooms(false);
@@ -340,7 +316,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     }
 
     router.push("/bookingreview");
-  }, [isAuthenticated, selectedRoomDrafts.length, selectedCounts, moveIn, checkoutDate, router]);
+  }, [isAuthenticated, selectedRoomDrafts.length, selectedCounts, moveIn, checkoutDate, propertyId, router]);
 
   useEffect(() => {
     const contextKey = `${propertyId}::${moveIn}::${checkoutDate}`;
@@ -354,9 +330,15 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
       return;
     }
 
-    setSelectedCounts(stored.selectedCounts);
-    setIsAgeConfirmed(stored.isAgeConfirmed);
-    didRestoreSelectionRef.current = true;
+    const frameId = window.requestAnimationFrame(() => {
+      setSelectedCounts(stored.selectedCounts);
+      setIsAgeConfirmed(stored.isAgeConfirmed);
+      didRestoreSelectionRef.current = true;
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
   }, [moveIn, checkoutDate, propertyId]);
 
   useEffect(() => {
@@ -419,7 +401,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     return () => {
       window.clearTimeout(saveTimer);
     };
-  }, [moveIn, checkoutDate, selectedCounts, isAgeConfirmed]);
+  }, [moveIn, checkoutDate, selectedCounts, isAgeConfirmed, propertyId]);
 
   const updateCount = (roomKey: string, nextValue: number) => {
     const room = rooms.find((item) => getRoomSelectionKey(item) === roomKey);
@@ -430,27 +412,21 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
   };
 
   const continueToCheckout = () => {
+    setContinueError(null);
+
     if (selectedRoomDrafts.length === 0) {
-      toast.error("Select at least one Colive room.");
+      setContinueError("Select at least one Colive room.");
       return;
     }
 
     if (!isAgeConfirmed) {
-      toast.error("Please confirm guest age before checkout.");
+      setContinueError("Confirm that all guests are above 18 to continue.");
       return;
     }
 
     if (isRestoringSession) {
-      toast.info("Restoring your session", {
-        description: "Please wait a moment, then try Review Booking again.",
-      });
+      setContinueError("Please wait while your session is restored, then try again.");
       return;
-    }
-
-    if (availabilitySource === "local_db_estimate") {
-      toast.warning("Estimated availability", {
-        description: "Live availability is temporarily estimated. Checkout quote will revalidate before payment.",
-      });
     }
 
     const signature = buildBookingSignature({
@@ -479,10 +455,6 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
       },
     });
 
-    toast.success("Colive stay saved", {
-      description: "Taking you to review booking.",
-    });
-
     if (!isAuthenticated) {
       saveReviewResumeIntent({
         source: "colive",
@@ -497,10 +469,12 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
           selectedCounts,
         }),
       });
+      setIsContinuing(false);
       openAuthModal("signin");
       return;
     }
 
+    setIsContinuing(true);
     router.push("/bookingreview");
   };
 
@@ -839,7 +813,15 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                       </span>
                     </div>
 
-                    <Button className="vh-cta-button mt-5 w-full disabled:cursor-not-allowed disabled:opacity-55" disabled={!canContinue} onClick={continueToCheckout} type="button">
+                    {continueError ? <p className="mt-4 text-sm text-[#ff8b8b]">{continueError}</p> : null}
+                    <Button
+                      className="vh-cta-button mt-5 w-full disabled:cursor-not-allowed disabled:opacity-55"
+                      disabled={!canContinue}
+                      loading={isContinuing}
+                      loadingText="Review Booking"
+                      onClick={continueToCheckout}
+                      type="button"
+                    >
                       Review Booking
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -946,12 +928,20 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
           <div className="flex items-center justify-between gap-3 px-4 py-4">
             <div>
               <p className="text-xl font-bold text-white">Rs. {formatINRPlain(selectedRoomTotal)}</p>
+              {continueError ? <p className="mt-1 max-w-[180px] text-xs text-[#ff8b8b]">{continueError}</p> : null}
               <button className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.08em] text-white/72" type="button">
                 {selectedRoomCount} room{selectedRoomCount === 1 ? "" : "s"} / {duration} mo
                 <Info className="h-3.5 w-3.5" />
               </button>
             </div>
-            <Button className="vh-cta-button px-5 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-55" disabled={!canContinue} onClick={continueToCheckout} type="button">
+            <Button
+              className="vh-cta-button px-5 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-55"
+              disabled={!canContinue}
+              loading={isContinuing}
+              loadingText="Review"
+              onClick={continueToCheckout}
+              type="button"
+            >
               Review
             </Button>
           </div>

@@ -153,8 +153,23 @@ function AmenitiesSection() {
   );
 }
 
-function RoomsSection({ rooms }: { rooms: RoomCardProps[] }) {
-  const roomItems = rooms.length > 0 ? rooms : homePageContent.homeRooms;
+function InlineSectionState({
+  title,
+  body,
+}: {
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="rounded-[18px] border border-dashed border-white/20 bg-white/5 px-6 py-8 text-center text-white">
+      <p className="font-['Geologica'] text-xl font-semibold">{title}</p>
+      <p className="mx-auto mt-2 max-w-[560px] text-sm leading-7 text-white/72">{body}</p>
+    </div>
+  );
+}
+
+function RoomsSection({ roomError, rooms }: { roomError?: string | null; rooms: RoomCardProps[] }) {
+  const roomItems = rooms;
   const roomGridClass =
     roomItems.length <= 1
       ? "grid grid-cols-1 gap-6 md:max-w-[420px] md:mx-auto"
@@ -175,20 +190,30 @@ function RoomsSection({ rooms }: { rooms: RoomCardProps[] }) {
             text={sectionHeaderStickers.rooms.text}
           />
         </FadeIn>
-        <Stagger className={roomGridClass}>
-          {roomItems.map((room) => (
-            <StaggerItem key={room.title}>
-              <RoomCard {...room} />
-            </StaggerItem>
-          ))}
-        </Stagger>
+        {roomError ? (
+          <FadeIn>
+            <InlineSectionState body={roomError} title="Rooms did not load" />
+          </FadeIn>
+        ) : roomItems.length === 0 ? (
+          <FadeIn>
+            <InlineSectionState body="No rooms are available right now for the selected stay window." title="No rooms available" />
+          </FadeIn>
+        ) : (
+          <Stagger className={roomGridClass}>
+            {roomItems.map((room) => (
+              <StaggerItem key={room.title}>
+                <RoomCard {...room} />
+              </StaggerItem>
+            ))}
+          </Stagger>
+        )}
       </div>
     </SectionFrame>
   );
 }
 
-function EventsSection({ events }: { events: EventCardProps[] }) {
-  const eventItems = events.length > 0 ? events : homePageContent.homeEvents;
+function EventsSection({ eventError, events }: { eventError?: string | null; events: EventCardProps[] }) {
+  const eventItems = events;
   const eventGridClass =
     eventItems.length <= 1
       ? "grid grid-cols-1 gap-6 md:grid-cols-1 md:max-w-[460px] md:mx-auto"
@@ -209,13 +234,23 @@ function EventsSection({ events }: { events: EventCardProps[] }) {
             text={sectionHeaderStickers.events.text}
           />
         </FadeIn>
-        <Stagger className={eventGridClass}>
-          {eventItems.slice(0, 3).map((event) => (
-            <StaggerItem key={`${event.title}-${event.date}-${event.time}`}>
-              <EventCard {...event} />
-            </StaggerItem>
-          ))}
-        </Stagger>
+        {eventError ? (
+          <FadeIn>
+            <InlineSectionState body={eventError} title="Events did not load" />
+          </FadeIn>
+        ) : eventItems.length === 0 ? (
+          <FadeIn>
+            <InlineSectionState body="No events are scheduled right now." title="No upcoming events" />
+          </FadeIn>
+        ) : (
+          <Stagger className={eventGridClass}>
+            {eventItems.slice(0, 3).map((event) => (
+              <StaggerItem key={`${event.title}-${event.date}-${event.time}`}>
+                <EventCard {...event} />
+              </StaggerItem>
+            ))}
+          </Stagger>
+        )}
       </div>
     </SectionFrame>
   );
@@ -501,24 +536,28 @@ function CtaSection({ destinationHref = "/property" }: { destinationHref?: strin
 
 export function HomeSections({
   order = homeSectionOrder,
-  homeEvents = homePageContent.homeEvents,
-  homeRooms = homePageContent.homeRooms,
+  eventError = null,
+  homeEvents = [],
+  homeRooms = [],
   propertyDestinationHref = "/property",
+  roomError = null,
 }: {
   order?: HomeSectionId[];
+  eventError?: string | null;
   homeEvents?: EventCardProps[];
   homeRooms?: RoomCardProps[];
   propertyDestinationHref?: string;
+  roomError?: string | null;
 }) {
   return (
     <>
       {order.map((sectionId) => {
         if (sectionId === "rooms") {
-          return <RoomsSection key={sectionId} rooms={homeRooms} />;
+          return <RoomsSection key={sectionId} roomError={roomError} rooms={homeRooms} />;
         }
 
         if (sectionId === "events") {
-          return <EventsSection key={sectionId} events={homeEvents} />;
+          return <EventsSection eventError={eventError} key={sectionId} events={homeEvents} />;
         }
 
         const sectionComponents: Record<Exclude<HomeSectionId, "rooms" | "events">, () => ReactNode> = {

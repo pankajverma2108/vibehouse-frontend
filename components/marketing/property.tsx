@@ -60,7 +60,6 @@ import {
   propertyGuidelines,
   propertyHero,
   propertyOverview,
-  roomCategories,
   roomFaqs,
 } from "@/content/rooms";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
@@ -172,6 +171,15 @@ function readAvailabilitySource(payload: RoomApiPayload): AvailabilitySource | n
   }
 
   return null;
+}
+
+function readAvailabilityError(payload: RoomApiPayload): string | null {
+  if (typeof payload.availability_error !== "string") {
+    return null;
+  }
+
+  const message = payload.availability_error.trim();
+  return message ? message : null;
 }
 
 function getLocalDate(days: number) {
@@ -470,9 +478,11 @@ function DateRangePicker({
 function DesktopBookingSummary({
   checkIn,
   checkOut,
+  continueError,
   essentials,
   essentialsTotal,
   isAgeConfirmed,
+  isContinuing,
   onAgeConfirmChange,
   selectedCounts,
   roomCategoryList,
@@ -480,6 +490,7 @@ function DesktopBookingSummary({
 }: {
   checkIn: string;
   checkOut: string;
+  continueError?: string | null;
   essentials: Array<{
     id: string;
     title: string;
@@ -488,6 +499,7 @@ function DesktopBookingSummary({
   }>;
   essentialsTotal: number;
   isAgeConfirmed: boolean;
+  isContinuing?: boolean;
   onAgeConfirmChange: (value: boolean) => void;
   selectedCounts: Record<string, number>;
   roomCategoryList: RoomCategory[];
@@ -609,7 +621,15 @@ function DesktopBookingSummary({
           </span>
         </div>
 
-        <Button className="vh-cta-button mt-5 w-full disabled:cursor-not-allowed disabled:opacity-55" disabled={!isAgeConfirmed || !hasSelection} onClick={onContinue} type="button">
+        {continueError ? <p className="mt-4 text-sm text-[#ff8b8b]">{continueError}</p> : null}
+        <Button
+          className="vh-cta-button mt-5 w-full disabled:cursor-not-allowed disabled:opacity-55"
+          disabled={!isAgeConfirmed || !hasSelection}
+          loading={isContinuing}
+          loadingText="Review Booking"
+          onClick={onContinue}
+          type="button"
+        >
           Review Booking
         </Button>
       </div>
@@ -620,9 +640,11 @@ function DesktopBookingSummary({
 function MobileStickySummary({
   checkIn,
   checkOut,
+  continueError,
   essentials,
   essentialsTotal,
   isAgeConfirmed,
+  isContinuing,
   onAgeConfirmChange,
   selectedCounts,
   roomCategoryList,
@@ -630,6 +652,7 @@ function MobileStickySummary({
 }: {
   checkIn: string;
   checkOut: string;
+  continueError?: string | null;
   essentials: Array<{
     id: string;
     title: string;
@@ -638,6 +661,7 @@ function MobileStickySummary({
   }>;
   essentialsTotal: number;
   isAgeConfirmed: boolean;
+  isContinuing?: boolean;
   onAgeConfirmChange: (value: boolean) => void;
   selectedCounts: Record<string, number>;
   roomCategoryList: RoomCategory[];
@@ -744,6 +768,7 @@ function MobileStickySummary({
             <p className="text-2xl font-semibold text-white">
               {showUnavailablePricePreview ? "Price unavailable" : `₹${formatINRPlain(displayAmount)}`}
             </p>
+            {continueError ? <p className="mt-1 max-w-[220px] text-xs text-[#ff8b8b]">{continueError}</p> : null}
             <button
               className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-[#46B2FF]"
               disabled={!hasSelection}
@@ -754,7 +779,14 @@ function MobileStickySummary({
               <Info className="h-3.5 w-3.5" />
             </button>
           </div>
-          <Button className="vh-cta-button h-10 min-w-[128px] px-3 py-2 text-xs sm:px-4 sm:text-sm disabled:cursor-not-allowed disabled:opacity-55" disabled={!hasSelection} onClick={onContinue} type="button">
+          <Button
+            className="vh-cta-button h-10 min-w-[128px] px-3 py-2 text-xs sm:px-4 sm:text-sm disabled:cursor-not-allowed disabled:opacity-55"
+            disabled={!hasSelection}
+            loading={isContinuing}
+            loadingText="Review Booking"
+            onClick={onContinue}
+            type="button"
+          >
             Review Booking
           </Button>
         </div>
@@ -1037,6 +1069,7 @@ type PropertyProps = {
   initialCheckOut?: string;
   initialAvailabilityEnabled?: boolean;
   initialRoomCategories?: RoomCategory[];
+  initialRoomError?: string | null;
 };
 
 export function Property({
@@ -1044,7 +1077,8 @@ export function Property({
   initialCheckIn,
   initialCheckOut,
   initialAvailabilityEnabled = false,
-  initialRoomCategories = roomCategories,
+  initialRoomCategories = [],
+  initialRoomError = null,
 }: PropertyProps) {
   const router = useRouter();
   const { isAuthenticated, isRestoringSession, openAuthModal } = useGuestAuth();
@@ -1052,14 +1086,15 @@ export function Property({
   const [selectedCounts, setSelectedCounts] = useState<Record<string, number>>({});
   const [activeRoomKey, setActiveRoomKey] = useState<string | null>(null);
   const [activeRoomImageIndex, setActiveRoomImageIndex] = useState(0);
-  const [roomCategoryList, setRoomCategoryList] = useState<RoomCategory[]>(
-    initialRoomCategories.length > 0 ? initialRoomCategories : roomCategories,
-  );
+  const [roomCategoryList, setRoomCategoryList] = useState<RoomCategory[]>(initialRoomCategories);
+  const [roomError, setRoomError] = useState<string | null>(initialRoomError);
+  const [continueError, setContinueError] = useState<string | null>(null);
+  const [isContinuing, setIsContinuing] = useState(false);
   const [resolvedPropertyId, setResolvedPropertyId] = useState(propertyId ?? "");
-  const [availabilitySource, setAvailabilitySource] = useState<AvailabilitySource | null>(null);
   const [isLoadingCatalog, setIsLoadingCatalog] = useState(false);
   const [isRefreshingAvailability, setIsRefreshingAvailability] = useState(false);
   const [availabilityRequestedByUser, setAvailabilityRequestedByUser] = useState(initialAvailabilityEnabled);
+  const [fetchVersion, setFetchVersion] = useState(0);
   const [selectedEssentials] = useState<Record<string, number>>({});
   const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
   const roomResponseCacheRef = useRef<Map<string, CachedRoomPayload>>(new Map());
@@ -1212,6 +1247,11 @@ export function Property({
     return safePayload;
   }, [resolvedPropertyId]);
 
+  const retryRooms = useCallback(() => {
+    roomResponseCacheRef.current.clear();
+    setFetchVersion((current) => current + 1);
+  }, []);
+
   const updateCount = (roomKey: string, nextValue: number) => {
     const room = roomCategoryList.find((item) => getRoomSelectionKey(item) === roomKey);
     const isBookable = room?.hasLiveAvailability && room.inventoryState !== "sold_out" && !hasUnavailableRoomPrice(room);
@@ -1264,6 +1304,7 @@ export function Property({
 
     async function loadCatalog() {
       setIsLoadingCatalog(true);
+      setRoomError(null);
 
       try {
         const payload = await fetchRoomsPayload({ signal: controller.signal });
@@ -1272,28 +1313,22 @@ export function Property({
           return;
         }
 
+        const nextError = readAvailabilityError(payload);
         const nextCategories = readCategories(payload);
         const nextPropertyId = typeof payload.property_id === "string" ? payload.property_id.trim() : "";
-        const nextAvailabilitySource = readAvailabilitySource(payload);
-
         if (nextPropertyId && nextPropertyId !== resolvedPropertyId) {
           setResolvedPropertyId(nextPropertyId);
         }
 
-        setAvailabilitySource(nextAvailabilitySource);
-
-        if (nextCategories.length > 0) {
-          applyRoomCategories(nextCategories);
-        }
+        setRoomError(nextError);
+        applyRoomCategories(nextCategories);
       } catch (error) {
         if (!mounted || controller.signal.aborted) {
           return;
         }
 
-        setRoomCategoryList((current) => (current.length > 0 ? current : roomCategories));
-        toast.error("Room catalog unavailable", {
-          description: error instanceof Error ? error.message : "Please retry in a few seconds.",
-        });
+        setRoomError(error instanceof Error ? error.message : "Unable to load rooms right now.");
+        applyRoomCategories([]);
       } finally {
         if (mounted) {
           setIsLoadingCatalog(false);
@@ -1311,6 +1346,7 @@ export function Property({
     applyRoomCategories,
     availabilityRequestedByUser,
     fetchRoomsPayload,
+    fetchVersion,
     hasValidDateRange,
     resolvedPropertyId,
   ]);
@@ -1325,6 +1361,7 @@ export function Property({
 
     async function loadAvailability() {
       setIsRefreshingAvailability(true);
+      setRoomError(null);
 
       try {
         const payload = await fetchRoomsPayload({
@@ -1337,28 +1374,22 @@ export function Property({
           return;
         }
 
+        const nextError = readAvailabilityError(payload);
         const nextCategories = readCategories(payload);
         const nextPropertyId = typeof payload.property_id === "string" ? payload.property_id.trim() : "";
-        const nextAvailabilitySource = readAvailabilitySource(payload);
-
         if (nextPropertyId && nextPropertyId !== resolvedPropertyId) {
           setResolvedPropertyId(nextPropertyId);
         }
 
-        if (nextCategories.length > 0) {
-          applyRoomCategories(nextCategories);
-        }
-
-        setAvailabilitySource(nextAvailabilitySource);
+        setRoomError(nextError);
+        applyRoomCategories(nextCategories);
         // Note: local_db_estimate is handled silently — no banner shown.
       } catch (error) {
         if (!mounted || controller.signal.aborted) {
           return;
         }
-        // Silently fail: keep the existing room list visible, just log a toast.
-        toast.error("Live availability sync failed", {
-          description: error instanceof Error ? error.message : "Please retry in a few seconds.",
-        });
+        setRoomError(error instanceof Error ? error.message : "Unable to load live availability right now.");
+        applyRoomCategories([]);
       } finally {
         if (mounted) {
           setIsRefreshingAvailability(false);
@@ -1378,6 +1409,7 @@ export function Property({
     checkIn,
     checkOut,
     fetchRoomsPayload,
+    fetchVersion,
     hasValidDateRange,
     resolvedPropertyId,
   ]);
@@ -1501,28 +1533,19 @@ export function Property({
   };
 
   const continueToCheckout = () => {
+    setContinueError(null);
     if (!resolvedPropertyId) {
-      toast.error("Checkout blocked", {
-        description: "Property context is missing. Refresh and try again.",
-      });
+      setContinueError("Property context is missing. Refresh and try again.");
       return;
     }
+
 
     if (!hasValidDateRange || !checkIn || !checkOut || selectedRoomDrafts.length === 0) {
-      toast.error("Select at least one room", {
-        description: "Pick your dates and rooms to continue to checkout.",
-      });
+      setContinueError("Pick your dates and rooms to continue.");
       return;
     }
 
 
-    if (availabilitySource === "local_db_estimate") {
-      // local_db_estimate means eZee is down but we have DB estimates — allow the flow to
-      // continue with a toast warning rather than hard-blocking checkout.
-      toast.warning("Estimated pricing", {
-        description: "Live rates are temporarily unavailable. Shown prices are estimates from our DB.",
-      });
-    }
 
     const hasInvalidSelection = selectedRoomDrafts.some((draftRoom) => {
       const room = roomCategoryList.find((item) => item.roomTypeId === draftRoom.roomTypeId || item.slug === draftRoom.slug);
@@ -1530,23 +1553,17 @@ export function Property({
     });
 
     if (hasInvalidSelection) {
-      toast.error("Room availability changed", {
-        description: "Please review your room selection and try again.",
-      });
+      setContinueError("Please review your room selection and try again.");
       return;
     }
 
     if (!isAgeConfirmed) {
-      toast.error("Please confirm guest age", {
-        description: "You must confirm all guests are above 18 to continue.",
-      });
+      setContinueError("Confirm that all guests are above 18 to continue.");
       return;
     }
 
     if (isRestoringSession) {
-      toast.info("Restoring your session", {
-        description: "Please wait a moment, then try Review Booking again.",
-      });
+      setContinueError("Please wait while your session is restored, then try again.");
       return;
     }
 
@@ -1571,10 +1588,6 @@ export function Property({
       createdAt: Date.now(),
     });
 
-    toast.success("Room selection saved", {
-      description: "Taking you to review booking.",
-    });
-
     if (!isAuthenticated) {
       saveReviewResumeIntent({
         source: "nightly",
@@ -1589,10 +1602,12 @@ export function Property({
           selectedCounts,
         }),
       });
+      setIsContinuing(false);
       openAuthModal("signin");
       return;
     }
 
+    setIsContinuing(true);
     router.push("/bookingreview");
   };
 
@@ -1711,6 +1726,14 @@ export function Property({
                     <RoomCardSkeleton />
                     <RoomCardSkeleton />
                   </>
+                ) : roomError ? (
+                  <div className="rounded-[20px] border border-dashed border-white/18 bg-white/5 p-6 text-center">
+                    <p className="mt-1 text-base font-semibold text-white">Rooms did not load</p>
+                    <p className="mt-2 text-sm text-white/75">{roomError}</p>
+                    <Button className="vh-cta-button mt-5" onClick={retryRooms} type="button">
+                      Retry rooms
+                    </Button>
+                  </div>
                 ) : roomCategoryList.length === 0 ? (
                   <div className="rounded-[20px] border border-white/10 bg-white/5 p-6 text-center">
                     <Image
@@ -1865,9 +1888,11 @@ export function Property({
                 <DesktopBookingSummary
                   checkIn={checkIn}
                   checkOut={checkOut}
+                  continueError={continueError}
                   essentials={selectedEssentialDrafts}
                   essentialsTotal={essentialsTotal}
                   isAgeConfirmed={isAgeConfirmed}
+                  isContinuing={isContinuing}
                   onContinue={continueToCheckout}
                   onAgeConfirmChange={setIsAgeConfirmed}
                   selectedCounts={selectedCounts}
@@ -1994,9 +2019,11 @@ export function Property({
       <MobileStickySummary
         checkIn={checkIn}
         checkOut={checkOut}
+        continueError={continueError}
         essentials={selectedEssentialDrafts}
         essentialsTotal={essentialsTotal}
         isAgeConfirmed={isAgeConfirmed}
+        isContinuing={isContinuing}
         onContinue={continueToCheckout}
         onAgeConfirmChange={setIsAgeConfirmed}
         selectedCounts={selectedCounts}
