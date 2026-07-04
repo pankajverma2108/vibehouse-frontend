@@ -4,10 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { MessageSquareText, RefreshCcw, Star } from "lucide-react";
+import { RefreshCcw, Star } from "lucide-react";
 
 import { GuestTextArea } from "@/components/guest/guest-form-fields";
-import { Stagger, StaggerItem } from "@/components/shared/motion";
 import { Button } from "@/components/ui/button";
 import {
   getPublicFeedback,
@@ -26,19 +25,8 @@ type FeedbackPageProps = {
   previewScenario?: FeedbackPreviewScenario;
 };
 
-type FeedbackSubmitPreviewPayload = {
-  rating: number;
-  comment?: string;
-};
-
 const MAX_COMMENT_LENGTH = 2000;
-const RATING_OPTIONS = [
-  { value: 1, label: "Very poor", hint: "Needs immediate attention" },
-  { value: 2, label: "Poor", hint: "Below expectations" },
-  { value: 3, label: "Okay", hint: "Resolved, but average" },
-  { value: 4, label: "Good", hint: "Quick and reliable" },
-  { value: 5, label: "Excellent", hint: "Exactly what I needed" },
-] as const;
+const RATING_VALUES = [1, 2, 3, 4, 5] as const;
 
 function buildContextLine(feedback: FeedbackLookupResponse): string {
   const requestLabel = feedback.request?.trim();
@@ -62,20 +50,6 @@ function buildContextLine(feedback: FeedbackLookupResponse): string {
 function buildSupportLine(feedback: FeedbackLookupResponse): string {
   const staffName = feedback.staff_name?.trim() || "our team";
   return `Handled by ${staffName}.`;
-}
-
-function getRatingCopy(rating: number) {
-  return RATING_OPTIONS.find((option) => option.value === rating) ?? null;
-}
-
-function buildSubmitPayload(
-  rating: number,
-  trimmedComment: string,
-): FeedbackSubmitPreviewPayload {
-  return {
-    rating,
-    ...(trimmedComment ? { comment: trimmedComment } : {}),
-  };
 }
 
 function feedbackStateCopy(state: FeedbackState): {
@@ -117,31 +91,34 @@ function FeedbackShell({
   children: ReactNode;
 }) {
   return (
-    <section className="min-h-screen bg-[#07070a] py-16">
-      <div className="vh-container">
-        <div className="mx-auto max-w-screen-lg">
-          <header className="mb-6 flex items-center justify-between gap-4 border-b border-dashed border-white/14 pb-4">
+    <section className="min-h-screen bg-[#07070a] py-6 sm:py-8 md:py-12">
+      <div className="vh-container px-4 sm:px-6">
+        <div className="mx-auto max-w-[760px]">
+          <header className="mb-4 flex items-center justify-between gap-3 border-b border-dashed border-white/14 pb-3 sm:mb-5 sm:gap-4 sm:pb-4">
             <Link
               aria-label="The Daily Social home"
               className="inline-flex items-center"
               href="/"
             >
-              <Image
-                alt="The Daily Social"
-                className="w-[120px]"
-                height={62}
-                priority
-                src="/brands/tds/logo.png"
-                style={{ height: "auto" }}
-                width={120}
-              />
+              <span className="relative block h-[44px] w-[86px] sm:h-[52px] sm:w-[104px] md:h-[60px] md:w-[120px]">
+                <Image
+                  alt="The Daily Social"
+                  fill
+                  priority
+                  src="/brands/tds/logo.png"
+                  sizes="120px"
+                  style={{ objectFit: "contain" }}
+                />
+              </span>
             </Link>
-            <p className="font-caption text-right text-white/55">Service Feedback</p>
+            <p className="font-caption text-right text-[11px] text-white/55 sm:text-xs">
+              Service Feedback
+            </p>
           </header>
 
-          <Stagger className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4">
             {children}
-          </Stagger>
+          </div>
         </div>
       </div>
     </section>
@@ -162,42 +139,29 @@ function ContextPanel({
   const displayBody = isValidFeedback && feedback ? buildSupportLine(feedback) : body;
 
   return (
-    <StaggerItem className="h-full">
-      <div className="flex h-full flex-col rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
-        <div className="space-y-4">
+    <div className="order-1 h-full">
+      <div className="flex h-full flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:p-5 md:rounded-[22px] md:p-6">
+        <div className="space-y-3 sm:space-y-4">
           <p className="font-caption text-white/55">The Daily Social</p>
-          <h1 className="font-sectiontitle text-[34px] leading-[1.05] text-white sm:text-[42px]">
+          <h1 className="font-sectiontitle text-[25px] leading-[1.02] text-white sm:text-[32px] md:text-[42px]">
             {displayTitle}
           </h1>
-          <p className="text-sm leading-7 text-white/72 sm:text-base">
+          <p className="text-[15px] leading-7 text-white/72 sm:text-base">
             {displayBody}
           </p>
-
-          {isValidFeedback && feedback ? (
-            <div className="border-t border-dashed border-white/14 pt-5">
-              <p className="font-caption text-white/55">Ticket Context</p>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-white/62">
-                {feedback.request?.trim() ? <span>{feedback.request.trim()}</span> : null}
-                {feedback.room_no?.trim() ? <span>Room {feedback.room_no.trim()}</span> : null}
-              </div>
-              <p className="mt-4 text-sm leading-7 text-white/72">
-                Choose a score on the right and leave a note only if something needs extra attention.
-              </p>
-            </div>
-          ) : null}
         </div>
       </div>
-    </StaggerItem>
+    </div>
   );
 }
 
 function LoadingPanel() {
   return (
-    <StaggerItem className="h-full">
+    <div className="h-full">
       <div
         aria-busy="true"
         aria-live="polite"
-        className="flex min-h-[420px] flex-col rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6"
+        className="flex min-h-[280px] flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-[22px] md:p-6"
         role="status"
       >
         <div className="my-auto text-left">
@@ -213,7 +177,7 @@ function LoadingPanel() {
           <span className="vh-button-spinner mt-6 h-6 w-6 text-[#f9cb37]" />
         </div>
       </div>
-    </StaggerItem>
+    </div>
   );
 }
 
@@ -225,8 +189,8 @@ function RetryPanel({
   onRetry: () => void;
 }) {
   return (
-    <StaggerItem className="h-full">
-      <div className="flex min-h-[420px] flex-col rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
+    <div className="h-full">
+      <div className="flex min-h-[280px] flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-[22px] md:p-6">
         <div className="my-auto">
           <p className="font-caption text-white/55">Service Unavailable</p>
           <h2 className="font-sectiontitle mt-3 text-[22px] text-white">
@@ -254,7 +218,7 @@ function RetryPanel({
           </div>
         </div>
       </div>
-    </StaggerItem>
+    </div>
   );
 }
 
@@ -268,8 +232,8 @@ function TerminalPanel({
   const copy = feedbackStateCopy(state);
 
   return (
-    <StaggerItem className="h-full">
-      <div className="flex min-h-[420px] flex-col rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
+    <div className="h-full">
+      <div className="flex min-h-[280px] flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-[22px] md:p-6">
         <div className="my-auto">
           <p className="font-caption text-white/55">{copy.eyebrow}</p>
           <h2 className="font-sectiontitle mt-3 text-[22px] text-white sm:text-[24px]">
@@ -295,22 +259,20 @@ function TerminalPanel({
           </div>
         </div>
       </div>
-    </StaggerItem>
+    </div>
   );
 }
 
 function SuccessPanel({
-  previewPayload,
   rating,
   comment,
 }: {
-  previewPayload?: FeedbackSubmitPreviewPayload | null;
   rating: number;
   comment: string;
 }) {
   return (
-    <StaggerItem className="h-full">
-      <div className="flex min-h-[420px] flex-col rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
+    <div className="h-full">
+      <div className="flex min-h-[280px] flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-[22px] md:p-6">
         <div className="my-auto">
           <p className="font-caption text-white/55">Feedback Submitted</p>
           <h2 className="font-sectiontitle mt-3 text-[22px] text-white">
@@ -336,37 +298,19 @@ function SuccessPanel({
                 />
               );
             })}
-            <span className="ml-1 text-sm font-semibold text-white">
-              {getRatingCopy(rating)?.label ?? `${rating}/5`}
-            </span>
           </div>
 
           {comment ? (
             <div className="mt-6 border-t border-dashed border-white/14 pt-5">
-              <div className="flex items-center gap-2 text-white/55">
-                <MessageSquareText className="h-4 w-4" />
-                <p className="font-caption">Your note</p>
-              </div>
+              <p className="font-caption text-white/55">Your note</p>
               <p className="mt-2 text-sm leading-7 text-white/72">
                 {comment}
               </p>
             </div>
           ) : null}
-
-          {previewPayload ? (
-            <div className="mt-6 border-t border-dashed border-white/14 pt-5">
-              <p className="font-caption text-white/55">Mock API Payload</p>
-              <p className="mt-2 text-xs leading-6 text-white/55">
-                POST /public/feedback/:token
-              </p>
-              <pre className="mt-3 overflow-x-auto rounded-[16px] border border-white/10 bg-black/30 p-4 text-xs leading-6 text-white/78">
-                {JSON.stringify(previewPayload, null, 2)}
-              </pre>
-            </div>
-          ) : null}
         </div>
       </div>
-    </StaggerItem>
+    </div>
   );
 }
 
@@ -384,14 +328,16 @@ function RatingPicker({
       <legend className="text-[11px] font-black uppercase tracking-[0.12em] text-[#94a3b8]">
         Rating
       </legend>
-      <div className="grid grid-cols-1 gap-2">
-        {RATING_OPTIONS.map((option) => {
-          const value = option.value;
+      <div className="flex items-center gap-2 sm:gap-3">
+        {RATING_VALUES.map((value) => {
           const active = rating >= value;
 
           return (
             <label
-              className="block cursor-pointer"
+              className={cn(
+                "cursor-pointer p-1 transition-transform duration-200",
+                disabled && "cursor-not-allowed opacity-70",
+              )}
               key={value}
             >
               <input
@@ -404,40 +350,18 @@ function RatingPicker({
                 type="radio"
                 value={value}
               />
-              <span
+              <Star
                 className={cn(
-                  "flex min-h-[64px] w-full items-center justify-between gap-4 rounded-[16px] border px-4 py-3 text-left transition",
+                  "h-8 w-8 transition-colors sm:h-9 sm:w-9",
                   active
-                    ? "border-[var(--vh-pink)] bg-[rgba(198,40,40,0.16)] text-white shadow-[0_0_0_1px_rgba(198,40,40,0.25)]"
-                    : "border-white/10 bg-white/[0.03] text-white/68 hover:border-white/25 hover:bg-white/[0.05]",
-                  disabled && "cursor-not-allowed opacity-70",
+                    ? "fill-[#f9cb37] text-[#f9cb37]"
+                    : "fill-transparent text-white/28 hover:text-white/52",
                 )}
-              >
-                <span className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/20">
-                    <Star
-                      className={cn(
-                        "h-5 w-5",
-                        active ? "fill-current text-[#f9cb37]" : "text-white/34",
-                      )}
-                    />
-                  </span>
-                  <span className="space-y-1">
-                    <span className="block text-sm font-semibold text-white">{option.label}</span>
-                    <span className="block text-xs leading-5 text-white/60">{option.hint}</span>
-                  </span>
-                </span>
-                <span className="text-sm font-black text-white/78">{value}</span>
-              </span>
+              />
             </label>
           );
         })}
       </div>
-      <p className="text-xs leading-6 text-[#94a3b8]">
-        {rating > 0
-          ? `${getRatingCopy(rating)?.label ?? "Selected"} selected`
-          : "Choose 1 to 5 stars."}
-      </p>
     </fieldset>
   );
 }
@@ -446,23 +370,25 @@ export function FeedbackPage({
   token,
   previewScenario,
 }: FeedbackPageProps) {
-  const [feedback, setFeedback] = useState<FeedbackLookupResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const previewConfig = useMemo(
+    () => (previewScenario ? getFeedbackPreviewConfig(previewScenario) : null),
+    [previewScenario],
+  );
+  const [feedback, setFeedback] = useState<FeedbackLookupResponse | null>(
+    previewConfig?.feedback ?? null,
+  );
+  const [isLoading, setIsLoading] = useState(!previewConfig);
+  const [loadError, setLoadError] = useState<string | null>(
+    previewConfig?.loadError ?? null,
+  );
   const [reloadKey, setReloadKey] = useState(0);
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(previewConfig?.rating ?? 0);
+  const [comment, setComment] = useState(previewConfig?.comment ?? "");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [didSubmit, setDidSubmit] = useState(false);
-  const [previewSubmittedPayload, setPreviewSubmittedPayload] =
-    useState<FeedbackSubmitPreviewPayload | null>(null);
+  const [didSubmit, setDidSubmit] = useState(Boolean(previewConfig?.didSubmit));
 
   const trimmedComment = useMemo(() => comment.trim(), [comment]);
-  const draftPayload = useMemo(
-    () => buildSubmitPayload(Math.max(rating, 1), trimmedComment),
-    [rating, trimmedComment],
-  );
   const contextTitle = useMemo(
     () => feedbackStateCopy(feedback?.state ?? "valid").title,
     [feedback?.state],
@@ -485,11 +411,6 @@ export function FeedbackPage({
         setLoadError(preview.loadError ?? null);
         setSubmitError(null);
         setDidSubmit(Boolean(preview.didSubmit));
-        setPreviewSubmittedPayload(
-          preview.didSubmit && preview.rating
-            ? buildSubmitPayload(preview.rating, (preview.comment ?? "").trim())
-            : null,
-        );
         setIsLoading(false);
         return;
       }
@@ -498,7 +419,6 @@ export function FeedbackPage({
       setLoadError(null);
       setSubmitError(null);
       setDidSubmit(false);
-      setPreviewSubmittedPayload(null);
 
       const result = await getPublicFeedback(token);
 
@@ -541,7 +461,6 @@ export function FeedbackPage({
     if (previewScenario) {
       setSubmitError(null);
       setIsSubmitting(true);
-      setPreviewSubmittedPayload(buildSubmitPayload(rating, trimmedComment));
 
       window.setTimeout(() => {
         setIsSubmitting(false);
@@ -597,52 +516,21 @@ export function FeedbackPage({
             setIsLoading(true);
             setLoadError(null);
             setFeedback(null);
-            setPreviewSubmittedPayload(null);
             setReloadKey((current) => current + 1);
           }}
         />
       ) : didSubmit ? (
-        <SuccessPanel
-          comment={trimmedComment}
-          previewPayload={previewSubmittedPayload}
-          rating={rating}
-        />
+        <SuccessPanel comment={trimmedComment} rating={rating} />
       ) : feedback && feedback.state !== "valid" ? (
         <TerminalPanel feedback={feedback} state={feedback.state} />
       ) : (
-        <StaggerItem className="h-full">
+        <div className="order-2 h-full">
           <form
-            className="flex min-h-[420px] flex-col rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6"
+            className="flex flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:p-5 md:rounded-[22px] md:p-6"
             onSubmit={handleSubmit}
           >
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <p className="font-caption text-white/55">Submit Rating</p>
-                <h2 className="font-sectiontitle text-[22px] text-white">
-                  Choose the score that fits.
-                </h2>
-                <p className="text-sm leading-7 text-white/72 sm:text-base">
-                  Select one rating and add a note only if you want the team to review more detail.
-                </p>
-              </div>
-
-              <div className="border-t border-dashed border-white/14 pt-5">
-                <p className="font-caption text-white/55">Completed Request</p>
-                <p className="mt-2 font-bodyfocus text-[15px] text-white">
-                  {feedback ? buildContextLine(feedback) : "How was your support experience?"}
-                </p>
-                {feedback ? (
-                  <p className="mt-2 text-sm leading-7 text-white/72">
-                    {buildSupportLine(feedback)}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="border-t border-dashed border-white/14 pt-5">
-                <p className="font-caption text-white/55">Request Body</p>
-                <p className="mt-2 text-sm leading-7 text-white/72">
-                  Backend receives `rating` and optional `comment`. `rating` stays empty until a score is chosen, then submits as 1 to 5.
-                </p>
+            <div className="space-y-4 sm:space-y-5">
+              <div className="border-t border-dashed border-white/14 pt-1">
                 <RatingPicker
                   disabled={isSubmitting}
                   onChange={setRating}
@@ -650,7 +538,7 @@ export function FeedbackPage({
                 />
               </div>
 
-              <div className="border-t border-dashed border-white/14 pt-5">
+              <div className="border-t border-dashed border-white/14 pt-4">
                 <GuestTextArea
                   disabled={isSubmitting}
                   helper={`${comment.length}/${MAX_COMMENT_LENGTH} characters`}
@@ -659,26 +547,15 @@ export function FeedbackPage({
                   onChange={(event) => setComment(event.target.value)}
                   placeholder="Anything the team should review from this request?"
                   rows={5}
+                  controlClassName="border-[rgba(198,40,40,0.28)] bg-[rgba(198,40,40,0.08)] focus:border-[var(--vh-pink)] focus:bg-[rgba(198,40,40,0.12)] placeholder:text-white/35"
                   value={comment}
                 />
               </div>
-
-              {previewScenario ? (
-                <div className="border-t border-dashed border-white/14 pt-5">
-                  <p className="font-caption text-white/55">Mock API Payload</p>
-                  <p className="mt-2 text-xs leading-6 text-white/55">
-                    POST /public/feedback/:token
-                  </p>
-                  <pre className="mt-3 overflow-x-auto rounded-[16px] border border-white/10 bg-black/30 p-4 text-xs leading-6 text-white/78">
-                    {JSON.stringify(draftPayload, null, 2)}
-                  </pre>
-                </div>
-              ) : null}
             </div>
 
-            <div className="mt-auto pt-6">
+            <div className="mt-auto pt-4 sm:pt-5">
               <Button
-                className="vh-cta-button h-12 w-full text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                className="vh-cta-button h-11 w-full text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:h-12"
                 disabled={rating === 0}
                 loading={isSubmitting}
                 loadingText="Sending feedback"
@@ -697,12 +574,12 @@ export function FeedbackPage({
                 </p>
               ) : null}
 
-              <p className="mt-3 text-xs leading-6 text-[#94a3b8]">
+              <p className="mt-2.5 text-xs leading-5 text-[#94a3b8]">
                 This link accepts one response only.
               </p>
             </div>
           </form>
-        </StaggerItem>
+        </div>
       )}
     </FeedbackShell>
   );

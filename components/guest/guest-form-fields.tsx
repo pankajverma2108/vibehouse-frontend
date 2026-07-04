@@ -50,16 +50,21 @@ export function GuestTextArea({
   helper,
   error,
   className,
+  controlClassName,
   ...props
 }: ComponentProps<"textarea"> & {
   label: string;
   helper?: string;
   error?: string;
+  controlClassName?: string;
 }) {
   return (
     <FieldChrome className={className} error={error} helper={helper} label={label}>
       <textarea
-        className="min-h-32 w-full resize-y rounded-[8px] border-2 border-[#334155] bg-[#10131a] px-4 py-3 text-sm leading-6 text-white outline-none transition duration-300 placeholder:text-[#94a3b8]/55 focus:border-[var(--vh-pink)] focus:bg-[#16070c] focus:shadow-[0_0_0_3px_rgba(198,40,40,0.22)]"
+        className={cn(
+          "min-h-32 w-full resize-y rounded-[8px] border-2 border-[#334155] bg-[#10131a] px-4 py-3 text-sm leading-6 text-white outline-none transition duration-300 placeholder:text-[#94a3b8]/55 focus:border-[var(--vh-pink)] focus:bg-[#16070c] focus:shadow-[0_0_0_3px_rgba(198,40,40,0.22)]",
+          controlClassName,
+        )}
         {...props}
       />
     </FieldChrome>
