@@ -1,9 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import { footerLinks, siteMeta } from "@/content/site";
+import { isFeedbackRoute } from "@/lib/feedback-route";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  if (isFeedbackRoute(pathname)) {
+    return null;
+  }
+
   return (
     <footer className="bg-[#07070a] px-4 py-10 md:px-6">
       <div className="vh-container">

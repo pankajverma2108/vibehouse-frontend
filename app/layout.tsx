@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body className="vh-shell flex min-h-screen flex-col font-body">
+      <body suppressHydrationWarning className="vh-shell flex min-h-screen flex-col font-body">
         <GuestAuthProvider>
           <Suspense fallback={null}>
             <Navigation />

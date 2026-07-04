@@ -48,7 +48,7 @@ export function parseApiError(data: unknown, fallback: string): string {
   return fallback;
 }
 
-function getRequestContextHeaders(): Record<string, string> {
+export function getRequestContextHeaders(): Record<string, string> {
   if (typeof window === "undefined") {
     return {};
   }

@@ -19,6 +19,7 @@ import { hostelNavItems } from "@/content/nav-menu";
 import { siteMeta } from "@/content/site";
 import { navFontStyles } from "@/content/typography";
 import { getDefaultPropertyDestinationHref } from "@/lib/cx-api";
+import { isFeedbackRoute } from "@/lib/feedback-route";
 import { getActiveGuestHubBooking, getScopedGuestHubHref } from "@/lib/guest-hub";
 import { cn } from "@/lib/utils";
 
@@ -194,7 +195,7 @@ export function Navigation() {
     };
   }, [isDesktopMenuOpen]);
 
-  if (isGuestHubRoute(pathname)) {
+  if (isGuestHubRoute(pathname) || isFeedbackRoute(pathname)) {
     return null;
   }
 
