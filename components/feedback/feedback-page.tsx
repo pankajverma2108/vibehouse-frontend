@@ -15,20 +15,30 @@ import {
   type FeedbackLookupResponse,
   type FeedbackState,
 } from "@/lib/feedback-api";
+import {
+  getFeedbackPreviewConfig,
+  type FeedbackPreviewScenario,
+} from "@/lib/feedback-preview";
 import { cn } from "@/lib/utils";
 
 type FeedbackPageProps = {
   token: string;
+  previewScenario?: FeedbackPreviewScenario;
+};
+
+type FeedbackSubmitPreviewPayload = {
+  rating: number;
+  comment?: string;
 };
 
 const MAX_COMMENT_LENGTH = 2000;
-const RATING_LABELS: Record<number, string> = {
-  1: "Poor",
-  2: "Okay",
-  3: "Good",
-  4: "Very good",
-  5: "Excellent",
-};
+const RATING_OPTIONS = [
+  { value: 1, label: "Very poor", hint: "Needs immediate attention" },
+  { value: 2, label: "Poor", hint: "Below expectations" },
+  { value: 3, label: "Okay", hint: "Resolved, but average" },
+  { value: 4, label: "Good", hint: "Quick and reliable" },
+  { value: 5, label: "Excellent", hint: "Exactly what I needed" },
+] as const;
 
 function buildContextLine(feedback: FeedbackLookupResponse): string {
   const requestLabel = feedback.request?.trim();
@@ -51,7 +61,21 @@ function buildContextLine(feedback: FeedbackLookupResponse): string {
 
 function buildSupportLine(feedback: FeedbackLookupResponse): string {
   const staffName = feedback.staff_name?.trim() || "our team";
-  return `Completed by ${staffName}. This link works once.`;
+  return `Handled by ${staffName}.`;
+}
+
+function getRatingCopy(rating: number) {
+  return RATING_OPTIONS.find((option) => option.value === rating) ?? null;
+}
+
+function buildSubmitPayload(
+  rating: number,
+  trimmedComment: string,
+): FeedbackSubmitPreviewPayload {
+  return {
+    rating,
+    ...(trimmedComment ? { comment: trimmedComment } : {}),
+  };
 }
 
 function feedbackStateCopy(state: FeedbackState): {
@@ -64,25 +88,25 @@ function feedbackStateCopy(state: FeedbackState): {
       return {
         eyebrow: "Already Submitted",
         title: "You've already rated this request.",
-        body: "Thanks for sharing your feedback. This link is single-use, so there is nothing else to submit here.",
+        body: "This completed request already has a response attached to it.",
       };
     case "expired":
       return {
         eyebrow: "Link Expired",
         title: "This feedback link has expired.",
-        body: "The feedback window for this request has closed. If you still need help, reach out to the front desk team directly.",
+        body: "The response window for this request has closed.",
       };
     case "not_found":
       return {
         eyebrow: "Invalid Link",
         title: "This feedback link is invalid.",
-        body: "The token could not be verified. Please use the latest link sent to you on WhatsApp.",
+        body: "Please use the latest WhatsApp link for this ticket.",
       };
     default:
       return {
-        eyebrow: "Feedback",
-        title: "Rate the support you received.",
-        body: "A quick rating and optional note goes straight back to the ticket for the team to review.",
+        eyebrow: "Service Feedback",
+        title: "Rate the completed request.",
+        body: "Your response is written back to the ticket.",
       };
   }
 }
@@ -118,17 +142,13 @@ function FeedbackShell({
           <Stagger className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {children}
           </Stagger>
-
-          <footer className="mt-6 border-t border-dashed border-white/14 pt-4 text-center text-xs leading-6 text-white/48">
-            One-time feedback page for completed service requests.
-          </footer>
         </div>
       </div>
     </section>
   );
 }
 
-function BrandPanel({
+function ContextPanel({
   feedback,
   title,
   body,
@@ -137,32 +157,32 @@ function BrandPanel({
   title: string;
   body: string;
 }) {
+  const isValidFeedback = feedback?.state === "valid";
+  const displayTitle = isValidFeedback && feedback ? buildContextLine(feedback) : title;
+  const displayBody = isValidFeedback && feedback ? buildSupportLine(feedback) : body;
+
   return (
     <StaggerItem className="h-full">
       <div className="flex h-full flex-col rounded-[22px] border border-dashed border-[rgba(255,255,255,0.3)] bg-[#07070a] p-5 shadow-[0_20px_45px_rgba(0,0,0,0.24)] md:p-6">
-        <div className="space-y-3">
+        <div className="space-y-4">
           <p className="font-caption text-white/55">The Daily Social</p>
           <h1 className="font-sectiontitle text-[34px] leading-[1.05] text-white sm:text-[42px]">
-            {title}
+            {displayTitle}
           </h1>
           <p className="text-sm leading-7 text-white/72 sm:text-base">
-            {body}
+            {displayBody}
           </p>
-        </div>
 
-        <div className="mt-auto space-y-5 pt-8">
-          <div className="border-t border-dashed border-white/14 pt-5">
-            <p className="font-sectiontitle text-[18px] text-white">Private feedback link</p>
-            <p className="mt-2 text-sm leading-7 text-white/72">
-              No login is required. The link is the only credential and works one time.
-            </p>
-          </div>
-
-          {feedback ? (
+          {isValidFeedback && feedback ? (
             <div className="border-t border-dashed border-white/14 pt-5">
               <p className="font-caption text-white/55">Ticket Context</p>
-              <p className="mt-2 font-bodyfocus text-[15px] text-white">{buildContextLine(feedback)}</p>
-              <p className="mt-2 text-sm leading-7 text-white/72">{buildSupportLine(feedback)}</p>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-white/62">
+                {feedback.request?.trim() ? <span>{feedback.request.trim()}</span> : null}
+                {feedback.room_no?.trim() ? <span>Room {feedback.room_no.trim()}</span> : null}
+              </div>
+              <p className="mt-4 text-sm leading-7 text-white/72">
+                Choose a score on the right and leave a note only if something needs extra attention.
+              </p>
             </div>
           ) : null}
         </div>
@@ -185,10 +205,10 @@ function LoadingPanel() {
             Checking Link
           </p>
           <h2 className="font-sectiontitle mt-3 text-[22px] text-white">
-            Validating your feedback page.
+            Validating this feedback request.
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/72">
-            This takes a moment while we verify the ticket and token state.
+            We are confirming the ticket context and token state.
           </p>
           <span className="vh-button-spinner mt-6 h-6 w-6 text-[#f9cb37]" />
         </div>
@@ -210,7 +230,7 @@ function RetryPanel({
         <div className="my-auto">
           <p className="font-caption text-white/55">Service Unavailable</p>
           <h2 className="font-sectiontitle mt-3 text-[22px] text-white">
-            We couldn't load this feedback link right now.
+            We couldn't load this feedback request.
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/72">
             {message}
@@ -280,9 +300,11 @@ function TerminalPanel({
 }
 
 function SuccessPanel({
+  previewPayload,
   rating,
   comment,
 }: {
+  previewPayload?: FeedbackSubmitPreviewPayload | null;
   rating: number;
   comment: string;
 }) {
@@ -292,10 +314,10 @@ function SuccessPanel({
         <div className="my-auto">
           <p className="font-caption text-white/55">Feedback Submitted</p>
           <h2 className="font-sectiontitle mt-3 text-[22px] text-white">
-            Thanks for the quick rating.
+            Your feedback has been sent.
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/72 sm:text-base">
-            Your rating has been attached to the support ticket so the team can review it directly.
+            The completed ticket now includes your rating for the team to review.
           </p>
 
           <div
@@ -315,7 +337,7 @@ function SuccessPanel({
               );
             })}
             <span className="ml-1 text-sm font-semibold text-white">
-              {RATING_LABELS[rating]}
+              {getRatingCopy(rating)?.label ?? `${rating}/5`}
             </span>
           </div>
 
@@ -328,6 +350,18 @@ function SuccessPanel({
               <p className="mt-2 text-sm leading-7 text-white/72">
                 {comment}
               </p>
+            </div>
+          ) : null}
+
+          {previewPayload ? (
+            <div className="mt-6 border-t border-dashed border-white/14 pt-5">
+              <p className="font-caption text-white/55">Mock API Payload</p>
+              <p className="mt-2 text-xs leading-6 text-white/55">
+                POST /public/feedback/:token
+              </p>
+              <pre className="mt-3 overflow-x-auto rounded-[16px] border border-white/10 bg-black/30 p-4 text-xs leading-6 text-white/78">
+                {JSON.stringify(previewPayload, null, 2)}
+              </pre>
             </div>
           ) : null}
         </div>
@@ -350,9 +384,9 @@ function RatingPicker({
       <legend className="text-[11px] font-black uppercase tracking-[0.12em] text-[#94a3b8]">
         Rating
       </legend>
-      <div className="grid grid-cols-5 gap-2 sm:flex sm:gap-3">
-        {Array.from({ length: 5 }).map((_, index) => {
-          const value = index + 1;
+      <div className="grid grid-cols-1 gap-2">
+        {RATING_OPTIONS.map((option) => {
+          const value = option.value;
           const active = rating >= value;
 
           return (
@@ -372,22 +406,28 @@ function RatingPicker({
               />
               <span
                 className={cn(
-                  "flex h-14 w-full min-w-[54px] flex-col items-center justify-center rounded-[16px] border text-center transition",
+                  "flex min-h-[64px] w-full items-center justify-between gap-4 rounded-[16px] border px-4 py-3 text-left transition",
                   active
                     ? "border-[var(--vh-pink)] bg-[rgba(198,40,40,0.16)] text-white shadow-[0_0_0_1px_rgba(198,40,40,0.25)]"
                     : "border-white/10 bg-white/[0.03] text-white/68 hover:border-white/25 hover:bg-white/[0.05]",
                   disabled && "cursor-not-allowed opacity-70",
                 )}
               >
-                <Star
-                  className={cn(
-                    "h-5 w-5",
-                    active ? "fill-current text-[#f9cb37]" : "text-white/34",
-                  )}
-                />
-                <span className="mt-1 text-[11px] font-bold">
-                  {value}
+                <span className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/20">
+                    <Star
+                      className={cn(
+                        "h-5 w-5",
+                        active ? "fill-current text-[#f9cb37]" : "text-white/34",
+                      )}
+                    />
+                  </span>
+                  <span className="space-y-1">
+                    <span className="block text-sm font-semibold text-white">{option.label}</span>
+                    <span className="block text-xs leading-5 text-white/60">{option.hint}</span>
+                  </span>
                 </span>
+                <span className="text-sm font-black text-white/78">{value}</span>
               </span>
             </label>
           );
@@ -395,14 +435,17 @@ function RatingPicker({
       </div>
       <p className="text-xs leading-6 text-[#94a3b8]">
         {rating > 0
-          ? `${RATING_LABELS[rating]} support experience`
+          ? `${getRatingCopy(rating)?.label ?? "Selected"} selected`
           : "Choose 1 to 5 stars."}
       </p>
     </fieldset>
   );
 }
 
-export function FeedbackPage({ token }: FeedbackPageProps) {
+export function FeedbackPage({
+  token,
+  previewScenario,
+}: FeedbackPageProps) {
   const [feedback, setFeedback] = useState<FeedbackLookupResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -412,8 +455,14 @@ export function FeedbackPage({ token }: FeedbackPageProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [didSubmit, setDidSubmit] = useState(false);
+  const [previewSubmittedPayload, setPreviewSubmittedPayload] =
+    useState<FeedbackSubmitPreviewPayload | null>(null);
 
   const trimmedComment = useMemo(() => comment.trim(), [comment]);
+  const draftPayload = useMemo(
+    () => buildSubmitPayload(Math.max(rating, 1), trimmedComment),
+    [rating, trimmedComment],
+  );
   const contextTitle = useMemo(
     () => feedbackStateCopy(feedback?.state ?? "valid").title,
     [feedback?.state],
@@ -427,10 +476,29 @@ export function FeedbackPage({ token }: FeedbackPageProps) {
     let cancelled = false;
 
     async function loadFeedback() {
+      if (previewScenario) {
+        const preview = getFeedbackPreviewConfig(previewScenario);
+
+        setFeedback(preview.feedback);
+        setRating(preview.rating ?? 0);
+        setComment(preview.comment ?? "");
+        setLoadError(preview.loadError ?? null);
+        setSubmitError(null);
+        setDidSubmit(Boolean(preview.didSubmit));
+        setPreviewSubmittedPayload(
+          preview.didSubmit && preview.rating
+            ? buildSubmitPayload(preview.rating, (preview.comment ?? "").trim())
+            : null,
+        );
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(true);
       setLoadError(null);
       setSubmitError(null);
       setDidSubmit(false);
+      setPreviewSubmittedPayload(null);
 
       const result = await getPublicFeedback(token);
 
@@ -460,13 +528,26 @@ export function FeedbackPage({ token }: FeedbackPageProps) {
     return () => {
       cancelled = true;
     };
-  }, [token, reloadKey]);
+  }, [previewScenario, token, reloadKey]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (rating < 1 || rating > 5) {
       setSubmitError("Choose a rating before submitting.");
+      return;
+    }
+
+    if (previewScenario) {
+      setSubmitError(null);
+      setIsSubmitting(true);
+      setPreviewSubmittedPayload(buildSubmitPayload(rating, trimmedComment));
+
+      window.setTimeout(() => {
+        setIsSubmitting(false);
+        setDidSubmit(true);
+      }, 250);
+
       return;
     }
 
@@ -501,7 +582,7 @@ export function FeedbackPage({ token }: FeedbackPageProps) {
 
   return (
     <FeedbackShell>
-      <BrandPanel
+      <ContextPanel
         body={contextBody}
         feedback={feedback}
         title={contextTitle}
@@ -516,11 +597,16 @@ export function FeedbackPage({ token }: FeedbackPageProps) {
             setIsLoading(true);
             setLoadError(null);
             setFeedback(null);
+            setPreviewSubmittedPayload(null);
             setReloadKey((current) => current + 1);
           }}
         />
       ) : didSubmit ? (
-        <SuccessPanel comment={trimmedComment} rating={rating} />
+        <SuccessPanel
+          comment={trimmedComment}
+          previewPayload={previewSubmittedPayload}
+          rating={rating}
+        />
       ) : feedback && feedback.state !== "valid" ? (
         <TerminalPanel feedback={feedback} state={feedback.state} />
       ) : (
@@ -531,23 +617,32 @@ export function FeedbackPage({ token }: FeedbackPageProps) {
           >
             <div className="space-y-6">
               <div className="space-y-3">
-                <p className="font-caption text-white/55">One-Time Rating</p>
+                <p className="font-caption text-white/55">Submit Rating</p>
                 <h2 className="font-sectiontitle text-[22px] text-white">
-                  Tell us how we handled it.
+                  Choose the score that fits.
                 </h2>
                 <p className="text-sm leading-7 text-white/72 sm:text-base">
-                  Keep it short if you want. The star rating is required, and the note is optional.
+                  Select one rating and add a note only if you want the team to review more detail.
                 </p>
               </div>
 
               <div className="border-t border-dashed border-white/14 pt-5">
-                <p className="font-caption text-white/55">Request</p>
+                <p className="font-caption text-white/55">Completed Request</p>
                 <p className="mt-2 font-bodyfocus text-[15px] text-white">
                   {feedback ? buildContextLine(feedback) : "How was your support experience?"}
                 </p>
+                {feedback ? (
+                  <p className="mt-2 text-sm leading-7 text-white/72">
+                    {buildSupportLine(feedback)}
+                  </p>
+                ) : null}
               </div>
 
               <div className="border-t border-dashed border-white/14 pt-5">
+                <p className="font-caption text-white/55">Request Body</p>
+                <p className="mt-2 text-sm leading-7 text-white/72">
+                  Backend receives `rating` and optional `comment`. `rating` stays empty until a score is chosen, then submits as 1 to 5.
+                </p>
                 <RatingPicker
                   disabled={isSubmitting}
                   onChange={setRating}
@@ -562,11 +657,23 @@ export function FeedbackPage({ token }: FeedbackPageProps) {
                   label="Optional note"
                   maxLength={MAX_COMMENT_LENGTH}
                   onChange={(event) => setComment(event.target.value)}
-                  placeholder="Quick and polite. Solved fast. Anything the team should know."
+                  placeholder="Anything the team should review from this request?"
                   rows={5}
                   value={comment}
                 />
               </div>
+
+              {previewScenario ? (
+                <div className="border-t border-dashed border-white/14 pt-5">
+                  <p className="font-caption text-white/55">Mock API Payload</p>
+                  <p className="mt-2 text-xs leading-6 text-white/55">
+                    POST /public/feedback/:token
+                  </p>
+                  <pre className="mt-3 overflow-x-auto rounded-[16px] border border-white/10 bg-black/30 p-4 text-xs leading-6 text-white/78">
+                    {JSON.stringify(draftPayload, null, 2)}
+                  </pre>
+                </div>
+              ) : null}
             </div>
 
             <div className="mt-auto pt-6">
@@ -574,10 +681,10 @@ export function FeedbackPage({ token }: FeedbackPageProps) {
                 className="vh-cta-button h-12 w-full text-sm disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={rating === 0}
                 loading={isSubmitting}
-                loadingText="Submitting feedback"
+                loadingText="Sending feedback"
                 type="submit"
               >
-                Submit Feedback
+                Send Feedback
               </Button>
 
               {submitError ? (
@@ -591,7 +698,7 @@ export function FeedbackPage({ token }: FeedbackPageProps) {
               ) : null}
 
               <p className="mt-3 text-xs leading-6 text-[#94a3b8]">
-                Once this is submitted, the link can't be reused.
+                This link accepts one response only.
               </p>
             </div>
           </form>
