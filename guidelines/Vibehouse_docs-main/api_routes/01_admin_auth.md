@@ -10,7 +10,7 @@
 
 **POST** `/admin/auth/login`
 
-Validates credentials AND role in one step. If the selected role does not match the user's assigned role, the request is rejected before the password is even checked.
+Validates credentials, role, and the chosen property in one step. The selected `property_id` is the **active property** for the session — every property-scoped admin call uses it. The admin must be authorised on that property (via the `admin_user_properties` join table); otherwise login fails with 403.
 
 ### Request
 
@@ -19,13 +19,15 @@ Validates credentials AND role in one step. If the selected role does not match 
 | `email` | string | ✅ | Admin's email address |
 | `password` | string | ✅ | Admin's password |
 | `role` | string | ✅ | Must match assigned role exactly: `OWNER` \| `MANAGER` \| `RECEPTION` \| `HOUSEKEEPING_LEAD` \| `MAINTENANCE_LEAD` |
+| `property_id` | string | ✅ | Numeric eZee hotel code (`60765` for TDS Koramangala, `55402` for Buteak BTM). Must be in the admin's authorised property set. |
 
 #### Body (JSON)
 ```json
 {
   "email": "manager@vibehouse.in",
   "password": "Vibe@2026!",
-  "role": "MANAGER"
+  "role": "MANAGER",
+  "property_id": "60765"
 }
 ```
 
@@ -39,23 +41,24 @@ Validates credentials AND role in one step. If the selected role does not match 
     "email": "manager@vibehouse.in",
     "role": "MANAGER",
     "display_name": "Property Manager",
-    "property_id": "60765",
+    "property_ids": ["60765"],
+    "active_property_id": "60765",
     "permissions": [
       "dashboard.view",
-      "dashboard.analytics",
       "inventory.view",
       "inventory.edit",
-      "sla.config",
-      "staff.manage",
-      "orders.view",
-      "orders.refund",
-      "devices.view",
-      "devices.manage",
+      "bookings.view",
+      "events.view",
+      "events.edit",
+      "kyc.view",
+      "kyc.delete",
       "admin.manage"
     ]
   }
 }
 ```
+
+The JWT payload carries both `property_id` (the active property for this session) and `property_ids` (the full set of authorised properties). The admin layer always scopes by `property_id`; switch via `POST /admin/auth/switch-property`.
 
 ### Error Responses
 
@@ -63,7 +66,37 @@ Validates credentials AND role in one step. If the selected role does not match 
 |---|---|---|
 | `400` | Missing/invalid fields | `{ "message": ["email must be an email"], "error": "Bad Request", "statusCode": 400 }` |
 | `401` | Wrong password or user not found | `{ "message": "Invalid credentials", "statusCode": 401 }` |
-| `403` | Role mismatch (e.g. manager selects OWNER) | `{ "message": "You are not authorised for this role", "statusCode": 403 }` |
+| `403` | Role mismatch | `{ "message": "You are not authorised for this role", "statusCode": 403 }` |
+| `403` | Picked a property the admin is not authorised on | `{ "message": "You are not authorised for this property", "statusCode": 403 }` |
+| `403` | Account has zero properties assigned | `{ "message": "Your account has no properties assigned. Ask an owner to grant access.", "statusCode": 403 }` |
+
+---
+
+## 1b. Switch Active Property
+
+**POST** `/admin/auth/switch-property`
+
+Issues a new JWT whose active `property_id` is set to the requested property. Used by owner-level admins (and any admin with multiple assigned properties) to flip focus without logging out and back in. The requested `property_id` must be present in the JWT's `property_ids` set.
+
+### Request — body
+```json
+{ "property_id": "55402" }
+```
+
+### Response — 200 OK
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "active_property_id": "55402"
+}
+```
+
+### Error Responses
+
+| Status | Scenario |
+|---|---|
+| `401` | Missing/expired token |
+| `403` | Requested property not in `property_ids` |
 
 ### Postman Setup
 - Method: `POST`
@@ -97,7 +130,8 @@ Authorization: Bearer <access_token>
   "phone": "+919876543211",
   "role": "MANAGER",
   "display_name": "Property Manager",
-  "property_id": "60765",
+  "property_ids": ["60765"],
+  "active_property_id": "60765",
   "permissions": ["dashboard.view", "inventory.view", "..."],
   "two_fa_enabled": false,
   "last_login_at": "2026-03-11T10:30:00.000Z",
@@ -140,7 +174,7 @@ Authorization: Bearer <owner_access_token>
   "phone": "+919876543220",
   "password": "SecurePass@123",
   "role_id": "role-reception",
-  "property_id": "60765"
+  "property_ids": ["60765"]
 }
 ```
 
@@ -151,7 +185,7 @@ Authorization: Bearer <owner_access_token>
 | `phone` | string | ❌ | With country code |
 | `password` | string | ✅ | Min 8 characters |
 | `role_id` | string | ✅ | UUID from `admin_roles` table (see route 5) |
-| `property_id` | string | ❌ | Omit for super-admin (sees all properties) |
+| `property_ids` | string[] | ✅ | One or more numeric eZee hotel codes the account is authorised on. Owners can pass all properties; managers/staff are typically scoped to one. |
 
 ### Response — 201 Created
 ```json
@@ -162,11 +196,35 @@ Authorization: Bearer <owner_access_token>
   "phone": "+919876543220",
   "role": "RECEPTION",
   "display_name": "Front Desk / Receptionist",
-  "property_id": "60765",
+  "property_ids": ["60765"],
   "is_active": true,
   "created_at": "2026-03-11T11:00:00.000Z"
 }
 ```
+
+---
+
+## 4b. Replace Admin's Property Assignments
+
+**PATCH** `/admin/users/:id/properties`
+
+Replaces the set of properties an admin can access. Old assignments are dropped and the new set is written in a single transaction. Requires `admin.manage`. The caller can only assign properties they themselves have access to (unless they are OWNER).
+
+#### Body (JSON)
+```json
+{ "property_ids": ["60765", "55402"] }
+```
+
+### Response — 200 OK
+The updated admin profile, including the new `property_ids`.
+
+### Error Responses
+
+| Status | Scenario |
+|---|---|
+| `400` | Empty array, or unknown property IDs |
+| `403` | Caller is trying to grant access to a property they don't have |
+| `404` | Admin not found |
 
 ### Error Responses
 
@@ -206,7 +264,7 @@ No query parameters. No body.
     "phone": "+919876543211",
     "role": "MANAGER",
     "display_name": "Property Manager",
-    "property_id": "60765",
+    "property_ids": ["60765"],
     "is_active": true,
     "last_login_at": "2026-03-11T10:30:00.000Z",
     "created_at": "2026-03-01T09:00:00.000Z"

@@ -4,12 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { footerLinks, siteMeta } from "@/content/site";
-import { isFeedbackRoute } from "@/lib/feedback-route";
+import { isStandalonePublicRoute } from "@/lib/feedback-route";
 
 export function Footer() {
   const pathname = usePathname();
 
-  if (isFeedbackRoute(pathname)) {
+  if (isStandalonePublicRoute(pathname)) {
     return null;
   }
 

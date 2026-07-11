@@ -1,14 +1,16 @@
 # 08 — Admin Bookings API
 
-**Base URL**: `http://localhost:8080`
-**Auth**: Admin JWT (`Authorization: Bearer <token>`)
+**Base URL (prod)**: `https://api.thedailysocial.co.in`  
+**Base URL (dev)**: `http://localhost:8080`  
+**Auth**: Admin JWT (`Authorization: Bearer <token>`)  
 **Permission**: `bookings.view`
 
 > **Design note**: eZee is the single source of truth for all bookings.
 > Our `ezee_booking_cache` is read-only from the admin side — state changes
 > (cancellations, check-ins, check-outs, room assignments) happen in eZee
-> and are reconciled back to our DB every 15 minutes on startup.
+> and are reconciled back to our DB every 15 minutes via `EzeeReconciliationService`.
 > There is no create/cancel endpoint here.
+> Use `POST /admin/bookings/trigger-reconcile` to force an immediate sync instead of waiting.
 
 ---
 
@@ -167,6 +169,57 @@ Full booking detail including all guests (PRIMARY + SECONDARY), KYC slot status 
 
 ---
 
+## 3. Flush Room Cache
+
+**DELETE** `/admin/bookings/cache/rooms?property_id=<id>`
+
+Invalidates the room catalog Redis cache for a property. Use after adding room types or after eZee room config changes so the next guest catalog request fetches fresh data.
+
+**Permission**: `bookings.view`
+
+**Response (200)**:
+```json
+{ "cleared": true, "message": "Room cache cleared for property 60765" }
+```
+
+---
+
+## 4. Trigger Reconciliation
+
+**POST** `/admin/bookings/trigger-reconcile`
+
+Immediately runs the full eZee reconciliation pass — detects status drift (check-in, check-out, cancellation, room number changes) and provisions MyGate lock PINs for newly checked-in guests.
+
+**Auth**: Admin JWT (`bookings.view`)
+
+**No request body required.**
+
+**Response (200)**:
+```json
+{ "ok": true, "message": "Reconciliation complete" }
+```
+
+**When to use**:
+- After marking a booking as "Checked In" in eZee, to immediately provision the room PIN without waiting 15 minutes.
+- After bulk-updating bookings in eZee (status changes, room assignments).
+- During development / testing.
+
+**What it runs** (in order):
+1. Unsynced new bookings → queues `InsertBooking` to eZee
+2. State drift (Cancelled / Checked In / Checked Out in eZee) → updates our DB; on check-in, provisions MyGate PIN + sends guest email
+3. External bookings (OTA / walk-in) → ingests new eZee reservations into cache, matches existing TDS guests
+
+**Errors**:
+
+| Status | Scenario |
+|--------|----------|
+| 401 | Missing or invalid JWT |
+| 403 | Insufficient permissions |
+
+> This endpoint is synchronous — it awaits the full reconciliation pass before returning. Expect 5–30s response time depending on the number of active bookings.
+
+---
+
 ## Booking Lifecycle (read-only from admin side)
 
 All state transitions happen in eZee. The reconciliation service syncs them back:
@@ -174,10 +227,10 @@ All state transitions happen in eZee. The reconciliation service syncs them back
 | eZee Action | Our DB (after reconciliation) | Delay |
 |-------------|-------------------------------|-------|
 | Guest books via app | `CONFIRMED`, `is_active=true` | Immediate (SQS worker) |
-| Staff cancels in eZee | `CANCELLED`, `is_active=false` | ≤ 15 min |
-| Staff checks in guest | `CHECKED_IN` | ≤ 15 min |
-| Staff checks out guest | `CHECKED_OUT`, `is_active=false` | ≤ 15 min |
-| Staff marks no-show | `NO_SHOW`, `is_active=false` | ≤ 15 min |
-| Staff assigns/changes room | `room_number` updated | ≤ 15 min |
+| Staff cancels in eZee | `CANCELLED`, `is_active=false` | ≤ 15 min (or instant via trigger-reconcile) |
+| Staff checks in guest | `CHECKED_IN` + MyGate PIN provisioned + email sent | ≤ 15 min (or instant via trigger-reconcile) |
+| Staff checks out guest | `CHECKED_OUT`, `is_active=false` | ≤ 15 min (or instant via trigger-reconcile) |
+| Staff marks no-show | `NO_SHOW`, `is_active=false` | ≤ 15 min (or instant via trigger-reconcile) |
+| Staff assigns/changes room | `room_number` updated | ≤ 15 min (or instant via trigger-reconcile) |
 
-Reconciliation runs on app startup and every 15 minutes via `setInterval` in `EzeeReconciliationService`.
+Reconciliation runs on app startup and every 15 minutes. Trigger manually via `POST /admin/bookings/trigger-reconcile`.

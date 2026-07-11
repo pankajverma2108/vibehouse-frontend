@@ -1,7 +1,35 @@
 # Payment API Routes (Razorpay Integration)
 
 > **Module**: `PaymentModule` (`src/payment/`)
-> **Base URL**: `http://localhost:8080`
+> **Base URL (prod)**: `https://api.thedailysocial.co.in`
+> **Base URL (dev)**: `http://localhost:8080`
+
+> [!IMPORTANT]
+> **Payment-logging enrichment (2026-05-20):** Every Razorpay order now carries `property_id`, `property_name`, `purpose`, `purpose_label`, and `guest_email` in its `notes` field. The `payments` table also has a denormalized `property_id` column (backfilled) so ops queries like "all Buteak captured payments this week" don't need a JOIN. See [the multi-property overview](13_multi_property.md) for property IDs.
+
+> [!IMPORTANT]
+> **eZee folio visibility:** Backend-originated bookings are sent to eZee with `Booking_Payment_Mode = "Online-Razorpay"` and `Room_N.SpecialRequest = "VHM Online | RP: pay_xxx | Booking — {room}, N nights"` so staff can identify them in the eZee folio.
+
+---
+
+## Razorpay `notes` shape (used by all 3 order-creation endpoints)
+
+All Razorpay orders this backend creates set the following `notes`:
+
+| Key | Type | Example |
+|---|---|---|
+| `property_id` | string | `"55402"` |
+| `property_name` | string | `"Buteak Suites"` |
+| `purpose` | string | `"booking"` / `"addon_upsell"` / `"colive"` |
+| `purpose_label` | string | `"Booking — Apartment 1 × 1, 2 nights"` |
+| `ezee_reservation_id` | string | `"55402-LCL-MPDPIIW7-A8E2"` (omitted for colive) |
+| `guest_id` | string | UUID |
+| `guest_email` | string | for at-a-glance identification in Razorpay dashboard |
+| `addon_order_id` | string | (booking + addon flows only) |
+| `draft_booking_id` | string | (colive only) |
+| `booking_reference` | string | (colive only) |
+
+**Dashboard filtering:** In Razorpay dashboard → Payments, you can search by note key/value (e.g., `property_id:55402`) to list only Buteak payments.
 
 ---
 
@@ -329,14 +357,57 @@ Authorization: Bearer <token>
 
 ---
 
+## `payments` Table Schema (relevant columns)
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | VarChar(36) | UUID PK |
+| `ezee_reservation_id` | VarChar(100) | FK to `ezee_booking_cache` |
+| `guest_id` | VarChar(36) | FK to `guests` |
+| `property_id` | VarChar(36) **NULLABLE** | **Denormalized from `ezee_booking_cache`** for fast ops queries. Backfilled by migration `20260520000001_payments_add_property_id`. Set at order-creation time for new payments. |
+| `razorpay_order_id` | VarChar(100) UNIQUE | |
+| `razorpay_payment_id` | VarChar(100) UNIQUE | Set on capture |
+| `amount` | Decimal(10,2) | INR |
+| `purpose` | VarChar(30) | `"booking"` / `"addon_upsell"` (colive payments live on `colive_draft_bookings.razorpay_order_id` instead) |
+| `status` | VarChar(20) | `CREATED` → `CAPTURED` / `FAILED` |
+| `created_at`, `updated_at` | Timestamp(6) | |
+
+**Index for ops:** `idx_payments_property_status_created` on `(property_id, status, created_at DESC)` supports queries like:
+```sql
+SELECT * FROM payments
+WHERE property_id = '55402' AND status = 'CAPTURED'
+  AND created_at > now() - interval '30 days'
+ORDER BY created_at DESC;
+```
+
+---
+
+## eZee Folio Tags (post-payment, async)
+
+When `fulfilOrder` runs after a successful capture, the SQS message to `vibehouse-ezee-sync.fifo` includes:
+- `razorpay_payment_id` — e.g. `pay_OPaQp1jGGv2bxk`
+- `property_name` — e.g. `"Buteak Suites"`
+- `purpose_label` — e.g. `"Booking — Apartment 1, 2 nights"`
+
+The eZee sync worker (`src/sqs/workers/ezee-sync.worker.ts`) uses these to populate eZee's optional fields on `InsertBooking`:
+
+| eZee field | Value |
+|---|---|
+| `Room_N.SpecialRequest` | `"VHM Online | RP: pay_OPaQp1jGGv2bxk | Booking — Apartment 1, 2 nights"` (≤250 chars, applied to every room) |
+| `Booking_Payment_Mode` | `"Online-Razorpay"` (booking-level, hardcoded for backend-originated bookings) |
+
+These fields surface in the eZee booking detail screen and folio (subject to operator verification on first deployment). OTA / walk-in bookings ingested by the reconciliation worker do NOT get these tags — they retain whatever eZee originally recorded.
+
+---
+
 ## Environment Variables
 
 | Key | Purpose |
 |---|---|
 | `RAZORPAY_TEST_API_KEY` | Razorpay Key ID (starts with `rzp_test_`) |
 | `RAZORPAY_TEST_API_SECRET` | Razorpay Key Secret |
-| `RAZORPAY_WEBHOOK_URL` | Webhook endpoint URL (for Razorpay dashboard config) |
-| `RAZORPAY_WEBHOOK_SECRET` | Shared secret for webhook signature verification |
+| `RAZORPAY_WEBHOOK_URL` | Webhook endpoint URL (for Razorpay dashboard config) — current: `https://api.thedailysocial.co.in/webhook/razorpay` |
+| `RAZORPAY_WEBHOOK_SECRET` | Shared secret for webhook signature verification — **must match the secret configured in Razorpay dashboard** (Test Mode → Settings → Webhooks). Stored as SecureString in SSM at `/tds/prod/RAZORPAY_WEBHOOK_SECRET`. |
 
 ---
 

@@ -1,9 +1,10 @@
 # Colive (Long-Stay) API Routes
 
-> Base URL: `http://localhost:8080` (dev) | Production TDS API URL
+> **Base URL (prod)**: `https://api.thedailysocial.co.in`  
+> **Base URL (dev)**: `http://localhost:8080`  
 >
-> All colive routes are under the `/guest/colive` prefix.
-> Payment routes for colive are under the existing `/payment` prefix.
+> All colive routes are under the `/guest/colive` prefix.  
+> Payment routes are under the existing `/payment` prefix.
 
 ---
 
@@ -14,17 +15,57 @@ The **Colive module** handles monthly long-stay bookings — a flow entirely sep
 ### Booking Reference Format
 `TDS-CL-YYYYMM-XXXX` — e.g. `TDS-CL-202605-A3F7`
 
-### Pricing Logic
-- Nightly rate fetched live from **eZee RoomList API**
-- `monthly_price = rate_per_night × 30`
-- `total = monthly_price × duration_months`
-- **GST: 5%** applied on room + addons (SGST 2.5% + CGST 2.5%)
+---
+
+## Pricing Formula
+
+Colive uses a **hybrid monthly + daily** formula, not a simple nightly multiplication.
+
+```
+months        = floor(duration_days / 30)
+remaining     = duration_days % 30
+
+room_total    = months × colive_price_month
+              + remaining × eZee_rate_per_night
+```
+
+**Examples** (using 4 Bed Dorm: `colive_price_month = ₹14,999`, eZee `ratePerNight = ₹999`):
+
+| duration_days | Months | Extra Days | Room Total (pre-GST) |
+|---|---|---|---|
+| 30 | 1 | 0 | 1 × ₹14,999 = **₹14,999** |
+| 45 | 1 | 15 | ₹14,999 + 15 × ₹999 = **₹29,984** |
+| 60 | 2 | 0 | 2 × ₹14,999 = **₹29,998** |
+| 90 | 3 | 0 | 3 × ₹14,999 = **₹44,997** |
+
+**Key rules:**
+- `colive_price_month` is set per room type in the `room_types` DB table (managed via admin endpoint)
+- If `colive_price_month` is null → `400 Bad Request "Colive pricing not configured for this room type"`
+- `eZee_rate_per_night` is fetched live from eZee for the stay window; falls back to `base_price_per_night` from DB
+- `per_month` add-ons multiply by `months` (whole months only, not extra days)
+- `one_time` add-ons are flat regardless of duration
+
+### Configured Room Prices (Koramangala A)
+
+| Room Type | colive_price_month (pre-GST) | MRP (eZee × 30) | Saving/month |
+|---|---|---|---|
+| 4 Bed Dormitory | ₹14,999 | ₹29,970 | ₹14,971 |
+| 6 Bed Dormitory | ₹12,999 | ₹26,970 | ₹13,971 |
+| Deluxe Room | ₹55,999 | ₹80,970 | ₹24,971 |
+
+MRP = eZee nightly rate × 30 (what the guest would pay at short-stay rates).
+
+### GST
+- Rate: **5%** (SGST 2.5% + CGST 2.5%) applied on `room_total + addon_subtotal`
 - No security deposit
 
 ### Quote TTL
 Quotes expire after **30 minutes**. Frontend must create a draft booking before expiry.
 
-### Auth Flow
+---
+
+## Auth Flow
+
 | Endpoint | Auth Required |
 |---|---|
 | `POST /guest/colive/search` | ❌ Public |
@@ -41,6 +82,8 @@ Quotes expire after **30 minutes**. Frontend must create a draft booking before 
 ## 1. POST `/guest/colive/search`
 
 Search available co-living properties by city, move-in date, duration, and stay type. Returns property cards with live pricing fetched from eZee.
+
+> **Note**: The search UI uses `duration_months` for the browsing slider (UX stays in months). The quote/draft-booking step uses `duration_days` for exact pricing.
 
 **Auth**: Not required
 
@@ -62,7 +105,7 @@ Search available co-living properties by city, move-in date, duration, and stay 
 |---|---|---|---|
 | `location_slug` | string | Yes | e.g. `bangalore`, `mumbai` |
 | `move_in_date` | YYYY-MM-DD | Yes | Desired move-in date |
-| `duration_months` | integer | Yes | Min: 1, Max: 12 |
+| `duration_months` | integer | Yes | Min: 1, Max: 12 — for search/display only |
 | `stay_type` | enum | No | `solo`, `couple`, `remote` — filters room options |
 | `location_id` | string | No | UUID of the location |
 | `guest_count` | integer | No | Default: 1 |
@@ -89,8 +132,8 @@ Search available co-living properties by city, move-in date, duration, and stay 
       "city_label": "Bangalore",
       "microcopy": "Your Bangalore base camp",
       "hero_image_url": "https://assets.thedailysocial.in/colive/ka-hero.jpg",
-      "price_from_monthly": 20970,
-      "strike_price_from_monthly": 24990,
+      "price_from_monthly": 14999,
+      "strike_price_from_monthly": 29970,
       "rating": 4.9,
       "rating_label": "Exceptional",
       "primary_tag": "Startup Hub",
@@ -105,8 +148,10 @@ Search available co-living properties by city, move-in date, duration, and stay 
 ```
 
 **Notes**:
-- Search session is **persisted** to `colive_search_sessions` for analytics (fire-and-forget, non-blocking)
-- eZee pricing is **cached in Redis for 30 minutes** per `property × checkin × checkout`
+- `price_from_monthly` = lowest `colive_price_month` across active room options (or `ratePerNight × 30` if not configured)
+- `strike_price_from_monthly` = `ratePerNight × 30` (short-stay MRP) — only present when it's higher than `price_from_monthly`
+- Search session persisted to `colive_search_sessions` for analytics (fire-and-forget)
+- eZee pricing cached in Redis for 30 minutes per `property × checkin × checkout`
 - `stay_type: "couple"` filters out rooms where `max_guests < 2`
 - `inventory_state`: `available` | `limited` (≤2 units) | `sold_out`
 
@@ -152,26 +197,26 @@ GET /guest/colive/properties/60765?move_in_date=2026-05-01&duration_months=3&sta
   ],
   "room_options": [
     {
-      "room_type_id": "rt-ka-queen",
-      "slug": "private-room",
-      "name": "Private Room",
-      "description": "...",
-      "monthly_price": 74970,
-      "strike_monthly_price": 89970,
-      "available_units": 8,
-      "inventory_message": null,
-      "feature_points": ["Queen-size bed", "En-suite bathroom", "Work desk + chair"],
-      "max_guests": 2,
-      "recommended_for": ["couple", "remote"],
-      "thumbnail_url": "..."
-    },
-    {
       "room_type_id": "rt-ka-4dorm",
       "slug": "4-bed-dorm",
       "name": "4-Bed Mixed Dorm",
-      "monthly_price": 20970,
+      "description": "...",
+      "monthly_price": 14999,
+      "strike_monthly_price": 29970,
       "available_units": 24,
-      "feature_points": ["Privacy curtain", "Personal locker", "Reading light"]
+      "inventory_message": null,
+      "feature_points": ["Privacy curtain", "Personal locker", "Reading light"],
+      "max_guests": 1,
+      "recommended_for": ["solo"],
+      "thumbnail_url": "..."
+    },
+    {
+      "room_type_id": "rt-ka-deluxe",
+      "slug": "deluxe-room",
+      "name": "Deluxe Room",
+      "monthly_price": 55999,
+      "strike_monthly_price": 80970,
+      "available_units": 4
     }
   ],
   "stories": [
@@ -196,15 +241,14 @@ GET /guest/colive/properties/60765?move_in_date=2026-05-01&duration_months=3&sta
 ```
 
 **Notes**:
-- `monthly_price = eZee_rate_per_night × 30` (live from eZee)
-- `strike_monthly_price = db_base_price_per_night × 30` (from room_types table)
-- Room options filtered by `stay_type` (couples only see rooms with `max_guests ≥ 2`)
+- `monthly_price` = `colive_price_month` from DB (or `ratePerNight × 30` as fallback for unconfigured rooms)
+- `strike_monthly_price` = `ratePerNight × 30` — shown only when higher than `monthly_price`
 
 ---
 
 ## 3. GET `/guest/colive/properties/:property_id/addons`
 
-Fetch the add-on catalog for the checkout step. Includes meals, laundry, coworking desk, airport pickup, etc.
+Fetch the add-on catalog for the checkout step.
 
 **Auth**: Not required
 
@@ -212,7 +256,7 @@ Fetch the add-on catalog for the checkout step. Includes meals, laundry, coworki
 
 | Param | Type | Required | Notes |
 |---|---|---|---|
-| `duration_months` | integer | No | Used for frontend price calculation display |
+| `duration_months` | integer | No | Used for frontend display of monthly totals |
 
 **Response** (200):
 ```json
@@ -233,29 +277,20 @@ Fetch the add-on catalog for the checkout step. Includes meals, laundry, coworki
       "availability_message": null,
       "category": "meals",
       "icon_hint": "utensils"
-    },
-    {
-      "addon_id": "cadd-tds-ka-bikerental",
-      "slug": "bike-rental",
-      "name": "Bike Rental (E-Scooter)",
-      "pricing_model": "per_month",
-      "unit_price": 3500,
-      "is_available": false,
-      "availability_message": "Coming soon — join the waitlist"
     }
   ]
 }
 ```
 
 **Pricing models**:
-- `per_month` — multiply by `duration_months` for the total cost
-- `one_time` — flat charge regardless of duration
+- `per_month` — `line_total = unit_price × quantity × months` (where `months = floor(duration_days / 30)`)
+- `one_time` — `line_total = unit_price × quantity` (flat, regardless of duration)
 
 ---
 
 ## 4. POST `/guest/colive/quote`
 
-Compute a fully-priced quote from live eZee rates + selected add-ons. Quote is persisted for 30 minutes and referenced at draft-booking creation.
+Compute a fully-priced quote from the hybrid pricing formula. Quote is persisted for 30 minutes and referenced at draft-booking creation.
 
 **Auth**: ✅ Guest JWT required
 
@@ -265,15 +300,24 @@ Compute a fully-priced quote from live eZee rates + selected add-ons. Quote is p
   "property_id": "60765",
   "room_type_id": "rt-ka-4dorm",
   "move_in_date": "2026-05-01",
-  "duration_months": 3,
+  "duration_days": 90,
   "stay_type": "solo",
   "addons": [
-    { "addon_id": "cadd-tds-ka-meals3xday", "quantity": 1 },
-    { "addon_id": "cadd-tds-ka-laundryplan", "quantity": 1 }
+    { "addon_id": "cadd-tds-ka-meals3xday", "quantity": 1 }
   ],
   "coupon_code": null
 }
 ```
+
+| Field | Type | Validation | Notes |
+|---|---|---|---|
+| `property_id` | string | Required | |
+| `room_type_id` | string | Required | |
+| `move_in_date` | YYYY-MM-DD | Required | |
+| `duration_days` | integer | Min: **30**, Max: 730 | Exact number of days — replaces old `duration_months` |
+| `stay_type` | enum | Required | `solo` \| `couple` \| `remote` |
+| `addons` | array | Required | Can be empty `[]` |
+| `coupon_code` | string | Optional | |
 
 **Response** (200):
 ```json
@@ -283,10 +327,12 @@ Compute a fully-priced quote from live eZee rates + selected add-ons. Quote is p
   "room": {
     "room_type_id": "rt-ka-4dorm",
     "name": "4-Bed Mixed Dorm",
-    "monthly_price": 20970,
-    "strike_monthly_price": 23970,
-    "duration_months": 3,
-    "line_total": 62910
+    "colive_monthly_price": 14999,
+    "strike_monthly_price": 29970,
+    "duration_days": 90,
+    "months": 3,
+    "remaining_days": 0,
+    "line_total": 44997
   },
   "addons": [
     {
@@ -296,14 +342,6 @@ Compute a fully-priced quote from live eZee rates + selected add-ons. Quote is p
       "unit_price": 7000,
       "pricing_model": "per_month",
       "line_total": 21000
-    },
-    {
-      "addon_id": "cadd-tds-ka-laundryplan",
-      "name": "Laundry Plan",
-      "quantity": 1,
-      "unit_price": 1500,
-      "pricing_model": "per_month",
-      "line_total": 4500
     }
   ],
   "included_items": [
@@ -312,41 +350,59 @@ Compute a fully-priced quote from live eZee rates + selected add-ons. Quote is p
     { "id": "deposit", "label": "Security Deposit", "type": "included", "display_value": "₹0" }
   ],
   "charges": {
-    "room_subtotal": 62910,
-    "addon_subtotal": 25500,
+    "room_subtotal": 44997,
+    "addon_subtotal": 21000,
     "discount_total": 0,
     "deposit_total": 0,
-    "tax_total": 4421,
-    "grand_total": 92831
+    "tax_total": 3300,
+    "grand_total": 69297
   },
   "savings": {
-    "monthly_savings": 3000,
-    "total_savings": 9000
+    "monthly_savings": 14971,
+    "total_savings": 44913
   },
   "pricing_notes": [
-    "Pricing includes 92 nights (3 months)",
+    "Pricing includes 90 days (3 months)",
     "GST @ 5% applied on room + addons",
     "No security deposit required"
   ]
 }
 ```
 
-**Error Responses**:
+**Pricing note with extra days** (e.g. `duration_days: 45`):
+```json
+{
+  "room": {
+    "duration_days": 45,
+    "months": 1,
+    "remaining_days": 15,
+    "line_total": 29984
+  },
+  "pricing_notes": [
+    "Pricing includes 45 days (1 month + 15 days at ₹999/night)",
+    ...
+  ]
+}
+```
+
+**Errors**:
+
 | Code | Reason |
 |---|---|
-| 404 | Property or room type not found |
-| 400 | Pricing unavailable from eZee (falls back to DB base price) |
+| 400 | `colive_price_month` not set for this room type |
+| 404 | Property or room option not found |
 
 **Notes**:
 - `quote_id` must be passed to `/draft-booking`
 - Quote expires in **30 minutes** — if expired, a `410 Gone` is returned at draft-booking
-- Rate fetched from eZee; falls back to `room_types.base_price_per_night` if eZee is down
+- `strike_monthly_price` omitted when not higher than `colive_monthly_price`
+- Add-on `line_total` for `per_month` type = `unit_price × quantity × months` (extra days NOT charged for add-ons)
 
 ---
 
 ## 5. POST `/guest/colive/draft-booking`
 
-Creates a draft booking record before payment. Validates quote freshness, room availability, and all addon availability. Returns a `draft_booking_id` to pass to the payment flow.
+Creates a draft booking record before payment. Validates quote freshness and all addon availability.
 
 **Auth**: ✅ Guest JWT required
 
@@ -357,7 +413,7 @@ Creates a draft booking record before payment. Validates quote freshness, room a
   "property_id": "60765",
   "room_type_id": "rt-ka-4dorm",
   "move_in_date": "2026-05-01",
-  "duration_months": 3,
+  "duration_days": 90,
   "stay_type": "solo",
   "guest_details": {
     "first_name": "Rohan",
@@ -366,25 +422,29 @@ Creates a draft booking record before payment. Validates quote freshness, room a
     "phone": "+919876543210"
   },
   "addons": [
-    { "addon_id": "cadd-tds-ka-meals3xday", "quantity": 1 },
-    { "addon_id": "cadd-tds-ka-laundryplan", "quantity": 1 }
+    { "addon_id": "cadd-tds-ka-meals3xday", "quantity": 1 }
   ],
   "source": "web_colive_flow",
   "notes": null
 }
 ```
 
+| Field | Type | Validation | Notes |
+|---|---|---|---|
+| `duration_days` | integer | Min: **30**, Max: 730 | Must match quote's `duration_days` |
+
 **Response** (201):
 ```json
 {
   "draft_booking_id": "b91f2c3d-...",
+  "booking_reference": "TDS-CL-202605-A3F7",
   "property_id": "60765",
   "property_name": "The Daily Social - Koramangala A",
   "room_type_id": "rt-ka-4dorm",
   "room_type_name": "4-Bed Mixed Dorm",
   "move_in_date": "2026-05-01",
-  "duration_months": 3,
-  "estimated_checkout_date": "2026-08-01",
+  "duration_days": 90,
+  "estimated_checkout_date": "2026-07-30",
   "status": "draft",
   "guest_details": {
     "first_name": "Rohan",
@@ -396,15 +456,16 @@ Creates a draft booking record before payment. Validates quote freshness, room a
     { "addon_id": "...", "name": "Meals Plan (3x/day)", "quantity": 1, "line_total": 21000 }
   ],
   "charges": {
-    "room_subtotal": 62910,
-    "addon_subtotal": 25500,
-    "tax_total": 4421,
-    "grand_total": 92831
+    "room_subtotal": 44997,
+    "addon_subtotal": 21000,
+    "tax_total": 3300,
+    "grand_total": 69297
   }
 }
 ```
 
-**Error Responses**:
+**Errors**:
+
 | Code | Reason |
 |---|---|
 | 404 | Quote or room option not found |
@@ -421,7 +482,7 @@ draft → pending_payment → confirmed
 
 ## 6. POST `/payment/create-colive-order`
 
-Creates a Razorpay payment order for a colive draft booking. Updates draft status to `pending_payment`.
+Creates a Razorpay payment order for a colive draft booking.
 
 **Auth**: ✅ Guest JWT required
 
@@ -429,7 +490,7 @@ Creates a Razorpay payment order for a colive draft booking. Updates draft statu
 ```json
 {
   "draft_booking_id": "b91f2c3d-...",
-  "grand_total": 92831,
+  "grand_total": 69297,
   "currency": "INR"
 }
 ```
@@ -440,8 +501,8 @@ Creates a Razorpay payment order for a colive draft booking. Updates draft statu
   "payment_order_id": "order_Rz...",
   "razorpay_order_id": "order_Rz...",
   "razorpay_key": "rzp_test_...",
-  "amount": 92831,
-  "amount_paise": 9283100,
+  "amount": 69297,
+  "amount_paise": 6929700,
   "currency": "INR",
   "draft_booking_id": "b91f2c3d-...",
   "booking_reference": "TDS-CL-202605-A3F7",
@@ -453,18 +514,11 @@ Creates a Razorpay payment order for a colive draft booking. Updates draft statu
 }
 ```
 
-**Notes**:
-- Pass `razorpay_order_id` + `razorpay_key` directly to the Razorpay checkout JS SDK
-- `amount_paise` is the value to pass to Razorpay (in paise)
-
 ---
 
 ## 7. POST `/payment/verify-colive`
 
-Verifies the Razorpay HMAC signature after payment completes. On success:
-1. Marks draft booking as `confirmed`
-2. Queues an eZee `InsertBooking` → `ProcessBooking` → `AddPayment` sync via SQS
-3. Returns onboarding info for the confirmation screen
+Verifies the Razorpay HMAC signature after payment completes. On success, confirms the booking and queues eZee sync.
 
 **Auth**: ✅ Guest JWT required
 
@@ -486,12 +540,13 @@ Verifies the Razorpay HMAC signature after payment completes. On success:
   "booking_reference": "TDS-CL-202605-A3F7",
   "status": "confirmed",
   "payment_id": "pay-record-uuid",
-  "total_paid": 92831,
+  "total_paid": 69297,
   "currency": "INR"
 }
 ```
 
-**Error Responses**:
+**Errors**:
+
 | Code | Reason |
 |---|---|
 | 400 | Invalid Razorpay signature |
@@ -517,7 +572,7 @@ verify-colive (HTTP 200)
 
 ## 8. GET `/guest/colive/bookings/:booking_id`
 
-Confirmation and booking detail screen. Returns onboarding links, next steps, and full stay summary.
+Booking detail and confirmation screen.
 
 **Auth**: ✅ Guest JWT required (must be the booking owner)
 
@@ -534,8 +589,8 @@ Confirmation and booking detail screen. Returns onboarding links, next steps, an
   },
   "stay": {
     "move_in_date": "2026-05-01",
-    "duration_months": 3,
-    "checkout_date_estimated": "2026-08-01",
+    "duration_days": 90,
+    "checkout_date_estimated": "2026-07-30",
     "stay_type": "solo"
   },
   "room": {
@@ -552,10 +607,10 @@ Confirmation and booking detail screen. Returns onboarding links, next steps, an
     { "addon_id": "...", "name": "Meals Plan (3x/day)", "quantity": 1, "line_total": 21000 }
   ],
   "charges": {
-    "room_subtotal": 62910,
-    "addon_subtotal": 25500,
-    "tax_total": 4421,
-    "grand_total": 92831
+    "room_subtotal": 44997,
+    "addon_subtotal": 21000,
+    "tax_total": 3300,
+    "grand_total": 69297
   },
   "onboarding": {
     "whatsapp_url": "https://wa.me/919999999999",
@@ -572,6 +627,33 @@ Confirmation and booking detail screen. Returns onboarding links, next steps, an
 
 ---
 
+## Admin: Manage Colive Prices
+
+Room monthly prices are set via the admin API. Required permission: `colive.price_manage` (owner and manager roles only).
+
+### GET `/admin/room-types?property_id=60765`
+
+Lists all room types with their current `colive_price_month`.
+
+### PATCH `/admin/room-types/:room_type_id/colive-price`
+
+**Request**:
+```json
+{ "colive_price_month": 14999 }
+```
+
+**Response** (200):
+```json
+{
+  "id": "rt-ka-4dorm",
+  "name": "4-Bed Mixed Dorm",
+  "slug": "4-bed-mixed-dorm",
+  "colive_price_month": 14999
+}
+```
+
+---
+
 ## Database Tables
 
 | Table | Purpose |
@@ -581,9 +663,10 @@ Confirmation and booking detail screen. Returns onboarding links, next steps, an
 | `colive_property_content` | Rich marketing content per property |
 | `colive_room_options` | Room option cards shown in search + detail |
 | `colive_addons` | Add-on catalog per property |
-| `colive_quotes` | Persisted quotes (30-min TTL) |
-| `colive_draft_bookings` | Draft → confirmed booking lifecycle |
-| `colive_search_sessions` | Analytics: search sessions |
+| `colive_quotes` | Persisted quotes (30-min TTL) — stores `duration_days` |
+| `colive_draft_bookings` | Draft → confirmed booking lifecycle — stores `duration_days` |
+| `colive_search_sessions` | Analytics: search sessions — stores `duration_months` (search UI unit) |
+| `room_types` | Includes `colive_price_month` (decimal, nullable) |
 
 ---
 
@@ -591,9 +674,11 @@ Confirmation and booking detail screen. Returns onboarding links, next steps, an
 
 | | Nightly Booking | Colive (Long-Stay) |
 |---|---|---|
-| **Duration** | 1–30 nights | 1–12 months |
+| **Duration field** | `no_of_nights` (integer) | `duration_days` (integer, min 30) |
+| **Min stay** | 1 night | 30 days |
 | **Booking ref** | `TDS-CITY-TIMESTAMP-RAND` | `TDS-CL-YYYYMM-RAND` |
-| **Pricing source** | eZee (nightly rate) | eZee (nightly × 30 × months) |
+| **Room pricing** | `rate × nights` (flat nightly) | `months × colive_price_month + extra_days × ratePerNight` |
+| **Addon pricing** | Per-unit at checkout | `per_month` × whole months OR `one_time` flat |
 | **Payment flow** | `/booking/create-order` → `/payment/verify` | `/colive/draft-booking` → `/payment/create-colive-order` → `/payment/verify-colive` |
 | **Guest storage** | `ezee_booking_cache` | `colive_draft_bookings` |
 | **Addons** | `product_catalog` (physical/service) | `colive_addons` (monthly plans) |

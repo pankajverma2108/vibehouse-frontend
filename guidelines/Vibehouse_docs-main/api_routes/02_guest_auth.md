@@ -58,13 +58,54 @@ localStorage.setItem('guest_token', res.access_token); // replaces previous toke
 
 | Term | Meaning |
 |---|---|
-| **Guest** | Any user registered on the Vibe House PWA (email + password OR Google OAuth) |
+| **Guest** | Any user registered on the Vibe House PWA (email + password OR Google OAuth). One row per email/phone — shared across brands. |
 | **Customer (Cx)** | Guest who has at least one linked booking (`ezee_reservation_id`) |
 | **PRIMARY** | Guest whose email/phone matches the original booker in eZee |
 | **SECONDARY** | Additional guest added to a booking, approved by PRIMARY |
 | **Booking linking** | Separate flow (Workflow 02) — not part of this auth module |
+| **Brand** | `TDS` or `BUTEAK`. Identity is shared across brands but data is scoped per brand. Resolved from `Host` header at signup/login; stamped on the issued JWT (`brand` claim) and used to filter every guest-scoped read (e.g., `/guest/booking/mine`). |
+
+### Brand scoping (2026-05-21)
+
+The same guest credentials work on both brand frontends. The `brand` JWT claim controls what data the guest sees:
+
+- **Login on `www.thedailysocial.co.in`** → JWT `brand: 'TDS'` → `/guest/booking/mine` returns TDS bookings only.
+- **Login on `www.buteak.in`** → JWT `brand: 'BUTEAK'` → `/guest/booking/mine` returns Buteak bookings only.
+- **A guest with bookings on both brands** has to log in separately on each (issued two JWTs, one per brand session).
+- **OTP / 2FA / password-reset emails** auto-render in the brand of the request `Host` (different logo, sender address, accent color).
+- **JWTs issued before 2026-05-21** have no `brand` claim — the auth guard fills it in from the request's `Host` header so existing sessions keep working without a forced re-login.
 
 A guest account never expires. Booking IDs never expire — guests can always view past stays, download invoices, etc.
+
+### Per-brand SES region + production-access status (2026-05-21)
+
+OTP / verification / password-reset emails route through different AWS SES regions depending on brand:
+
+| Brand | From address | SES region | Production access | Recipient eligibility |
+|---|---|---|---|---|
+| TDS (60765) | `noreply@thedailysocial.co.in` | `ap-south-1` (Mumbai) | ❌ Sandbox (stuck case — see `docs/miscellenous/ses_production_access_status.md`) | Only verified recipients accepted |
+| Buteak (55402) | `noreply@buteak.in` | `ap-south-2` (Hyderabad) | ✅ **GRANTED 2026-05-22** | **Any recipient** — 50k/day quota, 14/sec rate |
+
+The routing is driven by `properties.branding_config.ses_region` (read at send time by EmailService). No FE change is needed — the brand is resolved from `Host` and the right SES region is picked automatically.
+
+For TDS sandbox limits: WhatsApp via Wati is the primary notification channel for TDS, so SES sandbox restrictions don't materially block guest flows. TDS will move to production access when the Mumbai-region case is unblocked (separate ticket).
+
+### OTP email template (2026-05-22)
+
+The OTP HTML template is brand-aware and renders per `branding_config`:
+
+- **Header bar**: brand primary color background + brand logo + brand name in accent color
+- **OTP code**: in a tinted card using primary color at 12% opacity background + 40% border; code itself rendered in secondary color, 38px bold, letter-spacing 8px for readability (copy-paste-safe)
+- **Expiry**: inside the OTP card, "Valid until {time} IST"
+- **CTA button**: brand-primary background, accent text; purpose-specific copy ("Reset password →", "Continue sign-in →", "Open {Brand} →")
+- **"Never share this code"** warning above footer
+- **Purpose-specific footer hint** (e.g., for password reset: "your account is unchanged until the code is used")
+
+All 4 trigger paths use the same template:
+- Signup auto-OTP (`POST /guest/auth/signup` returns `otp_sent: true`)
+- Manual resend (`POST /guest/auth/send-otp`)
+- Login 2FA (when guest has `two_fa_enabled = true`)
+- Password reset (`POST /guest/auth/forgot-password`)
 
 ---
 
@@ -72,23 +113,42 @@ A guest account never expires. Booking IDs never expire — guests can always vi
 
 ### Step 1 — Initiate Google Login
 
-**GET** `/guest/auth/google`
+**GET** `/guest/auth/google?brand=TDS|BUTEAK`
 
 No auth, no body. The browser navigates to this URL and Passport immediately redirects to Google's consent screen.
 
 ```
-// Simply open this in the browser:
-http://localhost:8080/guest/auth/google
+// On TDS frontend:
+https://api.thedailysocial.co.in/guest/auth/google?brand=TDS
+
+// On Buteak frontend (when it goes dynamic):
+https://api.thedailysocial.co.in/guest/auth/google?brand=BUTEAK
 ```
+
+> [!IMPORTANT]
+> **Brand isolation (2026-05-21):** The `?brand=` query param tells the backend which brand to stamp on the resulting JWT and which frontend URL to redirect back to after Google completes the consent flow. The brand is round-tripped via Passport's `state` param through Google. If `?brand=` is missing, the backend falls back to resolving brand from the request's `Host` header — usually correct but the explicit param is safer.
+
+> [!IMPORTANT]
+> **Host round-trip in state (2026-05-27):** The backend now ALSO captures the viewer's host (`X-Forwarded-Host` from the ALB) at `/guest/auth/google` and includes it in OAuth state alongside the brand. The state shape is `{"b":"BUTEAK","h":"dev.buteak.in"}` (JSON-encoded). The callback validates the host against an allowlist and uses it as the post-OAuth redirect base. This means OAuth from `dev.buteak.in` lands back on `dev.buteak.in` (instead of the brand's DB-configured redirect URL). Hosts not in the allowlist are ignored (fall back to the per-brand DB override). The allowlist mirrors the CORS allowlist in `src/main.ts` — `www.buteak.in`, `buteak.in`, `dev.buteak.in`, `www.thedailysocial.co.in`, `thedailysocial.co.in`, plus localhost variants.
 
 ### Step 2 — Google Callback (handled automatically)
 
-**GET** `/guest/auth/google/callback`
+**GET** `/guest/auth/google/callback?state=<state>`
 
-Google redirects here after the user grants consent. The backend:
+Google redirects here after the user grants consent (with the `state` param we set in step 1). The backend:
 1. Validates the OAuth code with Google
-2. Runs the upsert logic (see below)
-3. Redirects to `FRONTEND_URL/auth/google/success?token=<jwt>&name=<name>`
+2. Parses `state` (new format: JSON `{b, h?}`; legacy format: bare brand string)
+3. Resolves brand from state (fallback: `Host` header)
+4. Runs the upsert logic (see below)
+5. Issues a JWT with `brand` claim
+6. Resolves the post-OAuth redirect URL in this priority order:
+   - **`state.h` host** (NEW, allowlisted) — `https://<host-from-state>`
+   - `properties.branding_config.oauth_redirect_url` for the brand (per-property override)
+   - `process.env.FRONTEND_URL` (env fallback)
+   - `http://localhost:3000` (dev default)
+7. Final URL: `<resolved-frontend>/auth/google/success?token=<jwt>&name=<name>`
+
+> **Note on the legacy Buteak override:** `properties.branding_config.oauth_redirect_url` for property 55402 still points at `https://www.thedailysocial.co.in` from a May 2026 hack when Buteak FE was static. With the host round-trip in place this no longer affects normal flows (state-host wins), but the override remains as a safety net if state is ever lost.
 
 The **frontend** reads `?token` from the query string, stores it in localStorage, and navigates home — same JWT format as email/password login.
 
@@ -380,14 +440,17 @@ Creates a new guest account with email + password. Issues a JWT immediately — 
 | Status | Scenario | Body |
 |---|---|---|
 | `400` | Validation failure (short password, invalid email) | `{ "message": ["password must be longer than or equal to 8 characters"], "error": "Bad Request", "statusCode": 400 }` |
-| `409` | Email already registered | `{ "message": "Email already registered", "statusCode": 409 }` |
-| `409` | Phone already registered | `{ "message": "Phone number already registered", "statusCode": 409 }` |
+| `409` | Email OR phone already registered (any brand) | `{ "message": "Account exists — sign in", "statusCode": 409 }` |
+
+> [!IMPORTANT]
+> **Brand isolation (2026-05-21):** Identity is shared across brands — the same email/phone can only have ONE `guests` row total. If a guest already signed up on `www.thedailysocial.co.in` and tries to sign up again on `www.buteak.in` with the same email, they get `409 Account exists — sign in`. The 409 wording is intentionally generic: it does NOT reveal which brand they originally signed up on (privacy). They should instead `POST /guest/auth/login` — the resulting JWT will be brand-scoped to whichever brand the login request came from (resolved via `Host` header).
 
 ### Postman Setup
 - Method: `POST`
 - URL: `{{base_url}}/guest/auth/signup`
 - Body → raw → JSON: paste body above
 - No Authorization header needed
+- The OTP that follows is **brand-rendered** based on request `Host`: `Host: www.buteak.in` → email from `noreply@buteak.in` with Buteak gold accent; `Host: www.thedailysocial.co.in` → TDS branding.
 
 ---
 

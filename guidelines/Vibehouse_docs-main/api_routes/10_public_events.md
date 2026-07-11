@@ -1,8 +1,12 @@
 # Public Events — API Routes
 
-> **Base URL**: `http://localhost:8080`
+> **Base URL (prod)**: `https://api.thedailysocial.co.in`
+> **Base URL (dev)**: `http://localhost:8080`
 > **Auth**: None — these endpoints are fully public (no JWT required)
 > **All responses**: `Content-Type: application/json`
+
+> [!IMPORTANT]
+> **Breaking change (2026-05-19, multi-property rollout):** `property_id` is no longer optional. The old `DEFAULT_PROPERTY_ID=60765` fallback has been removed because the platform now serves two properties (TDS `60765` + Buteak `55402`). Either pass `?property_id=` explicitly, or call from a recognized hostname so the backend can resolve it via the `Host` header. Missing both returns **400**.
 
 ---
 
@@ -13,7 +17,8 @@
 | **Public Events** | Only events with `is_active = true` are returned. Hidden events are excluded. |
 | **No auth** | These endpoints have no authentication guards — guests, non-guests, and anonymous users can access them |
 | **Filter** | `upcoming` (date >= today) or `past` (date < today). Omit for all active events |
-| **property_id** | Required query param to scope events to a specific property. Defaults to `60765` if omitted |
+| **property_id** | **Required.** Resolution order: (1) `?property_id=` query param, (2) `Host` / `X-Forwarded-Host` header mapping (`www.thedailysocial.co.in` → `60765`, `www.buteak.in` → `55402`). Missing both → 400. |
+| **Buteak (property 55402)** | `branding_config.features.events = false` — Buteak doesn't use events. The endpoint still responds 200 with an empty array if called for `55402`. |
 
 ---
 
@@ -27,7 +32,7 @@ Returns all active events for a property, optionally filtered by upcoming/past. 
 
 | Param | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `property_id` | string | | `60765` | Property to list events for |
+| `property_id` | string | ✅ (or resolvable from Host) | — | Numeric eZee hotel code: `60765` (TDS) or `55402` (Buteak) |
 | `filter` | string | | (all) | `"upcoming"` or `"past"` |
 
 ### Sort Order
@@ -37,10 +42,17 @@ Returns all active events for a property, optionally filtered by upcoming/past. 
 
 ### Examples
 ```
-GET /public/events?property_id=60765
+GET /public/events?property_id=60765                  → TDS events
+GET /public/events?property_id=55402                  → Buteak events (likely empty)
 GET /public/events?property_id=60765&filter=upcoming
-GET /public/events?filter=past
+GET /public/events?filter=past                        → 400 unless Host resolves to a property
+GET /public/events    (Host: www.buteak.in)           → Buteak events (Host resolves to 55402)
 ```
+
+### Errors
+| Status | Cause |
+|---|---|
+| 400 | Neither `?property_id=` nor a recognized `Host` header. Body: `{"statusCode":400,"message":"property_id is required (or call from a known host)"}` |
 
 ### Response — 200 OK
 ```json

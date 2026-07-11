@@ -1,9 +1,15 @@
 # Admin Inventory — API Routes
 
-> **Base URL**: `http://localhost:8080`
+> **Base URL (prod)**: `https://api.thedailysocial.co.in`
+> **Base URL (dev)**: `http://localhost:8080`
 > **Auth**: Bearer token (JWT) — `Authorization: Bearer <token>`
 > **All responses**: `Content-Type: application/json`
 > **Permission gates**: `inventory.view` for reads, `inventory.edit` for writes, `borrowable.manage` / `borrowable.return_verify` for borrowable ops
+
+> [!IMPORTANT]
+> **Breaking change (2026-05-19, multi-property rollout):** The returnable endpoints (`GET /admin/inventory/returnable`, `GET /admin/inventory/returnable/:productId/forecast`, `POST /admin/inventory/returnable/:productId/issue`) no longer fall back to a default property. The calling admin's JWT **must** have a `property_id` set, otherwise these endpoints return **400**. Owner-role admins (without an assigned property) cannot currently use these endpoints — assign them to a property first.
+>
+> Properties are now `60765` (TDS Koramangala) and `55402` (Buteak Suites). Buteak has `branding_config.features.smart_lock = false` and currently has no `product_catalog` rows seeded — inventory endpoints will return empty arrays for `55402` until products are added.
 
 ---
 
@@ -17,6 +23,7 @@
 | **product_catalog** | Master list of everything a guest can order or request |
 | **inventory** | Stock ledger — one row per product per property. Only COMMODITY and BORROWABLE items have inventory rows. |
 | **borrowable_checkouts** | Checkout/return log for borrowed items |
+| **property_id** | Numeric eZee hotel code (`60765` TDS, `55402` Buteak). Required in DTOs for create/seed endpoints. Resolved from admin's JWT for the returnable endpoints. |
 
 ---
 

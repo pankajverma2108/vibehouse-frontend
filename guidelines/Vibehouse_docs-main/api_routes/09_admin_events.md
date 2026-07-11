@@ -1,9 +1,15 @@
 # Admin Events — API Routes
 
-> **Base URL**: `http://localhost:8080`
+> **Base URL (prod)**: `https://api.thedailysocial.co.in`
+> **Base URL (dev)**: `http://localhost:8080`
 > **Auth**: Bearer token (JWT) — `Authorization: Bearer <token>`
 > **All responses**: `Content-Type: application/json`
 > **Permission gates**: `events.view` for reads, `events.edit` for writes
+
+> [!IMPORTANT]
+> **Breaking change (2026-05-19, multi-property rollout):** The `DEFAULT_PROPERTY_ID=60765` fallback has been removed. The admin's JWT must have a `property_id`, OR `property_id` must be passed in the request body. Missing both → **400**.
+>
+> Buteak (`55402`) has `branding_config.features.events = false`. The endpoints still work for Buteak admins, but the FE should hide event management UI for that property.
 
 ---
 
@@ -12,7 +18,7 @@
 | Term | Meaning |
 |---|---|
 | **Event** | A social/entertainment event tied to a property (DJ night, pub crawl, yoga session, etc.) |
-| **property_id** | Each event belongs to a property — auto-set from the admin's JWT token |
+| **property_id** | Each event belongs to a property. Resolution order: (1) admin's JWT `property_id`, (2) `property_id` field in request body. Must match `^[0-9]+$` (numeric eZee hotel code, e.g. `60765` or `55402`). |
 | **is_active** | Controls visibility on the public API. Hidden events still appear in admin but not to guests |
 | **badge** | Optional coloured label on the event card (e.g. "Tonight", "Popular", "Sold Out") |
 | **poster** | Event image uploaded to S3 via backend proxy. DB stores the S3 file key (not the full URL). Frontend displays via `/public/events/poster?key=<fileKey>` proxy |
@@ -30,6 +36,7 @@ Creates a new event for the admin's property.
 
 | Field | Type | Required | Max Length | Description |
 |---|---|---|---|---|
+| `property_id` | string | conditional | — | **NEW (2026-05-19):** Required only if the admin's JWT doesn't carry a `property_id` (e.g., owner-role admins). Must match `^[0-9]+$`. |
 | `title` | string | ✅ | 200 | Event title |
 | `description` | string | | — | Full description / details |
 | `date` | string (ISO date) | ✅ | — | Event date, e.g. `"2026-04-01"` |

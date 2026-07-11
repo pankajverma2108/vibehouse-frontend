@@ -15,6 +15,14 @@ dist/
 docs/
 guidelines/
 
+# Track the two public breakfast handoff documents while keeping other internal docs local.
+!docs/
+docs/*
+!docs/breakfast/
+docs/breakfast/*
+!docs/breakfast/24_breakfast_stakeholder_workflow.md
+!docs/breakfast/25_breakfast_preview_and_test_routes.md
+
 # Internal planning and workflow docs (not for remote repo)
 # guidelines/finalised_workflows/
 # guidelines/api_routes/
