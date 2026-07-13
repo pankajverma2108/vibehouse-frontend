@@ -17,7 +17,7 @@ export default function BreakfastPreviewIndexPage() {
       <div className="mx-auto w-full max-w-[900px]">
         <StickerTag bg="#FEF08A" className="px-3 py-1.5 text-[10px] font-black not-italic tracking-[0.1em]" label="DESIGN PREVIEW" rotate="-rotate-[2deg]" text="#230f14" />
         <h1 className="font-sectiontitle mt-5 text-pretty text-[38px] leading-tight text-white sm:text-[52px]">Breakfast test links</h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-white/64">These exact allowlisted tokens use contract-valid sample data and never call the backend. Review Order opens a sample receipt, and Confirm Order simulates the saved state without writing anything. All other tokens continue through normal backend validation.</p>
+        <p className="mt-3 max-w-2xl text-base leading-7 text-white/64">These links use test data and do not save orders. Review Order opens the receipt, and Confirm Order shows the final state.</p>
         <div className="mt-10 grid gap-3 sm:grid-cols-2">
           {getBreakfastTestScenarios().map((scenario) => (
             <Link className="group min-w-0 rounded-[14px] border border-white/13 bg-white/[0.025] px-5 py-5 transition-colors hover:border-white/30 hover:bg-white/[0.05] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3c96b]" href={`/breakfast/${scenario.token}`} key={scenario.token}>

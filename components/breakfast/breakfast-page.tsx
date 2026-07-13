@@ -58,7 +58,7 @@ const EMPTY_ERRORS: BreakfastDraftErrors = {};
 
 const brandPresentation: Record<
   BreakfastBrand,
-  { heading: string; description: string; logo: string; logoAlt: string; sticker: string }
+  { heading: string; description: string; logo: string; logoAlt: string; sticker: string | null }
 > = {
   BUTEAK: {
     heading: "Buteak Suites Menu",
@@ -72,12 +72,26 @@ const brandPresentation: Record<
     description: "Choose complimentary breakfast for each guest in your stay.",
     logo: "/brands/tds/logo.png",
     logoAlt: "The Daily Social",
-    sticker: "GOOD MORNING",
+    sticker: null,
   },
 };
 
+export function getBreakfastGreeting(date = new Date()) {
+  const hourPart = new Intl.DateTimeFormat("en-IN", {
+    hour: "2-digit",
+    hourCycle: "h23",
+    timeZone: "Asia/Kolkata",
+  }).formatToParts(date).find((part) => part.type === "hour");
+  const hour = Number(hourPart?.value ?? 0);
+
+  if (hour < 12) return "GOOD MORNING";
+  if (hour < 17) return "GOOD AFTERNOON";
+  return "GOOD EVENING";
+}
+
 function BreakfastBrandHeader({ brand, previewLabel }: { brand?: BreakfastBrand; previewLabel?: string }) {
   const presentation = brand ? brandPresentation[brand] : null;
+  const stickerLabel = brand === "TDS" ? getBreakfastGreeting() : presentation?.sticker;
 
   return (
     <header className="pb-8 pt-5 sm:pb-10 sm:pt-8">
@@ -85,7 +99,7 @@ function BreakfastBrandHeader({ brand, previewLabel }: { brand?: BreakfastBrand;
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-white/14 pb-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#f3c96b]">Design preview</p>
-            <p className="mt-1 text-sm text-white/62">{previewLabel} - confirmation is simulated</p>
+            <p className="mt-1 text-sm text-white/62">{previewLabel} - test order, nothing will be saved</p>
           </div>
           <Link
             className="inline-flex min-h-11 items-center rounded-[10px] border border-white/15 px-4 text-sm font-bold text-white hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3c96b]"
@@ -113,11 +127,11 @@ function BreakfastBrandHeader({ brand, previewLabel }: { brand?: BreakfastBrand;
             </div>
           )}
         </div>
-        {presentation ? (
+        {presentation && stickerLabel ? (
           <StickerTag
             bg="#FEF08A"
             className="mt-2 px-3 py-1.5 text-[10px] font-black not-italic tracking-[0.1em]"
-            label={presentation.sticker}
+            label={stickerLabel}
             rotate="rotate-[3deg]"
             text="#230f14"
           />
@@ -362,7 +376,7 @@ export function BreakfastPage({ token, previewLabel, simulateSubmit = false, ini
     setReview(buildBreakfastOrderReview(validLookup, currentValidation.payload));
     setReceiptMode("review");
     setReceiptOpen(true);
-    setAnnouncement("Order ready for review. Nothing has been sent yet.");
+    setAnnouncement("Review your order before confirming.");
   }, [draft, focusError, pending, validLookup]);
 
   const handleConfirm = useCallback(async () => {
@@ -441,7 +455,7 @@ export function BreakfastPage({ token, previewLabel, simulateSubmit = false, ini
     setDraft((current) => setBreakfastRoomIntent(current, room, "SKIP"));
     setErrors(EMPTY_ERRORS);
     setSkipReservationId(null);
-    setAnnouncement(`Breakfast for Room ${room.room_number} is marked to skip. Confirm the full order to save it.`);
+    setAnnouncement(`Breakfast for Room ${room.room_number} will be skipped. Confirm your order to save it.`);
   }, [skipReservationId, validLookup]);
 
   const handleDraftChange = useCallback((update: SetStateAction<BreakfastDraft>) => {
@@ -463,7 +477,7 @@ export function BreakfastPage({ token, previewLabel, simulateSubmit = false, ini
     setErrors(EMPTY_ERRORS);
     setEditing(true);
     setReceiptOpen(false);
-    setAnnouncement("Your reviewed choices are ready to edit.");
+    setAnnouncement("Your choices are ready to edit.");
   }, []);
 
   const brand = lookup?.brand;
@@ -488,7 +502,7 @@ export function BreakfastPage({ token, previewLabel, simulateSubmit = false, ini
               <BreakfastStayContext response={validLookup} />
               {validLookup.window.state === "frozen" ? (
                 <section className="border-l-2 border-[#f3c96b] bg-[#f3c96b]/8 px-4 py-4" role="status">
-                  <p className="font-bold text-amber-50">Ordering is read-only right now.</p>
+                  <p className="font-bold text-amber-50">Breakfast ordering is closed.</p>
                   <p className="mt-1 text-sm leading-6 text-white/66">
                     Ordering for {formatBreakfastServiceDate(validLookup.window.service_date)} opens at {validLookup.window.opens_at_ist}.
                   </p>
@@ -508,7 +522,7 @@ export function BreakfastPage({ token, previewLabel, simulateSubmit = false, ini
                   ) : undefined}
                   menu={validLookup.menu}
                   note={validLookup.window.state === "open"
-                    ? "You can change these choices while the backend ordering window remains open."
+                    ? "You can change these choices while breakfast ordering is open."
                     : `Ordering opens at ${validLookup.window.opens_at_ist}.`}
                   rooms={summaryRooms}
                   serviceDate={validLookup.window.service_date}
@@ -534,7 +548,7 @@ export function BreakfastPage({ token, previewLabel, simulateSubmit = false, ini
               {validLookup.window.state === "frozen" && summaryRooms.length === 0 ? (
                 <section className="border-y border-dashed border-white/16 py-8">
                   <h2 className="font-sectiontitle text-[28px] text-white">No breakfast order yet</h2>
-                  <p className="mt-2 text-sm leading-6 text-white/64">Return when the backend ordering window opens.</p>
+                  <p className="mt-2 text-sm leading-6 text-white/64">Return when breakfast ordering opens.</p>
                 </section>
               ) : null}
             </div>

@@ -2,7 +2,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { BreakfastPage } from "@/components/breakfast/breakfast-page";
+import { BreakfastPage, getBreakfastGreeting } from "@/components/breakfast/breakfast-page";
 import { getPublicBreakfast, submitPublicBreakfast } from "@/lib/breakfast-api";
 import { buildPreviewRooms } from "@/lib/breakfast-order";
 import { getBreakfastTestScenario } from "@/lib/breakfast-preview";
@@ -115,7 +115,7 @@ describe("BreakfastPage review and confirmation flow", () => {
     );
 
     expect((screen.getByRole("button", { name: "Review Order" }) as HTMLButtonElement).disabled).toBe(true);
-    expect(screen.getByText("Complete every room to enable Review Order.")).not.toBeNull();
+    expect(screen.getByText("Finish each room to review your order.")).not.toBeNull();
     expect(submitPublicBreakfast).not.toHaveBeenCalled();
   });
 
@@ -262,5 +262,15 @@ describe("BreakfastPage review and confirmation flow", () => {
     expect(screen.getByRole("heading", { name: "Order Placed" })).not.toBeNull();
     expect(screen.getByRole("button", { name: "Edit Order" })).not.toBeNull();
     expect(screen.queryByRole("button", { name: "Confirm Order" })).toBeNull();
+  });
+});
+
+describe("breakfast greeting", () => {
+  it.each([
+    ["2026-07-13T03:00:00.000Z", "GOOD MORNING"],
+    ["2026-07-13T08:00:00.000Z", "GOOD AFTERNOON"],
+    ["2026-07-13T15:00:00.000Z", "GOOD EVENING"],
+  ])("uses India time when the page opens at %s", (timestamp, expected) => {
+    expect(getBreakfastGreeting(new Date(timestamp))).toBe(expected);
   });
 });

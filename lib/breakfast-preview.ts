@@ -74,7 +74,7 @@ const scenarios: Record<BreakfastTestToken, BreakfastTestScenario> = {
   "test-OneGuestInTwoPaxRoom": {
     token: "test-OneGuestInTwoPaxRoom",
     label: "One guest - two-pax apartment",
-    description: "A two-pax apartment with one actual breakfast-eligible guest; the backend cap is one Plate.",
+    description: "A two-pax apartment with one guest and one Plate.",
     response: response([room("204 - two-pax apartment", 1)], "TDS"),
   },
   "test-OnePax": { token: "test-OnePax", label: "One guest · one room", description: "The simplest single-room breakfast order.", response: response([room("101", 1)]) },
@@ -82,8 +82,8 @@ const scenarios: Record<BreakfastTestToken, BreakfastTestScenario> = {
   "test-FourPaxOneRoom": { token: "test-FourPaxOneRoom", label: "Four guests · one room", description: "High occupancy and repeated plate controls.", response: response([room("408", 4)]) },
   "test-ThreeRooms": { token: "test-ThreeRooms", label: "Three rooms · six guests", description: "One booker with three rooms; exercises the room selector and different occupancies.", response: response([room("201", 1), room("202", 2), room("203", 3)]) },
   "test-ExistingOrder": { token: "test-ExistingOrder", label: "Existing submitted order", description: "Two saved plates with independent slots and an Edit action.", response: response([existingRoom]) },
-  "test-FrozenOrder": { token: "test-FrozenOrder", label: "Frozen read-only order", description: "A saved order rendered while the backend window is frozen.", response: { ...response([existingRoom]), window: { ...response([existingRoom]).window, state: "frozen", opens_at_ist: "2026-07-12 11:00 IST" } } },
-  "test-AllSlotsFull": { token: "test-AllSlotsFull", label: "All delivery slots full", description: "Every backend slot reports zero remaining.", response: { ...response([room("305", 2)]), slots: slots.map((slot) => ({ ...slot, booked: slot.capacity, remaining: 0 })) } },
+  "test-FrozenOrder": { token: "test-FrozenOrder", label: "Frozen read-only order", description: "A saved order while breakfast ordering is closed.", response: { ...response([existingRoom]), window: { ...response([existingRoom]).window, state: "frozen", opens_at_ist: "2026-07-12 11:00 IST" } } },
+  "test-AllSlotsFull": { token: "test-AllSlotsFull", label: "All delivery slots full", description: "Every delivery time is full.", response: { ...response([room("305", 2)]), slots: slots.map((slot) => ({ ...slot, booked: slot.capacity, remaining: 0 })) } },
   "test-TDSTwoRooms": { token: "test-TDSTwoRooms", label: "TDS · two rooms", description: "The same workflow with The Daily Social branding and a room selector.", response: response([room("101 A", 2), room("102 B", 1)], "TDS") },
 };
 

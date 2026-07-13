@@ -158,10 +158,10 @@ export function BreakfastConfirmationDialog({
       closeLabel="Close order receipt"
       closeDisabled={pending}
       description={mode === "review"
-        ? "Check every room, plate, and delivery slot. Nothing is sent until you confirm."
+        ? "Check each room, plate, and delivery time before confirming."
         : simulated
-          ? "Preview complete. This sample order was not sent to the backend."
-          : "Your breakfast order has been sent. This is your latest receipt."}
+          ? "Preview only. Nothing was saved."
+          : "Your breakfast order is confirmed."}
       footer={mode === "review" ? (
         <div className="flex flex-col gap-3 sm:flex-row-reverse">
           <Button
@@ -179,7 +179,7 @@ export function BreakfastConfirmationDialog({
       ) : editingButton ? <div className="flex flex-col sm:flex-row">{editingButton}</div> : undefined}
       onOpenChange={onOpenChange}
       open={open}
-      sticker={mode === "review" ? "CHECK YOUR PLATES" : simulated ? "SAMPLE ORDER" : "ORDER PLACED"}
+      sticker={mode === "review" ? "CHECK YOUR ORDER" : simulated ? "PREVIEW" : "ORDER PLACED"}
       title={mode === "review" ? "Review Your Order" : "Order Placed"}
     >
       <BreakfastReviewDetails review={review} serviceDate={serviceDate} />
@@ -204,7 +204,7 @@ export function BreakfastSkipDialog({
     <BreakfastDialogFrame
       closeLabel="Close skip breakfast dialog"
       closeDisabled={pending}
-      description={`This marks Room ${roomNumber} to skip breakfast. It does not send anything yet.`}
+      description={`Room ${roomNumber} will skip breakfast. You can change this before confirming.`}
       footer={(
         <div className="flex flex-col gap-3 sm:flex-row-reverse">
           <Button
@@ -234,7 +234,7 @@ export function BreakfastSkipDialog({
       title="Skip Breakfast?"
     >
       <p className="text-base leading-7 text-white/74">
-        Skip only if nobody in Room {roomNumber} needs breakfast for the service date shown on the page. You can change this before confirming the full order.
+        Skip only if nobody in Room {roomNumber} wants breakfast on the date shown.
       </p>
     </BreakfastDialogFrame>
   );

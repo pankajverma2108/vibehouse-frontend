@@ -78,14 +78,9 @@ export function BreakfastReviewDetails({ review, serviceDate }: { review: Breakf
           key={room.ezeeReservationId}
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h3 className="font-sectiontitle text-[25px] text-white" id={`review-room-${room.ezeeReservationId}`}>
-                Room {room.roomNumber}
-              </h3>
-              <p className="mt-1 text-xs text-white/48">
-                {room.guestCount} breakfast {room.guestCount === 1 ? "guest" : "guests"} listed by the backend
-              </p>
-            </div>
+            <h3 className="font-sectiontitle text-[25px] text-white" id={`review-room-${room.ezeeReservationId}`}>
+              Room {room.roomNumber}
+            </h3>
             <span className="text-xs font-bold uppercase tracking-[0.1em] text-[#f3c96b]">{room.statusLabel}</span>
           </div>
           {room.action === "SKIP" ? (
@@ -129,14 +124,9 @@ export function BreakfastOrderDetails({
           key={room.ezee_reservation_id}
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h3 className="font-sectiontitle text-[25px] text-white" id={`summary-room-${room.ezee_reservation_id}`}>
-                Room {room.room_number}
-              </h3>
-              <p className="mt-1 text-xs text-white/48">
-                {room.max_plates} breakfast {room.max_plates === 1 ? "guest" : "guests"} listed by the backend
-              </p>
-            </div>
+            <h3 className="font-sectiontitle text-[25px] text-white" id={`summary-room-${room.ezee_reservation_id}`}>
+              Room {room.room_number}
+            </h3>
             <span className="text-xs font-bold uppercase tracking-[0.1em] text-[#f3c96b]">
               {room.order_status === "SKIPPED" ? "Breakfast skipped" : "Breakfast ordered"}
             </span>

@@ -128,7 +128,7 @@ export function BreakfastOrderForm({
           <h2 className="font-sectiontitle mt-2 text-[28px] text-white sm:text-[34px]" id="breakfast-room-title">
             Choose a room
           </h2>
-          <p className="mt-2 text-sm leading-6 text-white/62">Finish or skip each room before reviewing the full order.</p>
+          <p className="mt-2 text-sm leading-6 text-white/62">Choose breakfast or skip each room.</p>
           <div
             aria-label="Breakfast rooms"
             className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:overflow-x-auto sm:pb-1"
@@ -173,9 +173,6 @@ export function BreakfastOrderForm({
             <h2 className="font-sectiontitle mt-2 text-[30px] leading-tight text-white sm:text-[38px]" id="active-room-title">
               {roomDraft.intent === "SKIP" ? "Breakfast skipped" : "Build each plate"}
             </h2>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-white/62">
-              The backend lists {room.max_plates} breakfast {room.max_plates === 1 ? "guest" : "guests"} for this room. One plate per guest.
-            </p>
           </div>
           {roomDraft.intent === "ORDER" && roomDraft.plates.length < room.max_plates ? (
             <Button
@@ -195,7 +192,7 @@ export function BreakfastOrderForm({
               <Ban aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-[#f3c96b]" />
               <div>
                 <p className="font-bold text-white">Room {room.room_number} is marked to skip breakfast.</p>
-                <p className="mt-1 text-sm leading-6 text-white/62">This choice stays local until you review and confirm the full order.</p>
+                <p className="mt-1 text-sm leading-6 text-white/62">You can change this before confirming your order.</p>
               </div>
             </div>
             <Button
@@ -211,7 +208,7 @@ export function BreakfastOrderForm({
           <>
             {roomDraft.plates.length === 0 ? (
               <div className="border-b border-dashed border-white/16 py-10 text-center">
-                <p className="text-base font-semibold text-white">Add a plate for this room, or explicitly skip breakfast.</p>
+                <p className="text-base font-semibold text-white">Add a plate or skip breakfast for this room.</p>
                 <Button
                   className="mt-4 h-11 rounded-full bg-[var(--vh-pink)] px-5 font-bold text-white hover:bg-[var(--vh-pink-soft)]"
                   onClick={() => setDraft((current) => addBreakfastPlate(current, room))}
@@ -441,13 +438,13 @@ export function BreakfastOrderForm({
         {isComplete ? (
           <p className="mt-4 flex items-start gap-2 text-sm leading-6 text-emerald-200" role="status">
             <Check aria-hidden="true" className="mt-1 size-4 shrink-0" />
-            Every room is ready. Review your receipt before confirming the order.
+            Your order is ready to review.
           </p>
         ) : (
           <div className="mt-4 flex items-start gap-2 text-sm leading-6 text-amber-100" role="status">
             <CircleAlert aria-hidden="true" className="mt-1 size-4 shrink-0" />
             <div>
-              <p className="font-semibold">Complete every room to enable Review Order.</p>
+              <p className="font-semibold">Finish each room to review your order.</p>
               {remainingRequirements.length > 0 ? (
                 <ul className="mt-1 list-disc space-y-0.5 pl-5 text-white/62">
                   {remainingRequirements.slice(0, 3).map((requirement, index) => <li key={`${index}-${requirement}`}>{requirement}</li>)}
