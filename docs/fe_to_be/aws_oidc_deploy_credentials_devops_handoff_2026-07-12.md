@@ -450,3 +450,91 @@ Never send an AWS secret access key, session token, GitHub secret value, or OIDC
 ## 15. Final Handoff Message
 
 The frontend deployment workflow is ready to authenticate through GitHub OIDC, but no usable AWS credential source is reaching `aws-actions/configure-aws-credentials`. DevOps should first verify the GitHub secret scope, then the AWS OIDC provider and IAM role trust relationship. Backend work is not required. Once authentication succeeds, any later `AccessDenied` should be handled as a specific ECR, ECS, `iam:PassRole`, or CloudFront policy issue using the error guide above.
+
+
+
+
+
+tried again at 15:50: 
+Root cause: the job fails at **Configure AWS credentials** because no valid AWS credentials source is available for the action.
+
+From the workflow ([`.github/workflows/deploy.yml`](https://github.com/Emagicor/Vibehouse_frontend/blob/8c4fc30f35d955db58f15a3c82b86229f1063603/.github/workflows/deploy.yml), lines 27–32), it uses OIDC + role assumption:
+
+```yaml
+- name: Configure AWS credentials
+  uses: aws-actions/configure-aws-credentials@v4
+  with:
+    role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+    role-session-name: GitHubActions-${{ github.run_id }}
+    aws-region: ${{ env.AWS_REGION }}
+```
+
+The error indicates this step cannot obtain credentials, which usually means one of these is misconfigured:
+
+1. `AWS_DEPLOY_ROLE_ARN` secret is missing/empty/wrong.
+2. The IAM role trust policy does not allow GitHub OIDC for this repo/branch.
+3. The role has insufficient permissions for ECS/ECR/CloudFront operations.
+
+## Fix
+
+### 1) Ensure secret is set correctly
+Set repo secret `AWS_DEPLOY_ROLE_ARN` to the exact role ARN, e.g.:
+
+`arn:aws:iam::<account-id>:role/<github-deploy-role>`
+
+---
+
+### 2) Fix IAM role trust policy for GitHub OIDC
+Attach/update trust policy on that role to allow this repo and branch (`main`):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::<account-id>:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:Emagicor/Vibehouse_frontend:ref:refs/heads/main"
+        }
+      }
+    }
+  ]
+}
+```
+
+---
+
+### 3) Ensure role permissions cover what this workflow does
+Minimum scope should include:
+- ECR auth + push
+- ECS describe/update/deploy task definition
+- `iam:PassRole` for task execution/task role used by ECS task definition
+- CloudFront invalidation (if used)
+
+---
+
+### 4) Add a guardrail in workflow to fail fast with clearer message
+Add this right before AWS credential configuration:
+
+```yaml
+- name: Validate required secrets
+  run: |
+    if [ -z "${{ secrets.AWS_DEPLOY_ROLE_ARN }}" ]; then
+      echo "AWS_DEPLOY_ROLE_ARN is not set"
+      exit 1
+    fi
+```
+
+This will make failures explicit instead of surfacing as generic provider-chain credential errors.
+
+---
+
+The failure is not in Docker/ECS deploy logic; it happens before any AWS API call because credential bootstrapping via OIDC is not succeeding.
