@@ -1,93 +1,81 @@
 # Guest Breakfast Ordering - Stakeholder Walkthrough
 
-**Audience:** property owners, operations stakeholders, and the author of the Breakfast BRD
+**Audience:** property owners, operations stakeholders, and the Breakfast BRD owner
 
-**Scope:** the working guest journey and its current operating limits
+**Scope:** working guest flow and operational limitations
 
-## What the feature introduces
+## What the feature does
 
-Checked-in guests can pre-order complimentary breakfast from a private WhatsApp link. The page uses the property's live breakfast menu, eligible room occupancy, delivery slots, and remaining slot capacity supplied by the backend.
+Checked-in guests receive one private WhatsApp link for breakfast ordering. The link can include every room held by the same booker. The webpage shows the actual breakfast-eligible guest count for each room, the live menu, delivery slots, and saved choices supplied by the backend.
 
-One WhatsApp link covers every room attached to the same booker. For example, a guest who booked Rooms 201, 202, and 203 receives one link and can switch between those rooms on the breakfast page.
+A room that can physically hold two people does not automatically receive two Plates. If only one eligible guest is recorded in that room, the backend returns one and the page shows only Plate 1.
 
-## How the guest receives the link
+## Guest walkthrough
 
-1. The property enables breakfast and maintains its menu and delivery slots in the admin breakfast console.
-2. The backend identifies eligible bookings: checked-in guests who are staying overnight.
-3. Breakfast links are sent through the configured WhatsApp/WATI invitation, either by the automatic schedule or the admin's manual send action.
-4. Each invitation contains a private, stay-specific breakfast link.
-5. The guest opens the link without signing in again.
-
-## Guest webpage walkthrough
-
-1. The backend validates that the link is active and that the stay is still eligible.
-2. The page loads the guest's rooms, adult occupancy, service date, current menu, and available delivery slots.
-3. If the booking contains several rooms, the guest selects a room from the room selector.
-4. Each room starts with one Plate per eligible adult: Plate 1, Plate 2, and so on.
-5. For every Plate, the guest:
-   - selects one main dish;
-   - optionally adds sides or beverages;
-   - selects that Plate's delivery slot;
-   - optionally adds an allergy or preparation note.
-6. If fewer adults want breakfast, the guest can remove individual Plates.
-7. The guest can explicitly skip breakfast for an entire room.
-8. Selecting **Submit order** sends the complete choices for rooms that have Plates.
-9. The backend checks the ordering window, room occupancy, menu IDs, and live slot capacity again.
-10. A successful order opens an **Order submitted** confirmation with a room-by-room and Plate-by-Plate summary.
-11. The guest may return and edit the order while the backend ordering window remains open.
+1. Operations enables breakfast, maintains the menu and slots, and sends the invitation automatically or manually through the configured WhatsApp/WATI flow.
+2. The guest opens the private link without another login.
+3. The backend validates the link, stay, service date, and ordering window.
+4. The page loads all rooms attached to the booking and the actual eligible guest count for each room.
+5. For each room, the guest chooses either to order or to skip breakfast for that room.
+6. For every Plate being ordered, the guest selects one main dish, an available delivery slot, optional extras or beverages, and an optional request.
+7. The guest can remove a Plate when fewer listed guests want breakfast and can restore it only up to the backend count.
+8. `Review Order` remains disabled until every room is complete or explicitly skipped. The page shows what still needs attention.
+9. `Review Order` opens a receipt grouped by Room and Plate. No order has been sent yet.
+10. `Edit Order` returns to the same choices. `Confirm Order` sends the reviewed receipt to the backend.
+11. The backend rechecks the room, eligible guests, menu, window, and live slot capacity.
+12. On success, the guest sees `Order Placed`. A saved order shows only `Edit Order` while changes are still allowed.
 
 ## Workflow diagram
 
 ```mermaid
 flowchart TD
-    A[Property enables breakfast] --> B[Admin maintains menu and delivery slots]
-    B --> C[Backend finds eligible checked-in overnight stays]
-    C --> D[Automatic schedule or admin sends WhatsApp invite]
-    D --> E[Guest opens private breakfast link]
-    E --> F{Link and stay valid?}
-    F -- No --> G[Show disabled, expired, revoked, or invalid-link message]
-    F -- Yes --> H[Load rooms, adult occupancy, menu, service date, and slots]
-    H --> I{Ordering window open?}
-    I -- No --> J[Show existing order read-only or explain when ordering opens]
-    I -- Yes --> K{More than one room?}
-    K -- Yes --> L[Guest selects a room]
-    K -- No --> M[Open the room directly]
-    L --> N[Show Plate 1 through Plate N from adult occupancy]
+    A[Operations configures menu and delivery slots] --> B[Backend finds eligible checked-in stays]
+    B --> C[WhatsApp or WATI sends a private breakfast link]
+    C --> D[Guest opens the link]
+    D --> E{Link and stay valid?}
+    E -- No --> F[Show safe invalid, revoked, disabled, or checked-out message]
+    E -- Yes --> G[Load service date, rooms, actual eligible guests, menu, slots, and saved order]
+    G --> H{Ordering window open?}
+    H -- No --> I[Show saved choices read-only or the next opening time]
+    H -- Yes --> J[Guest completes each room]
+    J --> K{Choice for this room}
+    K -- Skip room --> L[Stage room as Skipped]
+    K -- Order --> M[Choose each Plate's main, slot, extras, and request]
+    L --> N{All rooms complete?}
     M --> N
-    N --> O[Choose one main, optional extras or drinks, slot, and request for each Plate]
-    O --> P{Guest choice}
-    P -- Skip room --> Q[Confirm room-level Skip]
-    P -- Submit order --> R[Backend revalidates window, occupancy, menu, and capacity]
+    N -- No --> J
+    N -- Yes --> O[Review Order]
+    O --> P[Receipt: Room then Plates and choices]
+    P --> Q{Guest action}
+    Q -- Edit Order --> J
+    Q -- Confirm Order --> R[Backend revalidates and saves]
     R --> S{Accepted?}
-    S -- Slot filled or window changed --> T[Refresh state and ask guest to correct the choice]
-    T --> O
-    S -- Yes --> U[Show Order submitted summary]
-    U --> V[Guest may edit until the window freezes]
-    Q --> U
+    S -- Slot or window changed --> T[Preserve choices and show what must change]
+    T --> J
+    S -- Yes --> U[Order Placed receipt]
+    U --> V[Edit Order only while the window is open]
 ```
 
-## What property operations can control
+## What operations controls
 
-- Whether breakfast is enabled for the property.
-- Which menu items are active, their category, description, vegetarian status, and display order.
-- Which delivery slots are active and the Plate capacity of each slot.
+- Property breakfast enablement.
+- Active menu items, categories, descriptions, vegetarian state, and order.
+- Delivery slots and Plate capacity.
 - Automatic invitation timing and manual invitation sending.
-- Admin placement or adjustment of an order for a guest when operational intervention is required.
-- Daily room orders, Plate totals, slot occupancy, dashboard totals, and kitchen quantity summaries.
+- Admin order placement or correction where operational intervention is needed.
+- Daily orders, slot occupancy, Plate totals, and kitchen summaries.
 
-## Current limitations and rules
+## Current limitations
 
-- Eligibility and Plate counts come from backend/PMS room occupancy. The webpage cannot override them.
-- Plates are based on eligible adults; children do not create additional Plates in the current contract.
-- Each Plate can select one main dish. Sides and beverages are optional.
-- Slot capacity is counted in Plates, not rooms. Two Plates using one slot consume two places.
-- A slot can become full between page load and Submit. The backend remains the final authority and may ask the guest to choose again.
-- Skip applies to one room at a time. Rooms omitted from a submission remain unchanged.
-- The link stops working after checkout, revocation, property breakfast disablement, or another backend terminal state.
-- When the ordering window is frozen, the guest can view saved choices but cannot change them.
-- Phase 1 manages a menu catalog, not ingredient inventory or per-item stock.
-- Delivery-driver tracking, delivery SLA, buffet fallback, and post-delivery rating are not part of the current guest webpage.
+- The backend is the source of truth for rooms and actual breakfast-eligible guest count. The guest page cannot increase that count.
+- Current backend documentation treats `max_plates` as eligible adults per room; it is not the room's physical maximum occupancy.
+- Every ordered Plate needs one main and one slot. Sides and beverages are optional.
+- Slot capacity is counted in Plates, not rooms. A slot may fill after the page loads, so the backend can require another choice.
+- Skip applies separately to each room and is saved only when the guest confirms the complete reviewed order.
+- The page becomes read-only when the backend freezes ordering and stops working after checkout, revocation, disablement, or invalidation.
+- Menu and slot administration, ingredient stock, delivery tracking, buffet fallback, and ratings are outside this guest page.
+- TDS is the current frontend production target. Buteak hosting is a later rollout and requires its own route acceptance.
 
 ## Source-of-truth rule
 
-The backend is authoritative for the guest's rooms, adult occupancy, menu items, delivery slots, remaining capacity, link validity, ordering window, and saved order. The frontend only displays and submits the values permitted by that response.
+The frontend displays and submits only the backend response. It does not derive guest count from a room label, bed type, apartment capacity, or marketing inventory.

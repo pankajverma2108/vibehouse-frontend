@@ -8,6 +8,7 @@ import type {
 
 export const BREAKFAST_TEST_TOKENS = [
   "test-OnePax",
+  "test-OneGuestInTwoPaxRoom",
   "test-TwoPaxOneRoom",
   "test-FourPaxOneRoom",
   "test-ThreeRooms",
@@ -70,6 +71,12 @@ const existingRoom: BreakfastRoom = {
 };
 
 const scenarios: Record<BreakfastTestToken, BreakfastTestScenario> = {
+  "test-OneGuestInTwoPaxRoom": {
+    token: "test-OneGuestInTwoPaxRoom",
+    label: "One guest - two-pax apartment",
+    description: "A two-pax apartment with one actual breakfast-eligible guest; the backend cap is one Plate.",
+    response: response([room("204 - two-pax apartment", 1)], "TDS"),
+  },
   "test-OnePax": { token: "test-OnePax", label: "One guest · one room", description: "The simplest single-room breakfast order.", response: response([room("101", 1)]) },
   "test-TwoPaxOneRoom": { token: "test-TwoPaxOneRoom", label: "Two guests · one room", description: "Two separate plates within one room.", response: response([room("302", 2)]) },
   "test-FourPaxOneRoom": { token: "test-FourPaxOneRoom", label: "Four guests · one room", description: "High occupancy and repeated plate controls.", response: response([room("408", 4)]) },

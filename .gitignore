@@ -23,6 +23,11 @@ docs/breakfast/*
 !docs/breakfast/24_breakfast_stakeholder_workflow.md
 !docs/breakfast/25_breakfast_preview_and_test_routes.md
 
+# Track only the dated frontend-to-backend breakfast handoff.
+!docs/fe_to_be/
+docs/fe_to_be/*
+!docs/fe_to_be/breakfast_guest_order_prod_handoff_2026-07-13.md
+
 # Internal planning and workflow docs (not for remote repo)
 # guidelines/finalised_workflows/
 # guidelines/api_routes/

@@ -2,50 +2,49 @@
 
 ## Purpose
 
-These routes let product owners, property stakeholders, designers, and testers review the breakfast experience without a real stay or backend-issued breakfast token.
+These exact routes let stakeholders, designers, and testers review breakfast ordering without a real booking or backend-issued token.
 
-Preview scenarios use static fake booking data. They never read or write guest data. **Submit order** and **Skip breakfast** update only the current browser session and show a sample confirmation; they never call the breakfast API.
+Preview fixtures are fake and local to the frontend. Preview load and `Confirm Order` never read or write the breakfast API. Confirmation changes only the current browser session.
 
 ## Route model
 
-The real and preview experiences intentionally share the same public route shape:
+Both real and preview pages use:
 
 ```text
 /breakfast/{token}
 ```
 
-- A backend-issued opaque token uses the real API validation and order workflow.
-- An exact allowlisted test token uses its fake scenario and simulated Submit/Skip behavior.
-- Any unknown token is treated as a real token and sent to backend validation.
+- A backend-issued opaque token follows real GET validation and real POST confirmation.
+- An exact allowlisted test token uses a fake fixture and simulated confirmation.
+- Any unknown token, including an unknown `test-*` token, follows real backend validation.
+- There is no prefix wildcard.
 
-The allowlist uses exact equality. There is no `test-` prefix wildcard.
+## Available origins
 
-## Preview indexes
+- Local preview index: `http://localhost:3000/breakfast/preview`
+- Current TDS deployment: `https://thedailysocial.co.in/breakfast/preview`
+- Buteak: later rollout; do not use `https://buteak.in/breakfast/preview` as acceptance evidence until the Buteak host deploys this Next.js route.
 
-- Local: `http://localhost:3000/breakfast/preview`
-- Buteak deployment: `https://buteak.in/breakfast/preview`
-- TDS deployment: `https://thedailysocial.co.in/breakfast/preview`
+## Exact preview links
 
-The deployed URL is available only after the frontend version containing this feature is released on that domain.
-
-## Scenario links
-
-Use the path on localhost, Buteak, or TDS by replacing `{origin}` with the required origin.
+Replace `{origin}` with `http://localhost:3000` or the deployed TDS origin.
 
 | Scenario | Route |
 |---|---|
 | One guest in one room | `{origin}/breakfast/test-OnePax` |
+| One actual guest in a physically two-pax apartment | `{origin}/breakfast/test-OneGuestInTwoPaxRoom` |
 | Two guests and two Plates in one room | `{origin}/breakfast/test-TwoPaxOneRoom` |
-| Four guests and four Plates in one room | `{origin}/breakfast/test-FourPaxOneRoom` |
-| One booker with three rooms at 1, 2, and 3 eligible adults | `{origin}/breakfast/test-ThreeRooms` |
-| Existing submitted two-Plate order | `{origin}/breakfast/test-ExistingOrder` |
-| Existing order in the frozen read-only window | `{origin}/breakfast/test-FrozenOrder` |
+| Four guests and repeated Plate controls | `{origin}/breakfast/test-FourPaxOneRoom` |
+| One booker with three rooms | `{origin}/breakfast/test-ThreeRooms` |
+| Existing submitted order | `{origin}/breakfast/test-ExistingOrder` |
+| Existing order in a frozen window | `{origin}/breakfast/test-FrozenOrder` |
 | All delivery slots full | `{origin}/breakfast/test-AllSlotsFull` |
 | TDS branding with two rooms | `{origin}/breakfast/test-TDSTwoRooms` |
 
 ### Direct localhost links
 
 - `http://localhost:3000/breakfast/test-OnePax`
+- `http://localhost:3000/breakfast/test-OneGuestInTwoPaxRoom`
 - `http://localhost:3000/breakfast/test-TwoPaxOneRoom`
 - `http://localhost:3000/breakfast/test-FourPaxOneRoom`
 - `http://localhost:3000/breakfast/test-ThreeRooms`
@@ -56,44 +55,50 @@ Use the path on localhost, Buteak, or TDS by replacing `{origin}` with the requi
 
 ## Tester walkthrough
 
-1. Open the preview index and choose a scenario.
-2. Confirm the page header shows **Design preview** and **Submit is simulated**.
-3. For a multi-room scenario, switch between every room and verify the room's Plate count matches occupancy.
-4. For every Plate, choose one main dish and one available delivery slot.
-5. Optionally add sides, beverages, or a special request.
-6. Remove a Plate and add it back to verify the occupancy cap.
-7. Select **Submit order**.
-8. Confirm the **Order submitted** dialog opens with a Plate-by-Plate summary and the message that no order was saved.
-9. Close the dialog and use **Edit breakfast choices** to return to the form.
-10. Verify **Skip breakfast for Room ...** requires confirmation and affects only that room.
-11. Open the frozen scenario and confirm no Submit action is available.
-12. Open the all-slots-full scenario and confirm every delivery slot is disabled.
+1. Open `/breakfast/preview` and choose a scenario.
+2. Confirm the preview notice says the submission is simulated.
+3. Open `test-OneGuestInTwoPaxRoom`; verify the apartment label implies two-pax capacity but the page renders only Plate 1 because backend `max_plates` is one.
+4. Open a multi-room scenario and complete or Skip every room independently.
+5. Verify room navigation distinguishes complete, incomplete, and skipped rooms.
+6. Verify `Review Order` remains disabled until all mandatory room and Plate choices are complete.
+7. Select one main and one available slot for each ordered Plate; optionally select extras and requests.
+8. Select `Review Order`; verify no network request is made and a receipt opens in Room -> Plate order.
+9. Select `Edit Order`; verify all choices are preserved.
+10. Review again and select `Confirm Order`; verify the sample `Order Placed` receipt opens and no breakfast GET or POST is made.
+11. Verify the saved receipt exposes only `Edit Order` as its action.
+12. Open `test-ExistingOrder`; verify the saved summary initially exposes only Edit.
+13. Open `test-FrozenOrder`; verify the saved order is read-only.
+14. Open `test-AllSlotsFull`; verify full slots remain visible and unavailable.
 
 ## Real-token production checks
 
-Preview success does not replace a staging test with a backend-issued token. Before release acceptance, verify:
+Preview success does not prove backend persistence. With an authorized disposable WATI token, verify:
 
-- `GET /public/breakfast/{token}` loads backend rooms, current menu items, slots, window, and existing orders.
-- The live menu can contain any number of backend items; the frontend groups all returned active items by `MAIN`, `ADDON`, and `BEVERAGE` and sorts them by `sort_order`.
-- `POST /public/breakfast/{token}` saves the selected room and Plate payloads.
-- The success response replaces the UI with backend-returned room state and opens the confirmation dialog.
-- `409 slot_full` refreshes capacity and asks the guest to select another slot.
-- `409 window_frozen` switches the page to read-only.
-- Checked-out, revoked, disabled, and invalid tokens show terminal states without exposing guest information.
+- `GET /public/breakfast/{token}` supplies the correct rooms, actual per-room eligible guest count under `max_plates`, service date, menu, slots, and saved order;
+- Review opens without POST;
+- `Confirm Order` sends exactly one `POST /public/breakfast/{token}` with the reviewed Room/Plate payload;
+- the success response becomes the saved receipt;
+- a following GET reports `PLACED` or `SKIPPED` room state matching the receipt;
+- the admin order view is checked for the same `window.service_date`, not merely its default date;
+- `409 slot_full` preserves choices and requests another slot;
+- `409 window_frozen` switches to read-only;
+- invalid, checked-out, revoked, and disabled links expose no stay details.
 
-## Safety and data-isolation rules
+Never paste the real token or full tokenized URL into logs, screenshots, docs, tickets, or chat.
 
-- Test fixtures contain no real booking IDs, guest names, phone numbers, or opaque production tokens.
-- Test-token Submit and Skip never call GET or POST breakfast APIs.
-- Real tokens never use preview fixtures unless they exactly match the explicit test-token allowlist.
-- Both route types use `no-referrer` metadata so the token path is not forwarded as a browser referrer.
-- Preview pages are marked `noindex, nofollow` and are not linked from the public marketing navigation.
-- The preview fixture file must never contain copied production responses with guest data.
+## Safety rules
+
+- Fake fixtures contain no real booking IDs, names, phones, or production tokens.
+- Exact allowlisting is the only preview bypass.
+- Preview Confirm and Skip are simulated and never call the breakfast API.
+- Non-allowlisted tokens always use backend validation.
+- Breakfast token routes use `no-referrer`; preview routes use `noindex, nofollow`.
+- CDN, proxy, and observability access logs still require server-side token-path redaction.
 
 ## Implementation locations
 
-- Test-token allowlist and fake scenarios: `lib/breakfast-preview.ts`
-- Route decision between preview and real API: `app/breakfast/[token]/page.tsx`
+- Test-token allowlist and fixtures: `lib/breakfast-preview.ts`
+- Real-versus-preview route decision: `app/breakfast/[token]/page.tsx`
 - Preview index: `app/breakfast/preview/page.tsx`
-- Real API lookup and Submit: `lib/breakfast-api.ts`
-- Shared page and simulated mutation behavior: `components/breakfast/breakfast-page.tsx`
+- API transport: `lib/breakfast-api.ts`
+- Shared review and confirmation behavior: `components/breakfast/breakfast-page.tsx`
