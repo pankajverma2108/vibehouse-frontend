@@ -3,8 +3,8 @@
 import { CalendarDays, Clock3 } from "lucide-react";
 import type { ReactNode } from "react";
 
-import type { BreakfastMenuItem, BreakfastRoom } from "@/lib/breakfast-api";
-import type { BreakfastOrderReview, BreakfastReceiptRoom } from "@/lib/breakfast-order";
+import type { BreakfastMenuItem, BreakfastRoom, BreakfastSlot } from "@/lib/breakfast-api";
+import { formatBreakfastSlotWindow, type BreakfastOrderReview, type BreakfastReceiptRoom } from "@/lib/breakfast-order";
 
 export function formatBreakfastServiceDate(value: string) {
   const [year, month, day] = value.split("-").map(Number);
@@ -107,13 +107,16 @@ export function BreakfastReviewDetails({ review, serviceDate }: { review: Breakf
 export function BreakfastOrderDetails({
   rooms,
   menu,
+  slots,
   serviceDate,
 }: {
   rooms: BreakfastRoom[];
   menu: BreakfastMenuItem[];
+  slots: BreakfastSlot[];
   serviceDate: string;
 }) {
   const menuNames = new Map(menu.map((item) => [item.id, item.name]));
+  const slotWindows = new Map(slots.map((slot) => [slot.id, formatBreakfastSlotWindow(slot)]));
   return (
     <div className="space-y-8">
       <BreakfastDateLine serviceDate={serviceDate} />
@@ -144,7 +147,7 @@ export function BreakfastOrderDetails({
                   }))}
                   key={plate.plate_number}
                   plateNumber={plate.plate_number}
-                  slotLabel={plate.slot_label}
+                  slotLabel={slotWindows.get(plate.slot_id) ?? "Delivery time unavailable"}
                   specialRequests={plate.special_requests}
                 />
               ))}
@@ -159,6 +162,7 @@ export function BreakfastOrderDetails({
 export function BreakfastOrderSummary({
   rooms,
   menu,
+  slots,
   serviceDate,
   title = "Order Placed",
   note,
@@ -166,6 +170,7 @@ export function BreakfastOrderSummary({
 }: {
   rooms: BreakfastRoom[];
   menu: BreakfastMenuItem[];
+  slots: BreakfastSlot[];
   serviceDate: string;
   title?: string;
   note?: string;
@@ -178,7 +183,7 @@ export function BreakfastOrderSummary({
         {title}
       </h2>
       {note ? <p className="mt-3 text-sm leading-6 text-white/66">{note}</p> : null}
-      <div className="mt-7"><BreakfastOrderDetails menu={menu} rooms={rooms} serviceDate={serviceDate} /></div>
+      <div className="mt-7"><BreakfastOrderDetails menu={menu} rooms={rooms} serviceDate={serviceDate} slots={slots} /></div>
       {actions ? <div className="mt-7 flex flex-col gap-3 sm:flex-row">{actions}</div> : null}
     </section>
   );

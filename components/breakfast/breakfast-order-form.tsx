@@ -8,6 +8,7 @@ import type { BreakfastValidResponse } from "@/lib/breakfast-api";
 import {
   MAX_BREAKFAST_REQUEST_LENGTH,
   addBreakfastPlate,
+  formatBreakfastSlotWindow,
   getBreakfastErrorId,
   getRoomDraft,
   groupBreakfastMenu,
@@ -371,7 +372,9 @@ export function BreakfastOrderForm({
                                 onChange={() => setPlate(plateIndex, (current) => ({ ...current, slotId: slot.id }))}
                                 type="radio"
                               />
-                              <span className="font-semibold text-white">{slot.label}</span>
+                              <span className="font-semibold tabular-nums text-white">
+                                {formatBreakfastSlotWindow(slot)}
+                              </span>
                             </span>
                             <span className="shrink-0 text-xs font-bold text-white/52">{available ? "Available" : "Full"}</span>
                           </label>

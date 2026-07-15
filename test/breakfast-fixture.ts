@@ -17,8 +17,8 @@ export function createBreakfastFixture(): BreakfastValidResponse {
       { id: "drink-coffee", name: "Filter Coffee", description: "Fresh filter coffee.", category: "BEVERAGE", is_veg: true, sort_order: 1 },
     ],
     slots: [
-      { id: "slot-730", slot_number: 1, label: "7:30 - 8:00 AM", start_min: 450, end_min: 480, capacity: 12, booked: 8, remaining: 4, sort_order: 1 },
-      { id: "slot-800", slot_number: 2, label: "8:00 - 8:30 AM", start_min: 480, end_min: 510, capacity: 12, booked: 12, remaining: 0, sort_order: 2 },
+      { id: "slot-730", slot_number: 1, label: "Slot1", start_min: 450, end_min: 480, capacity: 12, booked: 8, remaining: 4, sort_order: 1 },
+      { id: "slot-800", slot_number: 2, label: "Slot2", start_min: 480, end_min: 510, capacity: 12, booked: 12, remaining: 0, sort_order: 2 },
     ],
   };
 }

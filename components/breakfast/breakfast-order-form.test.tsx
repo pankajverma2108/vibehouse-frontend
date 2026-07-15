@@ -32,7 +32,8 @@ describe("BreakfastOrderForm", () => {
   it("uses native per-plate radios and disables full slots", async () => {
     render(<Harness />);
     expect(screen.getAllByRole("radio", { name: /Masala Dosa/i })).toHaveLength(2);
-    expect(screen.getAllByRole("radio", { name: /8:00 - 8:30 AM/i }).every((item) => (item as HTMLInputElement).disabled)).toBe(true);
+    expect(screen.getAllByRole("radio", { name: /08:00 - 08:30/i }).every((item) => (item as HTMLInputElement).disabled)).toBe(true);
+    expect(screen.queryByText("Slot1")).toBeNull();
     expect(screen.getAllByText("Plate 2").length).toBeGreaterThan(0);
   });
 
@@ -50,7 +51,7 @@ describe("BreakfastOrderForm", () => {
     expect((reviewButton as HTMLButtonElement).disabled).toBe(true);
 
     const mains = screen.getAllByRole("radio", { name: /Masala Dosa/i });
-    const slots = screen.getAllByRole("radio", { name: /7:30 - 8:00 AM/i });
+    const slots = screen.getAllByRole("radio", { name: /07:30 - 08:00/i });
     await user.click(mains[0]);
     await user.click(mains[1]);
     await user.click(slots[0]);

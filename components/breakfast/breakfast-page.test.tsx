@@ -14,7 +14,7 @@ vi.mock("@/lib/breakfast-api", async (importOriginal) => {
 
 async function completeSinglePlate(user: ReturnType<typeof userEvent.setup>) {
   await user.click(await screen.findByRole("radio", { name: /Idli and Vada/i }));
-  await user.click(screen.getByRole("radio", { name: /7:30 - 8:00 AM/i }));
+  await user.click(screen.getByRole("radio", { name: /07:30 - 08:00/i }));
 }
 
 describe("BreakfastPage review and confirmation flow", () => {
@@ -37,12 +37,12 @@ describe("BreakfastPage review and confirmation flow", () => {
     const firstRoomMains = await screen.findAllByRole("radio", { name: /Masala Dosa/i });
     await user.click(firstRoomMains[0]);
     await user.click(firstRoomMains[1]);
-    const firstRoomSlots = screen.getAllByRole("radio", { name: /7:30 - 8:00 AM/i });
+    const firstRoomSlots = screen.getAllByRole("radio", { name: /07:30 - 08:00/i });
     await user.click(firstRoomSlots[0]);
     await user.click(firstRoomSlots[1]);
     await user.click(screen.getByRole("tab", { name: /Room 102 B/i }));
     await user.click(screen.getByRole("radio", { name: /Plain Omelette/i }));
-    await user.click(screen.getAllByRole("radio", { name: /7:30 - 8:00 AM/i })[0]);
+    await user.click(screen.getAllByRole("radio", { name: /07:30 - 08:00/i })[0]);
     await user.click(screen.getByRole("button", { name: "Review Order" }));
 
     const reviewDialog = await screen.findByRole("dialog", { name: "Review Your Order" });
@@ -100,7 +100,7 @@ describe("BreakfastPage review and confirmation flow", () => {
     await waitFor(() => expect(screen.queryByRole("dialog", { name: "Review Your Order" })).toBeNull());
 
     expect((screen.getByRole("radio", { name: /Idli and Vada/i }) as HTMLInputElement).checked).toBe(true);
-    expect((screen.getByRole("radio", { name: /7:30 - 8:00 AM/i }) as HTMLInputElement).checked).toBe(true);
+    expect((screen.getByRole("radio", { name: /07:30 - 08:00/i }) as HTMLInputElement).checked).toBe(true);
     expect(submitPublicBreakfast).not.toHaveBeenCalled();
   });
 
@@ -260,8 +260,26 @@ describe("BreakfastPage review and confirmation flow", () => {
   it("shows an existing saved order with Edit Order and no confirm action", () => {
     render(<BreakfastPage initialLookup={getBreakfastTestScenario("test-ExistingOrder").response} token="test-ExistingOrder" />);
     expect(screen.getByRole("heading", { name: "Order Placed" })).not.toBeNull();
+    expect(screen.getByText("07:30 - 08:00")).not.toBeNull();
+    expect(screen.queryByText("Slot1")).toBeNull();
     expect(screen.getByRole("button", { name: "Edit Order" })).not.toBeNull();
     expect(screen.queryByRole("button", { name: "Confirm Order" })).toBeNull();
+  });
+
+  it("does not expose an internal label when a saved slot is no longer returned", () => {
+    const response = getBreakfastTestScenario("test-ExistingOrder").response;
+    const missingSlotResponse = {
+      ...response,
+      slots: response.slots.filter((slot) => slot.id !== response.rooms[0].plates[0].slot_id),
+      rooms: response.rooms.map((room, index) => index === 0
+        ? { ...room, plates: room.plates.map((plate) => ({ ...plate, slot_label: "Slot1" })) }
+        : room),
+    };
+
+    render(<BreakfastPage initialLookup={missingSlotResponse} token="test-ExistingOrder" />);
+
+    expect(screen.getByText("Delivery time unavailable")).not.toBeNull();
+    expect(screen.queryByText("Slot1")).toBeNull();
   });
 });
 

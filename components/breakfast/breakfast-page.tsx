@@ -526,6 +526,7 @@ export function BreakfastPage({ token, previewLabel, simulateSubmit = false, ini
                     : `Ordering opens at ${validLookup.window.opens_at_ist}.`}
                   rooms={summaryRooms}
                   serviceDate={validLookup.window.service_date}
+                  slots={validLookup.slots}
                 />
               ) : null}
 

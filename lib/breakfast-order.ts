@@ -72,6 +72,15 @@ function compareSortOrder<T extends { sort_order: number; id: string }>(a: T, b:
 
 export function sortBreakfastMenu(menu: BreakfastMenuItem[]) { return [...menu].sort(compareSortOrder); }
 export function sortBreakfastSlots(slots: BreakfastSlot[]) { return [...slots].sort(compareSortOrder); }
+export function formatBreakfastSlotWindow(slot: Pick<BreakfastSlot, "start_min" | "end_min">) {
+  const formatMinutes = (minutes: number) => {
+    const hours = Math.floor(minutes / 60).toString().padStart(2, "0");
+    const mins = (minutes % 60).toString().padStart(2, "0");
+    return `${hours}:${mins}`;
+  };
+
+  return `${formatMinutes(slot.start_min)} - ${formatMinutes(slot.end_min)}`;
+}
 export function groupBreakfastMenu(menu: BreakfastMenuItem[]): BreakfastMenuGroups {
   const sorted = sortBreakfastMenu(menu);
   return {
@@ -282,17 +291,20 @@ export function buildBreakfastOrderReview(response: BreakfastValidResponse, payl
         statusLabel: payloadRoom.action === "SKIP" ? "Breakfast skipped" : "Breakfast selected",
         plates: payloadRoom.action === "SKIP"
           ? []
-          : (payloadRoom.plates ?? []).map((plate, index) => ({
-              plateNumber: index + 1,
-              slotId: plate.slot_id,
-              slotLabel: slots.get(plate.slot_id)?.label ?? "Selected slot",
-              specialRequests: plate.special_requests ?? null,
-              items: plate.items.map((item) => ({
-                menuItemId: item.menu_item_id,
-                name: menu.get(item.menu_item_id)?.name ?? "Menu item",
-                qty: item.qty,
-              })),
-            })),
+          : (payloadRoom.plates ?? []).map((plate, index) => {
+              const slot = slots.get(plate.slot_id);
+              return {
+                plateNumber: index + 1,
+                slotId: plate.slot_id,
+                slotLabel: slot ? formatBreakfastSlotWindow(slot) : "Selected slot",
+                specialRequests: plate.special_requests ?? null,
+                items: plate.items.map((item) => ({
+                  menuItemId: item.menu_item_id,
+                  name: menu.get(item.menu_item_id)?.name ?? "Menu item",
+                  qty: item.qty,
+                })),
+              };
+            }),
       };
     }),
   };
@@ -340,14 +352,17 @@ export function buildPreviewRooms(response: BreakfastValidResponse, payloadRooms
     return {
       ...room,
       order_status: "PLACED",
-      plates: (update.plates ?? []).map((plate, index) => ({
-        plate_number: index + 1,
-        slot_id: plate.slot_id,
-        slot_label: slots.get(plate.slot_id)?.label ?? "Selected slot",
-        status: "PLACED",
-        special_requests: plate.special_requests ?? null,
-        items: plate.items.map((item) => ({ menu_item_id: item.menu_item_id, name: menu.get(item.menu_item_id)?.name ?? "Menu item", qty: item.qty })),
-      })),
+      plates: (update.plates ?? []).map((plate, index) => {
+        const slot = slots.get(plate.slot_id);
+        return {
+          plate_number: index + 1,
+          slot_id: plate.slot_id,
+          slot_label: slot ? formatBreakfastSlotWindow(slot) : "Selected slot",
+          status: "PLACED",
+          special_requests: plate.special_requests ?? null,
+          items: plate.items.map((item) => ({ menu_item_id: item.menu_item_id, name: menu.get(item.menu_item_id)?.name ?? "Menu item", qty: item.qty })),
+        };
+      }),
     };
   });
 }

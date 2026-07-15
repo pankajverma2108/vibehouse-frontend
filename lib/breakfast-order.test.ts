@@ -6,6 +6,7 @@ import {
   buildPreviewRooms,
   createBreakfastDraft,
   doesBreakfastLookupMatchPayload,
+  formatBreakfastSlotWindow,
   isBreakfastSlotSelectable,
   removeBreakfastPlate,
   setBreakfastRoomIntent,
@@ -14,6 +15,10 @@ import {
 import { createBreakfastFixture } from "@/test/breakfast-fixture";
 
 describe("breakfast order helpers", () => {
+  it("formats the backend slot window without using its label", () => {
+    expect(formatBreakfastSlotWindow({ start_min: 450, end_min: 480 })).toBe("07:30 - 08:00");
+  });
+
   it("starts an unplaced room with one plate per backend adult", () => {
     const draft = createBreakfastDraft(createBreakfastFixture());
     expect(draft.rooms.map((room) => room.plates.length)).toEqual([2, 1]);
@@ -141,7 +146,7 @@ describe("breakfast order helpers", () => {
     payload.rooms[0].plates![0].items[0].qty = 9;
 
     expect(review.rooms[0]).toMatchObject({ roomNumber: "404", guestCount: 2, action: "ORDER", statusLabel: "Breakfast selected" });
-    expect(review.rooms[0].plates[0]).toMatchObject({ plateNumber: 1, slotLabel: "7:30 - 8:00 AM", specialRequests: "No onion", items: [{ name: "Masala Dosa", qty: 1 }] });
+    expect(review.rooms[0].plates[0]).toMatchObject({ plateNumber: 1, slotLabel: "07:30 - 08:00", specialRequests: "No onion", items: [{ name: "Masala Dosa", qty: 1 }] });
     expect(review.rooms[1]).toMatchObject({ roomNumber: "405", action: "SKIP", statusLabel: "Breakfast skipped", plates: [] });
     expect(review.payload.rooms[0].plates?.[0].items[0].qty).toBe(1);
   });

@@ -42,6 +42,7 @@ describe("BreakfastConfirmationDialog", () => {
     expect(screen.getByRole("dialog", { name: "Review Your Order" })).not.toBeNull();
     expect(screen.getByRole("button", { name: "Edit Order" })).not.toBeNull();
     expect(screen.getByRole("button", { name: "Confirm Order" })).not.toBeNull();
+    expect(screen.getByText("07:30 - 08:00")).not.toBeNull();
     expect(screen.getByText("Breakfast will be skipped for this room.")).not.toBeNull();
   });
 
