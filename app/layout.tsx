@@ -25,8 +25,8 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
-      <body suppressHydrationWarning className="vh-shell flex min-h-screen flex-col font-body">
+    <html lang="en" className="dark" data-scroll-behavior="smooth">
+      <body suppressHydrationWarning className="vh-shell flex min-h-screen flex-col font-body bg-[#0D0D0D] text-white antialiased">
         <GuestAuthProvider>
           <Suspense fallback={null}>
             <Navigation />

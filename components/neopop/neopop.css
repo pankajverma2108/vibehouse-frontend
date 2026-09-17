@@ -1,0 +1,282 @@
+/**
+ * NeoPOP Global Stylesheet & Core Geometry
+ * Conforming strictly to migration-plan/NEOPOP_DESIGN_SYSTEM_INSTRUCTIONS.md
+ */
+
+/* ==========================================================================
+   1. Typography / Font Faces (Gilroy & Cirka)
+   ========================================================================== */
+
+/* Gilroy (UI / Body / Display) */
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/gilroy/Gilroy-Thin.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/gilroy/Gilroy-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/gilroy/Gilroy-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/gilroy/Gilroy-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/gilroy/Gilroy-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/gilroy/Gilroy-ExtraBold.woff') format('woff');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Cirka (Editorial Headline / Display) */
+@font-face {
+  font-family: 'Cirka';
+  src: url('/fonts/cirka/PPCirka-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cirka';
+  src: url('/fonts/cirka/PPCirka-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cirka';
+  src: url('/fonts/cirka/PPCirka-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cirka';
+  src: url('/fonts/cirka/PPCirka-Semibold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cirka';
+  src: url('/fonts/cirka/PPCirka-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ==========================================================================
+   2. Design System Root Variables
+   ========================================================================== */
+
+:root {
+  /* Surfaces */
+  --np-black-500: #0d0d0d;
+  --np-black-400: #121212;
+  --np-black-300: #161616;
+  --np-black-200: #3d3d3d;
+  --np-black-100: #262626;
+
+  /* Typography Hierarchy */
+  --np-white-500: #ffffff;
+  --np-white-300: #efefef;
+  --np-white-100: #d2d2d2;
+  --np-white-secondary: rgba(255, 255, 255, 0.62);
+
+  /* Semantic Palette */
+  --np-yellow: #ffcb45;
+  --np-green: #3bffad;
+  --np-blue: #3f6fd9;
+  --np-pink: #ff426f;
+  --np-red: #ee4d37;
+
+  /* Geometry & Physics */
+  --np-edge-width: 3px;
+  --np-motion-press: 120ms;
+  --radius-container: 0px;
+  --radius-element: 0px;
+  --radius: 0px;
+
+  /* Font Families */
+  --font-gilroy: 'Gilroy', 'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-cirka: 'Cirka', 'Libre Bodoni', 'Italian Wedge', Georgia, serif;
+}
+
+/* ==========================================================================
+   3. Sharp Geometry & Plunk 3D Construction
+   ========================================================================== */
+
+.np-sharp {
+  border-radius: 0px !important;
+}
+
+/* 3D Plunk Button / Surface Container */
+.np-plunk {
+  isolation: isolate;
+  position: relative;
+  display: inline-flex;
+  background: transparent;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+/* Plunk Face */
+.np-plunk-face {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  transition: transform var(--np-motion-press) cubic-bezier(0.2, 0, 0, 1);
+  will-change: transform;
+  border-radius: 0px;
+  box-sizing: border-box;
+}
+
+/* Bottom Beveled Edge */
+.np-plunk::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: calc(100% - var(--np-edge-width));
+  height: var(--np-edge-width);
+  background: var(--np-edge, #000000);
+  transform: skewX(45deg);
+  transform-origin: 0 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity var(--np-motion-press) ease-in-out;
+}
+
+/* Right Beveled Edge */
+.np-plunk::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--np-edge-width);
+  height: calc(100% - var(--np-edge-width));
+  background: var(--np-edge, #000000);
+  transform: skewY(45deg);
+  transform-origin: 0 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity var(--np-motion-press) ease-in-out;
+}
+
+/* Press Feedback (Tactile down-right 3px translation) */
+.np-plunk:active > .np-plunk-face,
+.np-plunk[data-active="true"] > .np-plunk-face {
+  transform: translate3d(var(--np-edge-width), var(--np-edge-width), 0);
+}
+
+/* When pressed, edge hides under the face */
+.np-plunk:active::before,
+.np-plunk:active::after,
+.np-plunk[data-active="true"]::before,
+.np-plunk[data-active="true"]::after {
+  opacity: 0.2;
+}
+
+/* Disabled Plunk */
+.np-plunk:disabled,
+.np-plunk[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   4. High-Contrast Offset Shadows & Elevation
+   ========================================================================== */
+
+.np-elevation-low {
+  box-shadow: 3px 3px 0px var(--np-black-200);
+}
+
+.np-elevation-high {
+  box-shadow: 6px 6px 0px var(--np-black-200);
+}
+
+.np-elevation-yellow {
+  box-shadow: 4px 4px 0px var(--np-yellow);
+}
+
+.np-elevation-green {
+  box-shadow: 4px 4px 0px var(--np-green);
+}
+
+.np-elevation-pink {
+  box-shadow: 4px 4px 0px var(--np-pink);
+}
+
+.np-elevation-black {
+  box-shadow: 4px 4px 0px #000000;
+}
+
+/* ==========================================================================
+   5. Focus Visible & Accessibility Contract
+   ========================================================================== */
+
+:focus-visible {
+  outline: 2px solid var(--np-green) !important;
+  outline-offset: 3px !important;
+}
+
+/* ==========================================================================
+   6. Reduced Motion Support
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .np-plunk:active > .np-plunk-face,
+  .np-plunk[data-active="true"] > .np-plunk-face {
+    transform: none !important;
+  }
+}
