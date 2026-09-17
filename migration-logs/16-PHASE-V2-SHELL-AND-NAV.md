@@ -36,8 +36,9 @@ The goal of Phase V-2 was to transform the global website chrome—desktop navig
 
 | File | Status | Description |
 |---|---|---|
-| `components/marketing/navigation.tsx` | **MODIFIED** | Zero-radius pitch-black shell, NeoPOP yellow plunk CTA, secondary auth button, sharp dropdown cards. |
-| `components/marketing/mobile-staggered-menu.tsx` | **MODIFIED** | Full-screen pitch-black sheet, sharp `#161616` cards with zero rotation, uppercase Gilroy typography. |
+| `components/marketing/cred-mega-menu.tsx` | **NEW** | Full CRED Mega Menu overlay, stacked `CredBrandLogo`, and `CredExpandTrigger` box with spotlight glow rail and showcase cards. |
+| `components/marketing/navigation.tsx` | **MODIFIED** | Exact CRED top bar with left logo, right expand box, and full-screen mega menu integration. |
+| `components/marketing/mobile-staggered-menu.tsx` | **MODIFIED** | Full-screen pitch-black sheet and CRED expand trigger bridge. |
 | `components/marketing/footer.tsx` | **MODIFIED** | Pitch-black `#0D0D0D` canvas, sharp `#3D3D3D` borders, high-contrast Gilroy typography. |
 | `content/typography.ts` | **MODIFIED** | Nav font styles updated to Gilroy with NeoPOP uppercase tracking. |
 
