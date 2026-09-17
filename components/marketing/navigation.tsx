@@ -22,6 +22,7 @@ import { getDefaultPropertyDestinationHref } from "@/lib/cx-api";
 import { isStandalonePublicRoute } from "@/lib/feedback-route";
 import { getActiveGuestHubBooking, getScopedGuestHubHref } from "@/lib/guest-hub";
 import { StaticAwareLink } from "@/components/static-export/static-aware-link";
+import { Button } from "@/components/neopop";
 import { cn } from "@/lib/utils";
 
 type DesktopNavLink = {
@@ -34,8 +35,7 @@ type DesktopNavLink = {
 
 type DesktopNavCard = {
   label: string;
-  bgColor: string;
-  textColor: string;
+  accentColor: string;
   links: DesktopNavLink[];
 };
 
@@ -69,8 +69,7 @@ const hostelCardLinks: DesktopNavLink[] = hostelNavItems.map((property) => ({
 const desktopNavCards: DesktopNavCard[] = [
   {
     label: "Hostels",
-    bgColor: "var(--vh-pink)",
-    textColor: "#FFFFFF",
+    accentColor: "var(--np-yellow)",
     links: [
       ...hostelCardLinks,
       { label: "Colive", href: "/rooms?type=colive", description: "Long stay setup" },
@@ -78,8 +77,7 @@ const desktopNavCards: DesktopNavCard[] = [
   },
   {
     label: "Experiences",
-    bgColor: "var(--vh-cyan)",
-    textColor: "#0f172a",
+    accentColor: "var(--np-blue)",
     links: [
       { label: "Experience Calendar", href: "/events", description: "Weekly highlights" },
       { label: "About Us", href: "/about", description: "The Daily Social story" },
@@ -89,8 +87,7 @@ const desktopNavCards: DesktopNavCard[] = [
   },
   {
     label: "Guest Hub",
-    bgColor: "var(--vh-lime)",
-    textColor: "#0f172a",
+    accentColor: "var(--np-green)",
     links: [
       { label: "My Bookings", href: "/bookings", requiresAuth: true },
       { label: "My Hub", href: "/guest", requiresAuth: true },
@@ -203,7 +200,7 @@ export function Navigation() {
   return (
     <motion.nav
       animate={reducedMotion ? { opacity: isVisible ? 1 : 0 } : { opacity: isVisible ? 1 : 0, y: isVisible ? 0 : -MOTION_DISTANCE.xxl }}
-      className={cn("fixed inset-x-0 top-4 z-50", !isVisible && "pointer-events-none")}
+      className={cn("fixed inset-x-0 top-3 z-50", !isVisible && "pointer-events-none")}
       initial={false}
       transition={reducedMotion ? createReducedMotionTransition() : createMotionTransition("moderate", "standard")}
     >
@@ -212,17 +209,17 @@ export function Navigation() {
           <div
             ref={desktopMenuRef}
             className={cn(
-              "relative overflow-visible rounded-2xl transition-all duration-200",
+              "relative overflow-visible border border-[#3D3D3D] transition-all duration-200",
               isScrolled
-                ? "border border-white/12 bg-[rgba(15,16,26,0.92)] shadow-[0_20px_50px_rgba(0,0,0,0.34)] backdrop-blur-xl"
-                : "border border-transparent bg-[rgba(15,16,26,0.72)]",
+                ? "bg-[#0D0D0D]/95 shadow-[0_16px_36px_rgba(0,0,0,0.85)] backdrop-blur-xl"
+                : "bg-[#0D0D0D]/90 backdrop-blur-md",
             )}
           >
-            <div className="relative grid h-[60px] grid-cols-[auto_1fr_auto] items-center px-3">
+            <div className="relative grid h-[60px] grid-cols-[auto_1fr_auto] items-center px-3.5">
               <button
                 aria-expanded={isDesktopMenuOpen}
                 aria-label={isDesktopMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-                className="group inline-flex h-10 w-10 items-center justify-center rounded-lg text-white"
+                className="group inline-flex h-9 w-9 items-center justify-center border border-[#3D3D3D] bg-[#161616] text-white hover:border-white transition-colors"
                 onClick={() => {
                   setIsProfileMenuOpen(false);
                   setIsDesktopMenuOpen((value) => !value);
@@ -230,63 +227,63 @@ export function Navigation() {
                 type="button"
               >
                 <span className={cn("relative h-3.5 w-3.5 transition-transform duration-300", isDesktopMenuOpen && "rotate-45")}> 
-                  <span className={cn("absolute left-0 top-0 h-[5px] w-[5px] rounded-full bg-current transition-all duration-200", isDesktopMenuOpen && "scale-90")} />
-                  <span className={cn("absolute right-0 top-0 h-[5px] w-[5px] rounded-full bg-current transition-all duration-200", isDesktopMenuOpen && "scale-90")} />
-                  <span className={cn("absolute bottom-0 left-0 h-[5px] w-[5px] rounded-full bg-current transition-all duration-200", isDesktopMenuOpen && "scale-90")} />
-                  <span className={cn("absolute bottom-0 right-0 h-[5px] w-[5px] rounded-full bg-current transition-all duration-200", isDesktopMenuOpen && "scale-90")} />
+                  <span className={cn("absolute left-0 top-0 h-[4px] w-[4px] bg-current transition-all duration-200", isDesktopMenuOpen && "scale-90")} />
+                  <span className={cn("absolute right-0 top-0 h-[4px] w-[4px] bg-current transition-all duration-200", isDesktopMenuOpen && "scale-90")} />
+                  <span className={cn("absolute bottom-0 left-0 h-[4px] w-[4px] bg-current transition-all duration-200", isDesktopMenuOpen && "scale-90")} />
+                  <span className={cn("absolute bottom-0 right-0 h-[4px] w-[4px] bg-current transition-all duration-200", isDesktopMenuOpen && "scale-90")} />
                 </span>
               </button>
 
               <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap">
                 <span className="sr-only">{siteMeta.name}</span>
-                <span aria-hidden="true" className="vh-retro-sign-flat block text-center text-[16px] leading-none text-[var(--vh-ice)]">
+                <span aria-hidden="true" className="block text-center text-[15px] font-extrabold uppercase tracking-[0.14em] text-white font-['Gilroy',sans-serif]">
                   THE DAILY SOCIAL
                 </span>
               </Link>
 
-              <div className="ml-auto flex items-center gap-2.5">
+              <div className="ml-auto flex items-center gap-3">
                 <div className="relative" ref={profileMenuRef}>
                   {!shouldShowSignedInState ? (
-                    <button
-                      className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/20 bg-[var(--vh-pink)] px-3.5 text-sm font-semibold text-white shadow-[0px_-1px_0px_0px_#FFFFFF40_inset,_0px_1px_0px_0px_#FFFFFF40_inset] transition hover:bg-[var(--vh-pink-soft)]"
+                    <Button
+                      size="sm"
+                      variant="secondary"
                       onClick={() => openAuthModal("signin")}
-                      type="button"
                     >
                       Sign In
-                    </button>
+                    </Button>
                   ) : (
-                    <button
-                      className="inline-flex h-9 items-center gap-2 rounded-lg border border-[var(--vh-pink)]/45 bg-[rgba(35,15,20,0.82)] px-3 text-sm font-semibold text-white transition hover:bg-[rgba(198,40,40,0.16)]"
+                    <Button
+                      size="sm"
+                      variant="secondary"
                       disabled={isRestoringSession && !isAuthenticated}
                       onClick={() => {
                         setIsDesktopMenuOpen(false);
                         setIsProfileMenuOpen((value) => !value);
                       }}
-                      type="button"
+                      startIcon={<CircleUserRound className="h-4 w-4" />}
                     >
-                      <CircleUserRound className="h-4.5 w-4.5" />
-                      <span>{isRestoringSession && !isAuthenticated ? "Profile" : guestFirstName}</span>
-                    </button>
+                      {isRestoringSession && !isAuthenticated ? "Profile" : guestFirstName}
+                    </Button>
                   )}
 
                   {isAuthenticated && isProfileMenuOpen ? (
-                    <div className="absolute right-0 top-[calc(100%+10px)] z-30 w-[216px] rounded-[20px] border border-white/15 bg-[#06090f] p-2 shadow-[0_20px_48px_rgba(0,0,0,0.45)]">
+                    <div className="absolute right-0 top-[calc(100%+10px)] z-30 w-[220px] border border-[#3D3D3D] bg-[#121212] p-1.5 shadow-[4px_4px_0px_#000000]">
                       <Link
                         href="/bookings"
-                        className="block rounded-xl px-4 py-3 text-base font-semibold text-white/90 transition hover:bg-white/8"
+                        className="block px-3.5 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-white/90 hover:bg-[#161616] hover:text-[var(--np-yellow)] transition-colors font-['Gilroy',sans-serif]"
                         onClick={() => setIsProfileMenuOpen(false)}
                       >
                         My Bookings
                       </Link>
                       <Link
                         href="/profile"
-                        className="block rounded-xl px-4 py-3 text-base font-semibold text-white/90 transition hover:bg-white/8"
+                        className="block px-3.5 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-white/90 hover:bg-[#161616] hover:text-[var(--np-yellow)] transition-colors font-['Gilroy',sans-serif]"
                         onClick={() => setIsProfileMenuOpen(false)}
                       >
                         My Profile
                       </Link>
                       <button
-                        className="block w-full rounded-xl px-4 py-3 text-left text-base font-semibold text-[#f6b3c8] transition hover:bg-white/8"
+                        className="block w-full text-left px-3.5 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-[var(--np-red)] hover:bg-[#161616] transition-colors font-['Gilroy',sans-serif]"
                         onClick={() => {
                           signOut();
                           setIsProfileMenuOpen(false);
@@ -300,38 +297,43 @@ export function Navigation() {
                   ) : null}
                 </div>
 
-              <Link
-                href={propertyHref}
-                className="inline-flex h-9 items-center rounded-lg bg-[var(--vh-pink)] px-3.5 text-sm font-semibold text-white shadow-[0px_-1px_0px_0px_#FFFFFF40_inset,_0px_1px_0px_0px_#FFFFFF40_inset] transition hover:bg-[var(--vh-pink-soft)]"
-              >
-                Book Now
-              </Link>
-            </div>
+                <Button
+                  asChild
+                  size="sm"
+                  variant="primary"
+                >
+                  <Link href={propertyHref}>
+                    Book Now
+                  </Link>
+                </Button>
+              </div>
             </div>
 
             <AnimatePresence initial={false}>
               {isDesktopMenuOpen ? (
                 <motion.div
                   animate={{ height: "auto", opacity: 1 }}
-                  className="overflow-hidden border-t border-white/10"
+                  className="overflow-hidden border-t border-[#3D3D3D]"
                   exit={{ height: 0, opacity: 0 }}
                   initial={{ height: 0, opacity: 0 }}
                   transition={reducedMotion ? createReducedMotionTransition() : createMotionTransition("route", "enter")}
                 >
                   <motion.div
                     animate="show"
-                    className="grid grid-cols-3 gap-3 p-3"
+                    className="grid grid-cols-3 gap-3 p-3 bg-[#0D0D0D]"
                     initial="hidden"
                     variants={createStaggerContainerVariants({ reducedMotion })}
                   >
                     {desktopNavCards.map((card) => (
                       <motion.article
                         key={card.label}
-                        className="flex min-h-[206px] flex-col rounded-[14px] border border-black/15 p-4"
-                        style={{ backgroundColor: card.bgColor, color: card.textColor }}
+                        className="flex min-h-[210px] flex-col border border-[#3D3D3D] bg-[#161616] p-5 shadow-[4px_4px_0px_#000000]"
                         variants={createRevealVariants({ reducedMotion, y: MOTION_DISTANCE.lg })}
                       >
-                        <h3 className="text-[30px] leading-[34px]" style={navFontStyles.desktopCardTitle}>
+                        <h3
+                          className="text-[20px] font-extrabold uppercase tracking-[0.08em] pb-3 border-b border-[#3D3D3D]"
+                          style={{ color: card.accentColor, ...navFontStyles.desktopCardTitle }}
+                        >
                           {card.label}
                         </h3>
 
@@ -345,14 +347,13 @@ export function Navigation() {
                               return (
                                 <a
                                   key={`${card.label}-${resolvedHref}-${linkIndex}`}
-                                  className="inline-flex items-center gap-1.5 text-[15px] transition-opacity hover:opacity-100"
+                                  className="inline-flex items-center gap-1.5 text-[13px] uppercase tracking-[0.06em] text-white/75 transition-colors hover:text-white"
                                   href={resolvedHref}
                                   rel="noreferrer"
-                                  style={{ ...navFontStyles.desktopCardLink, color: card.textColor, opacity: 0.88 }}
                                   target="_blank"
                                   onClick={() => setIsDesktopMenuOpen(false)}
                                 >
-                                  <ArrowUpRight className="h-4 w-4 shrink-0" />
+                                  <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
                                   <span>{link.label}</span>
                                 </a>
                               );
@@ -363,9 +364,11 @@ export function Navigation() {
                             return (
                               <StaticAwareLink
                                 key={`${card.label}-${resolvedHref}-${linkIndex}`}
-                                className="inline-flex items-center gap-1.5 text-[15px] transition-opacity hover:opacity-100"
+                                className={cn(
+                                  "inline-flex items-center gap-1.5 text-[13px] uppercase tracking-[0.06em] transition-colors hover:text-white",
+                                  active ? "text-[var(--np-yellow)] font-bold" : "text-white/75"
+                                )}
                                 href={resolvedHref}
-                                style={{ ...navFontStyles.desktopCardLink, color: card.textColor, opacity: active ? 1 : 0.88 }}
                                 onClick={(event) => {
                                   if (link.requiresAuth && !shouldShowSignedInState) {
                                     event.preventDefault();
@@ -377,7 +380,7 @@ export function Navigation() {
                                   setIsDesktopMenuOpen(false);
                                 }}
                               >
-                                <ArrowUpRight className="h-4 w-4 shrink-0" />
+                                <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
                                 <span>{link.label}</span>
                               </StaticAwareLink>
                             );
@@ -393,20 +396,19 @@ export function Navigation() {
         </div>
 
         <div className="mx-auto flex max-w-7xl items-center lg:hidden">
-          <div className="flex w-full items-center justify-between rounded-full border border-white/12 bg-[rgba(15,16,26,0.88)] px-2.5 py-2 shadow-[0_20px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl">
-            <Link href="/" className="flex items-center justify-center whitespace-nowrap px-2 py-0.5 leading-none" aria-label={siteMeta.name}>
-              <span aria-hidden="true" className="vh-retro-sign-flat text-[14px] font-bold tracking-[0.12em] text-[var(--vh-ice)]">
+          <div className="flex w-full items-center justify-between border border-[#3D3D3D] bg-[#0D0D0D]/95 px-3 py-2 shadow-[0_12px_32px_rgba(0,0,0,0.7)] backdrop-blur-xl">
+            <Link href="/" className="flex items-center justify-center whitespace-nowrap px-1 py-0.5 leading-none" aria-label={siteMeta.name}>
+              <span aria-hidden="true" className="text-[13px] font-extrabold uppercase tracking-[0.12em] text-white font-['Gilroy',sans-serif]">
                 THE DAILY SOCIAL
               </span>
             </Link>
 
             <div className="flex items-center gap-2">
-              <Link
-                href={propertyHref}
-                className="rounded-full bg-[var(--vh-pink)] px-3.5 py-2 text-xs font-medium whitespace-nowrap text-white shadow-[0px_-1px_0px_0px_#FFFFFF40_inset,_0px_1px_0px_0px_#FFFFFF40_inset]"
-              >
-                Book Now
-              </Link>
+              <Button asChild size="sm" variant="primary">
+                <Link href={propertyHref}>
+                  Book Now
+                </Link>
+              </Button>
               <MobileStaggeredMenu activeGuestHubBookingId={activeGuestHubBooking?.ezee_reservation_id ?? null} isAuthenticated={shouldShowSignedInState} onOpenSignIn={() => openAuthModal("signin")} />
             </div>
           </div>
