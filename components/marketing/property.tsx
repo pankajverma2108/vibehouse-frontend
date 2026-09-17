@@ -67,6 +67,7 @@ import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { FadeIn } from "@/components/shared/motion";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { Button as NeoPopButton } from "@/components/neopop";
 import { useGuestAuth } from "@/components/auth/guest-auth-provider";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -381,7 +382,11 @@ function SectionTitle({
   title: string;
   className?: string;
 }) {
-  return <h2 className={`vh-title text-center text-[26px] leading-[1.12] text-white lg:text-left md:text-[30px] ${className}`}>{title}</h2>;
+  return (
+    <h2 className={`text-2xl md:text-3xl font-bold tracking-tight text-white font-['Cirka',serif] ${className}`}>
+      {title}
+    </h2>
+  );
 }
 
 function DateRangePicker({
@@ -414,33 +419,33 @@ function DateRangePicker({
       <PopoverTrigger asChild>
         <button
           aria-expanded={open}
-          className="flex w-full items-center justify-center gap-3 rounded-full border border-[var(--vh-pink)] bg-[#10111a] px-4 py-3 text-center text-white shadow-[0_10px_26px_rgba(0,0,0,0.28)] md:w-auto"
+          className="flex w-full items-center justify-between gap-3 border border-[#3D3D3D] bg-[#161616] px-5 py-3 text-white shadow-[3px_3px_0px_#000000] hover:border-[var(--np-yellow)] transition-all md:w-auto font-['Gilroy',sans-serif]"
           type="button"
         >
           <div className="inline-flex min-w-0 items-center gap-3">
-            <span className="inline-flex items-center justify-center text-[var(--vh-cyan)]">
+            <span className="inline-flex items-center justify-center text-[var(--np-yellow)]">
               <CalendarDays className="h-5 w-5" />
             </span>
-            <span className="text-base font-semibold md:text-lg">
+            <span className="text-sm md:text-base font-bold tracking-[0.04em]">
               {formatDisplayDate(toLocalDateString(dateRange?.from))}
             </span>
-            <span aria-hidden="true">&#8594;</span>
-            <span className="text-base font-semibold md:text-lg">
+            <span aria-hidden="true" className="text-white/40">&#8594;</span>
+            <span className="text-sm md:text-base font-bold tracking-[0.04em]">
               {formatDisplayDate(toLocalDateString(dateRange?.to))}
             </span>
           </div>
-          <ChevronDown className={`h-4 w-4 text-white/70 ${open ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-4 w-4 text-white/70 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
         </button>
       </PopoverTrigger>
       <PopoverContent
         align={align === "left" ? "start" : "end"}
         className={cn(
-          "z-[200] w-fit border-white/12 bg-[#10111a] p-2",
+          "z-[200] w-fit border border-[#3D3D3D] bg-[#161616] p-3 shadow-[6px_6px_0px_#000000] rounded-none",
           isDesktopCalendar ? "max-w-[min(100vw-1rem,860px)]" : "max-w-[min(100vw-1rem,420px)]",
         )}
       >
         <Calendar
-          className="vh-calendar-dark vh-calendar-balanced rounded-[20px]"
+          className="vh-calendar-dark vh-calendar-balanced rounded-none"
           defaultMonth={dateRange?.from}
           mode="range"
           numberOfMonths={isDesktopCalendar ? 2 : 1}
@@ -504,118 +509,119 @@ function DesktopBookingSummary({
 
   return (
     <aside className="hidden self-start lg:sticky lg:top-28 lg:block">
-      <div className="rounded-[26px] border border-white/12 bg-[var(--vh-panel-strong)] p-5 shadow-[var(--vh-shadow-lg)] lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
-        <h2 className="vh-title text-3xl text-white">{bookingSummary.title}</h2>
+      <div className="border border-[#3D3D3D] bg-[#161616] p-6 shadow-[4px_4px_0px_#000000] lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto font-['Gilroy',sans-serif]">
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white font-['Cirka',serif]">{bookingSummary.title}</h2>
 
-        <div className="mt-5 rounded-[18px] border border-white/10 bg-white/5 px-4 py-4 text-white">
+        <div className="mt-5 border border-[#3D3D3D] bg-[#121212] px-4 py-4 text-white">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/48">Check In</p>
-              <p className="mt-1 text-sm font-semibold">{formatDisplayDate(checkIn)}</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">Check In</p>
+              <p className="mt-1 text-sm font-extrabold">{formatDisplayDate(checkIn)}</p>
             </div>
-            <div className="rounded-full bg-[var(--vh-amber)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-900">
+            <div className="bg-[var(--np-yellow)] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-black shadow-[2px_2px_0px_#000000]">
               {nights} {nights === 1 ? "Night" : "Nights"}
             </div>
             <div className="text-right">
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/48">Check Out</p>
-              <p className="mt-1 text-sm font-semibold">{formatDisplayDate(checkOut)}</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">Check Out</p>
+              <p className="mt-1 text-sm font-extrabold">{formatDisplayDate(checkOut)}</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-5 space-y-3 border-t border-white/10 pt-5 text-sm text-white/82">
+        <div className="mt-5 space-y-3 border-t border-[#3D3D3D] pt-5 text-sm text-white/80">
           {hasSelection ? (
             selectedRooms.map((room) => (
               <div key={getRoomSelectionKey(room)} className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-white">{room.title}</p>
-                  <p className="text-xs text-white/55">
+                  <p className="font-extrabold text-white text-xs uppercase tracking-[0.04em]">{room.title}</p>
+                  <p className="text-[11px] text-white/50 mt-0.5">
                     Rs. {formatINRPlain(room.basePrice)} x {selectedCounts[getRoomSelectionKey(room)]} x {nights} {nights === 1 ? "night" : "nights"}
                   </p>
                 </div>
-                <p className="font-semibold text-white">
+                <p className="font-black text-white text-sm">
                   Rs. {formatINRPlain(room.basePrice * (selectedCounts[getRoomSelectionKey(room)] ?? 0) * nights)}
                 </p>
               </div>
             ))
           ) : (
-            <p className="rounded-[16px] border border-dashed border-white/12 bg-white/5 px-3 py-3 text-center text-sm font-semibold text-white/76">
+            <p className="border border-dashed border-[#3D3D3D] bg-[#121212] px-3 py-4 text-center text-xs font-bold uppercase tracking-[0.08em] text-white/50">
               Add room(s) to see booking totals.
             </p>
           )}
 
           {essentials.filter((item) => item.quantity > 0).map((item) => (
-            <div key={item.id} className="flex items-start justify-between gap-3 border-t border-white/10 pt-3">
+            <div key={item.id} className="flex items-start justify-between gap-3 border-t border-[#3D3D3D] pt-3">
               <div>
-                <p className="font-semibold text-white">{item.title}</p>
-                <p className="text-xs text-white/55">
+                <p className="font-extrabold text-white text-xs uppercase tracking-[0.04em]">{item.title}</p>
+                <p className="text-[11px] text-white/50 mt-0.5">
                   Rs. {formatINRPlain(item.unitPrice)} x {item.quantity}
                 </p>
               </div>
-              <p className="font-semibold text-white">Rs. {formatINRPlain(item.unitPrice * item.quantity)}</p>
+              <p className="font-black text-white text-sm">Rs. {formatINRPlain(item.unitPrice * item.quantity)}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-5 border-t border-white/10 pt-4 text-sm text-white/82">
+        <div className="mt-5 border-t border-[#3D3D3D] pt-4 text-xs text-white/70 space-y-2">
           <div className="flex items-center justify-between">
-            <p>Total room charges</p>
-            <p className="font-semibold text-white">Rs. {formatINRPlain(roomTotal)}</p>
+            <p className="uppercase tracking-[0.08em]">Total room charges</p>
+            <p className="font-bold text-white text-sm">Rs. {formatINRPlain(roomTotal)}</p>
           </div>
-          <div className="mt-2 flex items-center justify-between">
-            <p>Add-on charges</p>
-            <p className="font-semibold text-white">Rs. {formatINRPlain(essentialsTotal)}</p>
+          <div className="flex items-center justify-between">
+            <p className="uppercase tracking-[0.08em]">Add-on charges</p>
+            <p className="font-bold text-white text-sm">Rs. {formatINRPlain(essentialsTotal)}</p>
           </div>
-          <div className="mt-2 flex items-center justify-between">
-            <p className="group relative inline-flex items-center gap-1">
+          <div className="flex items-center justify-between">
+            <p className="group relative inline-flex items-center gap-1 uppercase tracking-[0.08em]">
               Total taxes
               <button
                 aria-label="View tax breakdown"
-                className="inline-flex items-center text-white/75 hover:text-white"
+                className="inline-flex items-center text-white/70 hover:text-white"
                 type="button"
               >
                 <Info className="h-3 w-3" />
               </button>
-              <span className="pointer-events-none absolute left-0 top-[calc(100%+6px)] z-20 hidden min-w-[180px] rounded-md border border-white/15 bg-[#10111a] px-2.5 py-2 text-[11px] leading-4 text-white/85 shadow-[0_10px_28px_rgba(0,0,0,0.35)] group-hover:block">
+              <span className="pointer-events-none absolute left-0 top-[calc(100%+6px)] z-20 hidden min-w-[180px] border border-[#3D3D3D] bg-[#121212] px-2.5 py-2 text-[11px] leading-4 text-white/85 shadow-[4px_4px_0px_#000000] group-hover:block">
                 <span className="block">Room tax - {formatINRPlain(roomTaxExact)}</span>
                 <span className="mt-1 block">Add-on tax - {formatINRPlain(addonTaxExact)}</span>
               </span>
             </p>
-            <p className="font-semibold text-white">Rs. {formatINRPlain(taxes)}</p>
+            <p className="font-bold text-white text-sm">Rs. {formatINRPlain(taxes)}</p>
           </div>
-          <div className="mt-3 flex items-center justify-between text-base">
-            <p className="font-semibold text-white">Total price</p>
-            <p className="font-bold text-[var(--vh-amber)]">Rs. {formatINRPlain(grandTotal)}</p>
+          <div className="pt-2 border-t border-[#3D3D3D] flex items-center justify-between">
+            <p className="font-bold text-white uppercase tracking-[0.1em] text-sm">Total price</p>
+            <p className="font-black text-xl text-[var(--np-yellow)]">Rs. {formatINRPlain(grandTotal)}</p>
           </div>
         </div>
 
-        <div className="my-4 flex items-start">
+        <div className="my-4 flex items-start gap-3 border-t border-[#3D3D3D] pt-4">
           <input
             checked={isAgeConfirmed}
-            className="mt-1 h-10 w-10 cursor-pointer rounded border-gray-300 bg-gray-100 p-2 text-blue-600 align-top focus:ring-blue-500"
+            className="mt-0.5 h-5 w-5 cursor-pointer rounded-none border border-[#3D3D3D] bg-[#121212] accent-[var(--np-yellow)] focus:ring-0"
             id="checked-checkbox-desktop"
             onChange={(event) => onAgeConfirmChange(event.target.checked)}
             type="checkbox"
           />
-          <span className="cursor-pointer select-none px-2 text-sm font-poppins text-[#ffffff]">
-            Yes, I confirm <span className="font-bold">all the guests are above 18 year old</span> and I acknowledge and accept the{" "}
-            <Link className="text-blue-400" href="/policies/">
-              Terms of Booking Conditions, Cancellation Policy &amp; Property Policy.
+          <label htmlFor="checked-checkbox-desktop" className="cursor-pointer select-none text-xs leading-relaxed text-white/80">
+            Yes, I confirm <span className="font-bold text-white">all guests are 18+ years old</span> and acknowledge the{" "}
+            <Link className="text-[var(--np-yellow)] hover:underline" href="/policies/">
+              Terms, Cancellation &amp; Property Policies.
             </Link>
-          </span>
+          </label>
         </div>
 
-        {continueError ? <p className="mt-4 text-sm text-[#ff8b8b]">{continueError}</p> : null}
-        <Button
-          className="vh-cta-button mt-5 w-full disabled:cursor-not-allowed disabled:opacity-55"
-          disabled={!isAgeConfirmed || !hasSelection}
-          loading={isContinuing}
-          loadingText="Review Booking"
-          onClick={onContinue}
-          type="button"
-        >
-          Review Booking
-        </Button>
+        {continueError ? <p className="mt-3 text-xs font-bold text-[#EE4D37] uppercase tracking-[0.06em]">{continueError}</p> : null}
+        <div className="mt-5">
+          <NeoPopButton
+            className="w-full font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em] text-sm"
+            disabled={!isAgeConfirmed || !hasSelection || isContinuing}
+            onClick={onContinue}
+            size="lg"
+            variant="primary"
+          >
+            {isContinuing ? "Reviewing..." : "Review Booking"}
+          </NeoPopButton>
+        </div>
       </div>
     </aside>
   );
@@ -669,79 +675,79 @@ function MobileStickySummary({
   const showUnavailablePricePreview = !hasSelection && !previewRoomWithPrice;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-40 lg:hidden">
-      <div className="overflow-hidden rounded-[22px] border border-white/12 bg-[var(--vh-panel-strong)] shadow-[var(--vh-shadow-lg)] backdrop-blur-xl">
+    <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-[#3D3D3D] bg-[#121212] shadow-[0_-4px_20px_rgba(0,0,0,0.7)] font-['Gilroy',sans-serif]">
+      <div className="overflow-hidden bg-[#121212]">
         {open && hasSelection ? (
-          <div className="animate-vh-fade-in border-b border-white/10 px-4 py-4">
+          <div className="border-b border-[#3D3D3D] bg-[#161616] px-4 py-4">
             <div className="flex items-center justify-between">
-              <p className="text-lg font-semibold text-white">Booking Summary</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-white">Booking Summary</p>
               <button
                 aria-label="Hide Summary"
-                className="rounded-full border border-white/12 p-2 text-white/72"
+                className="border border-[#3D3D3D] bg-[#121212] p-1.5 text-white/70 hover:text-white"
                 onClick={() => setOpen(false)}
                 type="button"
               >
                 <ChevronDown className="h-4 w-4" />
               </button>
             </div>
-            <p className="mt-1 text-xs text-white/58">
-              {nights} {nights === 1 ? "night" : "nights"} starting from {formatDisplayDate(checkIn)}
+            <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.08em] text-white/50">
+              {nights} {nights === 1 ? "night" : "nights"} from {formatDisplayDate(checkIn)}
             </p>
 
-            <div className="mt-3 max-h-[34vh] space-y-3 overflow-y-auto pr-1 text-sm text-white/84">
+            <div className="mt-3 max-h-[34vh] space-y-2.5 overflow-y-auto pr-1 text-xs text-white/80">
               {selectedRooms.map((room) => (
                 <div key={getRoomSelectionKey(room)} className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-white">
+                    <p className="font-extrabold text-white">
                       {room.title} x {selectedCounts[getRoomSelectionKey(room)]}
                     </p>
-                    <p className="text-xs text-white/58">Rs. {formatINRPlain(room.basePrice)} / night</p>
+                    <p className="text-[10px] text-white/50">Rs. {formatINRPlain(room.basePrice)} / night</p>
                   </div>
-                  <p className="font-semibold text-white">Rs. {formatINRPlain(room.basePrice * (selectedCounts[getRoomSelectionKey(room)] ?? 0) * nights)}</p>
+                  <p className="font-black text-white">Rs. {formatINRPlain(room.basePrice * (selectedCounts[getRoomSelectionKey(room)] ?? 0) * nights)}</p>
                 </div>
               ))}
 
               {selectedEssentials.map((item) => (
-                <div key={item.id} className="flex items-start justify-between gap-3 border-t border-white/10 pt-3">
+                <div key={item.id} className="flex items-start justify-between gap-3 border-t border-[#3D3D3D] pt-2">
                   <div>
-                    <p className="font-semibold text-white">
+                    <p className="font-extrabold text-white">
                       {item.title} x {item.quantity}
                     </p>
-                    <p className="text-xs text-white/58">Rs. {formatINRPlain(item.unitPrice)} each</p>
+                    <p className="text-[10px] text-white/50">Rs. {formatINRPlain(item.unitPrice)} each</p>
                   </div>
-                  <p className="font-semibold text-white">Rs. {formatINRPlain(item.unitPrice * item.quantity)}</p>
+                  <p className="font-black text-white">Rs. {formatINRPlain(item.unitPrice * item.quantity)}</p>
                 </div>
               ))}
 
-              <div className="border-t border-dashed border-white/15 pt-3">
+              <div className="border-t border-[#3D3D3D] pt-2 text-[11px] space-y-1 text-white/60">
                 <div className="flex items-center justify-between">
-                  <p>Add-ons</p>
-                  <p>Rs. {formatINRPlain(essentialsTotal)}</p>
+                  <p className="uppercase tracking-[0.06em]">Add-ons</p>
+                  <p className="font-bold text-white">Rs. {formatINRPlain(essentialsTotal)}</p>
                 </div>
-                <div className="mt-1 flex items-center justify-between">
-                  <p>Total taxes</p>
-                  <p>Rs. {formatINRPlain(taxes)}</p>
+                <div className="flex items-center justify-between">
+                  <p className="uppercase tracking-[0.06em]">Total taxes</p>
+                  <p className="font-bold text-white">Rs. {formatINRPlain(taxes)}</p>
                 </div>
-                <div className="mt-2 flex items-center justify-between font-semibold text-white">
-                  <p>Total price</p>
+                <div className="mt-2 flex items-center justify-between font-black text-sm text-[var(--np-yellow)] border-t border-[#3D3D3D] pt-2">
+                  <p className="uppercase tracking-[0.08em] text-white">Total price</p>
                   <p>Rs. {formatINRPlain(grandTotal)}</p>
                 </div>
               </div>
 
-              <div className="flex items-start pt-2">
+              <div className="flex items-start gap-2.5 pt-3 border-t border-[#3D3D3D]">
                 <input
                   checked={isAgeConfirmed}
-                  className="mt-1 h-8 w-8 cursor-pointer rounded border-gray-300 bg-gray-100 p-1 text-blue-600 align-top focus:ring-blue-500"
+                  className="mt-0.5 h-4 w-4 cursor-pointer rounded-none border border-[#3D3D3D] bg-[#121212] accent-[var(--np-yellow)] focus:ring-0"
                   id="checked-checkbox-mobile"
                   onChange={(event) => onAgeConfirmChange(event.target.checked)}
                   type="checkbox"
                 />
-                <span className="cursor-pointer select-none px-2 text-xs text-white/88">
-                  Yes, I confirm <span className="font-bold">all guests are above 18 years old</span> and accept{" "}
-                  <Link className="text-blue-400" href="/policies/">
-                    booking terms and policies.
+                <label htmlFor="checked-checkbox-mobile" className="cursor-pointer select-none text-[11px] leading-relaxed text-white/80">
+                  Yes, I confirm <span className="font-bold text-white">all guests are 18+</span> and accept{" "}
+                  <Link className="text-[var(--np-yellow)] hover:underline" href="/policies/">
+                    booking terms &amp; policies.
                   </Link>
-                </span>
+                </label>
               </div>
             </div>
           </div>
@@ -749,30 +755,29 @@ function MobileStickySummary({
 
         <div className="flex items-center justify-between gap-4 p-4">
           <div>
-            <p className="text-2xl font-semibold text-white">
+            <p className="text-xl font-black text-white font-['Gilroy',sans-serif]">
               {showUnavailablePricePreview ? "Price unavailable" : `₹${formatINRPlain(displayAmount)}`}
             </p>
-            {continueError ? <p className="mt-1 max-w-[220px] text-xs text-[#ff8b8b]">{continueError}</p> : null}
+            {continueError ? <p className="mt-1 max-w-[200px] text-[10px] font-bold text-[#EE4D37] uppercase">{continueError}</p> : null}
             <button
-              className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-[#46B2FF]"
+              className="mt-1 inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-[0.1em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]"
               disabled={!hasSelection}
               onClick={() => setOpen((value) => !value)}
               type="button"
             >
               Price breakup
-              <Info className="h-3.5 w-3.5" />
+              <Info className="h-3 w-3" />
             </button>
           </div>
-          <Button
-            className="vh-cta-button h-10 min-w-[128px] px-3 py-2 text-xs sm:px-4 sm:text-sm disabled:cursor-not-allowed disabled:opacity-55"
-            disabled={!hasSelection}
-            loading={isContinuing}
-            loadingText="Review Booking"
+          <NeoPopButton
+            className="min-w-[130px] px-4 py-2.5 text-xs font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em]"
+            disabled={!hasSelection || isContinuing}
             onClick={onContinue}
-            type="button"
+            size="sm"
+            variant="primary"
           >
-            Review Booking
-          </Button>
+            {isContinuing ? "Reviewing..." : "Review Booking"}
+          </NeoPopButton>
         </div>
       </div>
     </div>
@@ -780,44 +785,25 @@ function MobileStickySummary({
 }
 
 function BuildYourStaySection() {
-  const toneStyles = {
-    pink: { accent: "#c62828", sticker: "#FEF08A", text: "#0f172a" },
-    blue: { accent: "#00d1ff", sticker: "#00d1ff", text: "#0f172a" },
-    green: { accent: "#39ff14", sticker: "#39ff14", text: "#0f172a" },
-  } as const;
-
   return (
     <section id="build-your-stay" className="scroll-mt-28">
       <SectionTitle title={homePageContent.upsellTitle} />
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {upsellBentoItems.map((item, index) => {
-          const tone = toneStyles[item.tone];
-
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {upsellBentoItems.map((item) => {
           return (
             <div
               key={item.id}
-              className="group relative rounded-[12px] border-2 bg-[#1e293b] p-5 text-left transition-all hover:border-white"
-              style={{ borderColor: "#334155", transform: `rotate(${index % 2 === 0 ? -1 : 1}deg)` }}
+              className="relative border border-[#3D3D3D] bg-[#161616] p-5 text-left shadow-[3px_3px_0px_#000000] hover:border-[var(--np-yellow)] transition-all"
             >
-              <StickerTag
-                bg={tone.sticker}
-                className="absolute left-3 top-3 rounded-[3px] border-2 border-[var(--vh-surface-2)] px-2 py-1 text-[9px] font-bold not-italic uppercase"
-                label={item.kicker}
-                rotate={index % 2 === 0 ? "rotate-[2deg]" : "rotate-[-2deg]"}
-                text={tone.text}
-              />
+              <span className="inline-block bg-[var(--np-yellow)] text-black text-[10px] font-black uppercase tracking-[0.12em] px-2.5 py-0.5 font-['Gilroy',sans-serif] mb-3">
+                {item.kicker}
+              </span>
 
-              <div className="mb-3 mt-8 flex items-center gap-3">
-                <div
-                  className="inline-flex rounded-full p-2.5 transition-transform group-hover:scale-110"
-                  style={{ backgroundColor: `${tone.accent}22`, color: tone.accent }}
-                >
-                  <span className="h-3.5 w-3.5 rounded-full" style={{ backgroundColor: tone.accent }} />
-                </div>
-                <h3 className="text-lg font-bold uppercase text-white font-['Geologica']">{item.title}</h3>
-              </div>
+              <h3 className="text-base font-black uppercase text-white font-['Gilroy',sans-serif] tracking-[0.06em] mb-2">
+                {item.title}
+              </h3>
 
-              <p className="text-sm leading-6 text-white/80">{item.body}</p>
+              <p className="text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">{item.body}</p>
             </div>
           );
         })}
@@ -828,33 +814,33 @@ function BuildYourStaySection() {
 
 function RoomCardSkeleton() {
   return (
-    <article className="overflow-hidden rounded-[18px] border border-white/10 bg-[rgba(255,255,255,0.03)]">
+    <article className="border border-[#3D3D3D] bg-[#161616] shadow-[3px_3px_0px_#000000] rounded-none">
       <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)_188px]">
         {/* Image skeleton */}
-        <Skeleton className="h-[220px] w-full lg:h-full" />
+        <Skeleton className="h-[220px] w-full lg:h-full rounded-none bg-[#222222]" />
         
         {/* Content skeleton */}
         <div className="space-y-4 p-5">
           <div className="space-y-2">
-            <Skeleton className="h-6 w-40" />
-            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-6 w-40 rounded-none bg-[#222222]" />
+            <Skeleton className="h-4 w-24 rounded-none bg-[#222222]" />
           </div>
-          <Skeleton className="h-14 w-full" />
+          <Skeleton className="h-14 w-full rounded-none bg-[#222222]" />
           <div className="flex gap-2">
-            <Skeleton className="h-6 w-16" />
-            <Skeleton className="h-6 w-20" />
-            <Skeleton className="h-6 w-16" />
+            <Skeleton className="h-6 w-16 rounded-none bg-[#222222]" />
+            <Skeleton className="h-6 w-20 rounded-none bg-[#222222]" />
+            <Skeleton className="h-6 w-16 rounded-none bg-[#222222]" />
           </div>
-          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-4 w-32 rounded-none bg-[#222222]" />
         </div>
         
         {/* Price skeleton */}
-        <div className="flex flex-col justify-between border-t border-white/10 p-5 lg:border-l lg:border-t-0">
+        <div className="flex flex-col justify-between border-t border-[#3D3D3D] p-5 lg:border-l lg:border-t-0">
           <div className="space-y-2">
-            <Skeleton className="h-3 w-20" />
-            <Skeleton className="h-8 w-28" />
+            <Skeleton className="h-3 w-20 rounded-none bg-[#222222]" />
+            <Skeleton className="h-8 w-28 rounded-none bg-[#222222]" />
           </div>
-          <Skeleton className="mt-5 h-10 w-full rounded-full" />
+          <Skeleton className="mt-5 h-10 w-full rounded-none bg-[#222222]" />
         </div>
       </div>
     </article>
@@ -914,25 +900,25 @@ function RoomDetailsPopup({
 
   return (
     <div
-      className="animate-vh-fade-in fixed inset-0 z-[80] overflow-y-auto bg-[rgba(5,8,14,0.78)] px-3 py-4 backdrop-blur-sm"
+      className="animate-vh-fade-in fixed inset-0 z-[80] overflow-y-auto bg-black/85 px-3 py-4 backdrop-blur-md"
       onClick={onClose}
       role="presentation"
     >
       <div className="flex min-h-full items-start justify-center lg:items-center">
         <div
-          className="animate-vh-scale-in grid w-full max-w-5xl overflow-hidden rounded-[28px] border border-white/12 bg-[var(--vh-panel-strong)] shadow-[var(--vh-shadow-lg)] lg:max-h-[92vh] lg:grid-cols-[1.2fr_0.8fr]"
+          className="animate-vh-scale-in grid w-full max-w-5xl overflow-hidden border border-[#3D3D3D] bg-[#121212] shadow-[6px_6px_0px_#000000] rounded-none lg:max-h-[92vh] lg:grid-cols-[1.2fr_0.8fr]"
           onClick={(event) => event.stopPropagation()}
           role="dialog"
         >
-          <div className="border-b border-white/10 p-4 lg:border-b-0 lg:border-r lg:p-6">
-            <div className="overflow-hidden rounded-[22px]">
+          <div className="border-b border-[#3D3D3D] p-4 lg:border-b-0 lg:border-r lg:p-6">
+            <div className="overflow-hidden border border-[#3D3D3D] shadow-[3px_3px_0px_#000000]">
               <ImageWithFallback alt={room.title} className="h-[220px] w-full object-cover sm:h-[300px] md:h-[420px]" src={activeImage} />
             </div>
-            <div className="mt-4 grid grid-cols-4 gap-3">
+            <div className="mt-4 grid grid-cols-4 gap-2">
               {gallery.map((image, index) => (
                 <button
                   key={image}
-                  className={`overflow-hidden rounded-[16px] border ${index === imageIndex ? "border-[var(--vh-pink)]" : "border-white/10"}`}
+                  className={`overflow-hidden border ${index === imageIndex ? "border-[var(--np-yellow)] shadow-[2px_2px_0px_#000000]" : "border-[#3D3D3D]"}`}
                   onClick={() => onImageChange(index)}
                   type="button"
                 >
@@ -943,105 +929,111 @@ function RoomDetailsPopup({
           </div>
 
           <div className="p-5 md:p-6 lg:max-h-[92vh] lg:overflow-y-auto">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="vh-chip w-fit">Room Details</p>
-              <h3 className="mt-4 text-3xl font-bold text-white">{room.title}</h3>
-            </div>
-            <button
-              aria-label="Close"
-              className="rounded-full border border-white/10 p-2 text-white/65 hover:border-white/25 hover:text-white"
-              onClick={onClose}
-              type="button"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-
-          <p className="mt-6 text-sm leading-7 text-white/80">
-            Clean, practical, and comfortable for city stays, with features that make the room work well for both rest and day-to-day use.
-          </p>
-
-          <div className="mt-6 rounded-[18px] border border-white/10 bg-white/5 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/45">Availability</p>
-            <p className="mt-2 text-lg font-semibold text-[var(--vh-amber)]">{room.inventoryText}</p>
-            <div className="mt-4 flex items-center justify-between">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-white">{formatRoomPrice(room)}</span>
-                  {!isPriceUnavailable ? <span className="text-xs text-white/55">/ night</span> : null}
-                </div>
-                {room.inventoryState === "limited" && room.availableCount > 0 && (
-                  <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-[rgba(255,204,102,0.12)] px-2 py-0.5 text-[10px] font-bold text-[var(--vh-amber)]">
-                    ⚡ Only {room.availableCount} left!
-                  </p>
-                )}
+                <span className="inline-block bg-[var(--np-yellow)] text-black text-[10px] font-black uppercase tracking-[0.14em] px-2.5 py-0.5 font-['Gilroy',sans-serif]">
+                  Room Details
+                </span>
+                <h3 className="mt-3 text-3xl font-bold text-white font-['Cirka',serif] tracking-tight">{room.title}</h3>
               </div>
-              {!canBook ? (
-                <div className="flex flex-col items-end gap-1">
-                  {isPriceUnavailable ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(250,204,21,0.34)] bg-[rgba(250,204,21,0.12)] px-3 py-1.5 text-sm font-black uppercase tracking-[0.1em] text-[var(--vh-amber)]">
-                      Price unavailable
-                    </span>
-                  ) : isAvailabilityPending ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(0,209,255,0.34)] bg-[rgba(0,209,255,0.12)] px-3 py-1.5 text-sm font-black uppercase tracking-[0.1em] text-[var(--vh-cyan)]">
-                      Select dates
-                    </span>
-                  ) : (
-                    <span className="inline-flex animate-pulse items-center gap-1.5 rounded-full border border-[rgba(255,76,48,0.4)] bg-[rgba(255,76,48,0.12)] px-3 py-1.5 text-sm font-black uppercase tracking-[0.1em] text-[var(--vh-hot)]">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[var(--vh-hot)]" />
-                      SOLD OUT
-                    </span>
+              <button
+                aria-label="Close"
+                className="border border-[#3D3D3D] bg-[#161616] p-2 text-white/70 hover:border-white hover:text-white shadow-[2px_2px_0px_#000000]"
+                onClick={onClose}
+                type="button"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <p className="mt-5 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
+              Clean, practical, and comfortable for city stays, with features that make the room work well for both rest and day-to-day use.
+            </p>
+
+            <div className="mt-6 border border-[#3D3D3D] bg-[#161616] p-5 shadow-[3px_3px_0px_#000000]">
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50 font-['Gilroy',sans-serif]">Availability</p>
+              <p className="mt-1 text-base font-extrabold text-[var(--np-yellow)] font-['Gilroy',sans-serif]">{room.inventoryText}</p>
+              <div className="mt-4 flex items-center justify-between">
+                <div>
+                  <div className="flex items-baseline gap-1 font-['Gilroy',sans-serif]">
+                    <span className="text-3xl font-black text-white">{formatRoomPrice(room)}</span>
+                    {!isPriceUnavailable ? <span className="text-xs text-white/50 uppercase font-bold">/ night</span> : null}
+                  </div>
+                  {room.inventoryState === "limited" && room.availableCount > 0 && (
+                    <p className="mt-1 inline-flex items-center gap-1 bg-[#EE4D37]/15 border border-[#EE4D37]/40 px-2 py-0.5 text-[10px] font-bold text-[#EE4D37] uppercase font-['Gilroy',sans-serif]">
+                      ⚡ Only {room.availableCount} left!
+                    </p>
                   )}
                 </div>
-              ) : count === 0 ? (
-                <Button className="h-10 rounded-full px-5" onClick={onIncrement} type="button">
-                  Add
-                </Button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <button
-                    aria-label="Decrement Count"
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[var(--vh-surface-2)]"
-                    onClick={onDecrement}
-                    type="button"
-                  >
-                    <Minus className="h-4 w-4" />
-                  </button>
-                  <span className="w-4 text-center text-sm font-semibold text-white">{count}</span>
-                  <button
-                    aria-label="Increment Count"
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[var(--vh-surface-2)] disabled:cursor-not-allowed disabled:opacity-45"
-                    disabled={count >= room.availableCount}
-                    onClick={onIncrement}
-                    type="button"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/45">Room Amenities</p>
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {detailItems.map((label, index) => {
-                const Icon = iconForLabel(label);
-
-                return (
-                  <div key={`${label}-${index}`} className="flex items-center gap-3 text-sm text-white/84">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[var(--vh-cyan)]">
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    <span>{label}</span>
+                {!canBook ? (
+                  <div className="flex flex-col items-end gap-1">
+                    {isPriceUnavailable ? (
+                      <span className="border border-[#FFCB45]/40 bg-[#FFCB45]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]">
+                        Price unavailable
+                      </span>
+                    ) : isAvailabilityPending ? (
+                      <span className="border border-[#3F6FD9]/40 bg-[#3F6FD9]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[#3F6FD9] font-['Gilroy',sans-serif]">
+                        Select dates
+                      </span>
+                    ) : (
+                      <span className="border border-[#EE4D37]/40 bg-[#EE4D37]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[#EE4D37] font-['Gilroy',sans-serif]">
+                        SOLD OUT
+                      </span>
+                    )}
                   </div>
-                );
-              })}
+                ) : count === 0 ? (
+                  <NeoPopButton
+                    className="font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em] px-6"
+                    onClick={onIncrement}
+                    size="default"
+                    variant="primary"
+                  >
+                    Add
+                  </NeoPopButton>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <button
+                      aria-label="Decrement Count"
+                      className="flex h-9 w-9 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-white shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] transition-all font-bold"
+                      onClick={onDecrement}
+                      type="button"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </button>
+                    <span className="w-8 text-center text-base font-black text-white font-['Gilroy',sans-serif]">{count}</span>
+                    <button
+                      aria-label="Increment Count"
+                      className="flex h-9 w-9 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-white shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] transition-all font-bold disabled:opacity-40"
+                      disabled={count >= room.availableCount}
+                      onClick={onIncrement}
+                      type="button"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50 font-['Gilroy',sans-serif]">Room Amenities</p>
+              <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                {detailItems.map((label, index) => {
+                  const Icon = iconForLabel(label);
+
+                  return (
+                    <div key={`${label}-${index}`} className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.06em] text-white/80 font-['Gilroy',sans-serif] border border-[#3D3D3D] bg-[#161616] p-2.5 shadow-[2px_2px_0px_#000000]">
+                      <span className="flex h-7 w-7 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-[var(--np-yellow)]">
+                        <Icon className="h-3.5 w-3.5" />
+                      </span>
+                      <span>{label}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );
@@ -1581,33 +1573,36 @@ export function Property({
 
   return (
     <>
-      <section className="vh-section pt-28 md:pt-32">
-        <div className="vh-container">
-          <FadeIn className="mb-8 text-center">
-            <h1 className="leading-none">
-              <span className="vh-retro-sign-flat text-[2.2rem] md:text-[4.2rem] lg:text-[5rem]">
-                THE D<span className="vh-flicker">A</span>ILY SO<span className="vh-flicker" style={{ animationDelay: "0.6s" }}>C</span>IA<span className="vh-flicker" style={{ animationDelay: "1.2s" }}>L</span>
+      <section className="bg-[#0D0D0D] pt-28 md:pt-36 pb-12 border-b border-[#3D3D3D]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <FadeIn className="mb-10 text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--np-yellow)] mb-3 font-['Gilroy',sans-serif]">
+              THE FLAGSHIP HOSTEL
+            </p>
+            <h1 className="leading-tight">
+              <span className="font-['Cirka',serif] font-bold text-4xl md:text-6xl lg:text-7xl text-white tracking-tight">
+                THE DAILY SOCIAL
               </span>
             </h1>
-            <p className="mx-auto mt-5 max-w-[760px] text-base leading-7 text-white/78 md:text-lg">
+            <p className="mx-auto mt-4 max-w-[760px] text-sm md:text-base leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
               {propertyHero.blurb}
             </p>
           </FadeIn>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-12">
             <div className="md:col-span-7">
-              <div className="overflow-hidden rounded-[18px]">
+              <div className="overflow-hidden border border-[#3D3D3D] shadow-[4px_4px_0px_#000000]">
                 <ImageWithFallback
                   alt={propertyGallery[0].alt}
-                  className="h-[340px] w-full object-cover md:h-[500px]"
+                  className="h-[340px] w-full object-cover md:h-[480px]"
                   src={propertyGallery[0].src}
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 md:col-span-5">
+            <div className="grid grid-cols-2 gap-3 md:col-span-5">
               {propertyGallery.slice(1).map((image) => (
-                <div key={image.src} className="overflow-hidden rounded-[18px]">
-                  <ImageWithFallback alt={image.alt} className="h-[162px] w-full object-cover md:h-[242px]" src={image.src} />
+                <div key={image.src} className="overflow-hidden border border-[#3D3D3D] shadow-[3px_3px_0px_#000000]">
+                  <ImageWithFallback alt={image.alt} className="h-[164px] w-full object-cover md:h-[234px]" src={image.src} />
                 </div>
               ))}
             </div>
@@ -1615,21 +1610,18 @@ export function Property({
         </div>
       </section>
 
-      <section className="vh-section vh-section-alt">
-        <div className="vh-container">
-          <div className="space-y-8 pb-4 md:space-y-10 lg:pb-0">
+      <section className="bg-[#0D0D0D] py-12 md:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="space-y-12 pb-4 md:space-y-16 lg:pb-0">
             <section id="about" className="scroll-mt-28">
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start border border-[#3D3D3D] bg-[#161616] p-6 md:p-8 shadow-[4px_4px_0px_#000000]">
                 <div>
                   <SectionTitle title="About" />
-                  {/* <p className="mt-3 text-[15px] font-medium leading-7 text-white/84 md:text-base">
-                    The Hosteller BAM Coorg is where misty mornings, fresh brews, and good chaos settle into a comfortable rhythm.
-                  </p> */}
-                  <p className={`mt-3 text-[15px] leading-7 text-white/82 md:text-base ${aboutExpanded ? "" : "line-clamp-2"}`}>
+                  <p className={`mt-3 text-sm leading-relaxed text-white/75 font-['Gilroy',sans-serif] ${aboutExpanded ? "" : "line-clamp-2"}`}>
                     {propertyAboutText}
                   </p>
                   <button
-                    className="mt-2 text-sm font-semibold underline transition-colors duration-200 hover:text-[var(--vh-cyan)]"
+                    className="mt-3 text-xs font-bold uppercase tracking-[0.1em] text-[var(--np-yellow)] hover:underline font-['Gilroy',sans-serif]"
                     onClick={() => setAboutExpanded((value) => !value)}
                     type="button"
                   >
@@ -1637,9 +1629,9 @@ export function Property({
                   </button>
                 </div>
                 <div className="hidden lg:block lg:sticky lg:top-28">
-                  <Button asChild className="vh-cta-button h-12 w-full whitespace-nowrap px-4 text-sm sm:text-base">
+                  <NeoPopButton asChild className="w-full font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em]" size="lg" variant="primary">
                     <Link href="#availability">View rooms</Link>
-                  </Button>
+                  </NeoPopButton>
                 </div>
               </div>
             </section>
@@ -1647,25 +1639,23 @@ export function Property({
             <section id="amenities">
               <div>
                 <SectionTitle title="Amenities" />
-                <p className="mt-2 max-w-[640px] text-[15px] font-medium leading-7 text-white/84 md:text-base">
+                <p className="mt-2 max-w-[640px] text-sm text-white/70 font-['Gilroy',sans-serif]">
                   The good stuff that keeps the stay easy, social, and very hard to complain about.
                 </p>
               </div>
-              <div className="mt-5 grid grid-cols-4 gap-4 sm:gap-5 lg:grid-cols-12 lg:gap-2">
-                  {propertyAmenities.map((amenity, index) => {
-                    const Icon = amenityIcons[amenity.icon as keyof typeof amenityIcons] ?? ShieldCheck;
-                    const colorIndex = index % 3;
-                    const colors = ["var(--vh-pink)", "var(--vh-cyan)", "var(--vh-amber)"];
+              <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                {propertyAmenities.map((amenity, index) => {
+                  const Icon = amenityIcons[amenity.icon as keyof typeof amenityIcons] ?? ShieldCheck;
 
-                    return (
-                      <div key={`${amenity.label}-${index}`} className="text-center">
-                        <span className="inline-flex h-12 w-12 items-center justify-center" style={{ color: colors[colorIndex] }}>
-                          <Icon className="h-9 w-9" />
-                        </span>
-                        <p className="mt-2 text-xs font-medium leading-5 text-white/82 lg:text-sm">{amenity.label}</p>
-                      </div>
-                    );
-                  })}
+                  return (
+                    <div key={`${amenity.label}-${index}`} className="border border-[#3D3D3D] bg-[#161616] p-4 text-center shadow-[2px_2px_0px_#000000] hover:border-[var(--np-yellow)] transition-all">
+                      <span className="inline-flex h-10 w-10 items-center justify-center text-[var(--np-yellow)]">
+                        <Icon className="h-6 w-6" />
+                      </span>
+                      <p className="mt-2 text-xs font-bold uppercase tracking-[0.08em] text-white/90 font-['Gilroy',sans-serif]">{amenity.label}</p>
+                    </div>
+                  );
+                })}
               </div>
             </section>
 
@@ -1729,23 +1719,22 @@ export function Property({
                     return (
                       <article
                         key={roomKey}
-                        className="overflow-hidden rounded-[18px] border border-white/10 bg-[rgba(255,255,255,0.03)]"
-                        style={{ backgroundColor: "#10111a" }}
+                        className="border border-[#3D3D3D] bg-[#161616] shadow-[4px_4px_0px_#000000] transition-all hover:border-[var(--np-yellow)]"
                       >
-                        <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)_188px]">
-                          <div className="border-b border-white/10 lg:border-b-0 lg:border-r">
+                        <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)_200px]">
+                          <div className="border-b border-[#3D3D3D] lg:border-b-0 lg:border-r">
                             <button className="group block w-full text-left" onClick={() => openRoomPopup(roomKey)} type="button">
                               <ImageWithFallback
                                 alt={room.title}
-                                className="h-[180px] w-full object-cover transition duration-300 group-hover:scale-[1.03] lg:h-[170px]"
+                                className="h-[180px] w-full object-cover transition duration-300 group-hover:scale-[1.02] lg:h-[180px]"
                                 src={roomGallery[0] ?? room.image}
                               />
                             </button>
-                            <div className="grid grid-cols-3 gap-1 p-1.5">
+                            <div className="grid grid-cols-3 gap-1 p-1.5 bg-[#121212] border-t border-[#3D3D3D]">
                               {roomGallery.slice(0, 3).map((galleryImage, index) => (
                                 <button
                                   key={`${roomKey}-thumb-${index}`}
-                                  className="overflow-hidden rounded-[8px] border border-white/10"
+                                  className="overflow-hidden border border-[#3D3D3D] hover:border-[var(--np-yellow)]"
                                   onClick={() => {
                                     openRoomPopup(roomKey);
                                     setActiveRoomImageIndex(index);
@@ -1758,83 +1747,96 @@ export function Property({
                             </div>
                           </div>
 
-                          <div className="space-y-1 p-5">
+                          <div className="space-y-3 p-5 font-['Gilroy',sans-serif]">
                             <div className="flex flex-wrap items-center justify-between gap-3">
                               <button className="text-left" onClick={() => openRoomPopup(roomKey)} type="button">
-                                <h3 className="text-xl font-semibold text-white hover:text-[var(--vh-cyan)] font-['Geologica']">{room.title}</h3>
+                                <h3 className="text-xl font-extrabold uppercase tracking-[0.06em] text-white hover:text-[var(--np-yellow)] transition-colors">
+                                  {room.title}
+                                </h3>
                               </button>
                             </div>
 
-                            <p className="text-sm leading-7 text-white/78">
+                            <p className="text-xs leading-relaxed text-white/70">
                               Designed for practical, easy stays with the essentials that matter most for sleep, work, and daily comfort.
                             </p>
 
-                            <div className="flex flex-wrap gap-1">
-                              {featureLabels.map((label, index) => {
-                                const colorIndex = index % 4;
-                                const colors = ["#00d1ff", "#c62828", "#39ff14", "#facc15"];
-
-                                return (
-                                  <span
-                                    key={`${label}-${index}`}
-                                    className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-1 text-xs"
-                                    title={label}
-                                    style={{ color: colors[colorIndex] }}
-                                  >
-                                    <span className="text-white/70">{label}</span>
-                                  </span>
-                                );
-                              })}
+                            <div className="flex flex-wrap gap-1.5">
+                              {featureLabels.map((label, index) => (
+                                <span
+                                  key={`${label}-${index}`}
+                                  className="inline-flex items-center border border-[#3D3D3D] bg-[#121212] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-white/80"
+                                  title={label}
+                                >
+                                  {label}
+                                </span>
+                              ))}
                             </div>
 
-                            <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center justify-between gap-4 pt-1">
                               {isSoldOut ? (
-                                <p className="text-sm font-semibold text-[var(--vh-hot)]">Sold out for selected dates</p>
+                                <span className="inline-flex items-center gap-1.5 border border-[#EE4D37]/40 bg-[#EE4D37]/15 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-[#EE4D37]">
+                                  Sold out for selected dates
+                                </span>
                               ) : isPriceUnavailable ? (
-                                <p className="text-sm font-semibold text-[var(--vh-amber)]">Price unavailable. Retry shortly.</p>
+                                <span className="inline-flex items-center gap-1.5 border border-[#FFCB45]/40 bg-[#FFCB45]/15 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-[var(--np-yellow)]">
+                                  Price unavailable. Retry shortly.
+                                </span>
                               ) : isAvailabilityPending ? (
-                                <p className="text-sm font-semibold text-[var(--vh-cyan)]">Select dates to view live availability</p>
+                                <span className="inline-flex items-center gap-1.5 border border-[#3F6FD9]/40 bg-[#3F6FD9]/15 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-[#3F6FD9]">
+                                  Select dates to view live availability
+                                </span>
                               ) : isLimited ? (
-                                <p className="text-sm font-semibold text-[var(--vh-hot)]">
-                                  Only {room.availableCount} {room.availableCount === 1 ? "bed" : "beds"} left
-                                </p>
+                                <span className="inline-flex items-center gap-1.5 border border-[#EE4D37]/40 bg-[#EE4D37]/15 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-[#EE4D37]">
+                                  ⚡ Only {room.availableCount} {room.availableCount === 1 ? "bed" : "beds"} left
+                                </span>
                               ) : (
-                                <p className="text-sm font-semibold text-white/80">{room.inventoryText}</p>
+                                <span className="inline-flex items-center gap-1.5 border border-[#3BFFAD]/40 bg-[#3BFFAD]/15 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-[#3BFFAD]">
+                                  ● {room.inventoryText}
+                                </span>
                               )}
                             </div>
                           </div>
 
-                          <div className="flex flex-col justify-between border-t border-white/10 p-5 lg:border-l lg:border-t-0">
+                          <div className="flex flex-col justify-between border-t border-[#3D3D3D] p-5 lg:border-l lg:border-t-0 font-['Gilroy',sans-serif]">
                             <div>
-                              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/45">
+                              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">
                                 {room.hasLiveAvailability ? "Live price / night" : "From / night"}
                               </p>
-                              <p className="mt-2 text-3xl font-bold text-[#c62828]">{formatRoomPrice(room)}</p>
+                              <p className="mt-1 text-3xl font-black text-white">{formatRoomPrice(room)}</p>
                             </div>
 
                             <div className="mt-5 flex items-center justify-end gap-2">
                               {!canBook ? (
-                                <Button className="w-full rounded-full" disabled type="button">
+                                <button
+                                  className="w-full border border-[#3D3D3D] bg-[#222222] py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white/40 cursor-not-allowed"
+                                  disabled
+                                  type="button"
+                                >
                                   {isSoldOut ? "Sold out" : isPriceUnavailable ? "Unavailable" : "Check dates"}
-                                </Button>
+                                </button>
                               ) : count === 0 ? (
-                                <Button className="w-full rounded-full" onClick={() => updateCount(roomKey, 1)} type="button">
+                                <NeoPopButton
+                                  className="w-full font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em]"
+                                  onClick={() => updateCount(roomKey, 1)}
+                                  size="sm"
+                                  variant="primary"
+                                >
                                   Add
-                                </Button>
+                                </NeoPopButton>
                               ) : (
                                 <div className="ml-auto flex items-center gap-2">
                                   <button
                                     aria-label="Decrement Count"
-                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[var(--vh-surface-2)]"
+                                    className="flex h-9 w-9 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-white shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] transition-all font-bold"
                                     onClick={() => updateCount(roomKey, count - 1)}
                                     type="button"
                                   >
                                     <Minus className="h-4 w-4" />
                                   </button>
-                                  <span className="w-4 text-center text-sm font-semibold text-white">{count}</span>
+                                  <span className="w-6 text-center text-sm font-black text-white">{count}</span>
                                   <button
                                     aria-label="Increment Count"
-                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[var(--vh-surface-2)] disabled:cursor-not-allowed disabled:opacity-45"
+                                    className="flex h-9 w-9 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-white shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] transition-all font-bold disabled:opacity-40"
                                     disabled={count >= room.availableCount}
                                     onClick={() => updateCount(roomKey, count + 1)}
                                     type="button"
@@ -1874,29 +1876,29 @@ export function Property({
             <section id="guidelines">
               <SectionTitle title="Guidelines" />
               <div className="mt-6 max-w-4xl">
-                <div className="mb-3 flex flex-wrap justify-between gap-x-4 gap-y-2 rounded-[16px] bg-white/6 p-3 text-white/84">
+                <div className="mb-4 flex flex-wrap justify-between gap-x-4 gap-y-2 border border-[#3D3D3D] bg-[#161616] p-4 text-white font-['Gilroy',sans-serif] shadow-[2px_2px_0px_#000000]">
                   <div className="flex min-w-[180px] items-center gap-3">
-                    <CalendarDays className="h-5 w-5 text-[var(--vh-cyan)]" />
-                    <span>
+                    <CalendarDays className="h-5 w-5 text-[var(--np-yellow)]" />
+                    <span className="text-xs uppercase tracking-[0.06em]">
                       Check in:
-                      <strong className="ml-1 text-white">{propertyGuidelines.checkIn}</strong>
+                      <strong className="ml-1 text-white font-black">{propertyGuidelines.checkIn}</strong>
                     </span>
                   </div>
                   <div className="flex min-w-[180px] items-center gap-3">
-                    <Clock3 className="h-5 w-5 text-[var(--vh-cyan)]" />
-                    <span>
+                    <Clock3 className="h-5 w-5 text-[var(--np-yellow)]" />
+                    <span className="text-xs uppercase tracking-[0.06em]">
                       Check out:
-                      <strong className="ml-1 text-white">{propertyGuidelines.checkOut}</strong>
+                      <strong className="ml-1 text-white font-black">{propertyGuidelines.checkOut}</strong>
                     </span>
                   </div>
                 </div>
 
                 <Accordion className="space-y-2" defaultValue={["general-guidelines"]} type="multiple">
-                  <AccordionItem className="overflow-hidden rounded-lg border border-white/10 bg-white/5 px-4" value="general-guidelines">
-                    <AccordionTrigger className="text-base">General guidelines</AccordionTrigger>
-                    <AccordionContent className="space-y-2 border-t border-white/10 pt-2 text-sm leading-6">
+                  <AccordionItem className="border border-[#3D3D3D] bg-[#161616] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]" value="general-guidelines">
+                    <AccordionTrigger className="text-sm font-extrabold uppercase tracking-[0.06em] text-white">General guidelines</AccordionTrigger>
+                    <AccordionContent className="space-y-2 border-t border-[#3D3D3D] pt-3 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
                       {propertyGuidelines.summary.map((item) => (
-                        <p key={item}>- {item}</p>
+                        <p key={item}>● {item}</p>
                       ))}
                     </AccordionContent>
                   </AccordionItem>
@@ -1904,13 +1906,13 @@ export function Property({
                   {propertyGuidelines.sections.map((section, index) => (
                     <AccordionItem
                       key={section.title}
-                      className="overflow-hidden rounded-lg border border-white/10 bg-white/5 px-4"
+                      className="border border-[#3D3D3D] bg-[#161616] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]"
                       value={`guideline-${index}`}
                     >
-                      <AccordionTrigger className="text-base">{section.title}</AccordionTrigger>
-                      <AccordionContent className="space-y-2 border-t border-white/10 pt-2 text-sm leading-6">
+                      <AccordionTrigger className="text-sm font-extrabold uppercase tracking-[0.06em] text-white">{section.title}</AccordionTrigger>
+                      <AccordionContent className="space-y-2 border-t border-[#3D3D3D] pt-3 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
                         {section.content.map((item) => (
-                          <p key={item}>- {item}</p>
+                          <p key={item}>● {item}</p>
                         ))}
                       </AccordionContent>
                     </AccordionItem>
@@ -1923,15 +1925,15 @@ export function Property({
               <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
                 <div>
                   <SectionTitle title="Frequently Asked Questions" />
-                  <Accordion className="mt-6 space-y-4" defaultValue={["faq-0"]} type="multiple">
+                  <Accordion className="mt-6 space-y-3" defaultValue={["faq-0"]} type="multiple">
                     {roomFaqs.map((faq, index) => (
                       <AccordionItem
                         key={faq.question}
-                        className="overflow-hidden rounded-lg border border-white/10 bg-white/5 px-4"
+                        className="border border-[#3D3D3D] bg-[#161616] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]"
                         value={`faq-${index}`}
                       >
-                        <AccordionTrigger className="text-base">{faq.question}</AccordionTrigger>
-                        <AccordionContent className="border-t border-white/10 pt-4 text-sm leading-7">{faq.answer}</AccordionContent>
+                        <AccordionTrigger className="text-sm font-extrabold uppercase tracking-[0.06em] text-white">{faq.question}</AccordionTrigger>
+                        <AccordionContent className="border-t border-[#3D3D3D] pt-4 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">{faq.answer}</AccordionContent>
                       </AccordionItem>
                     ))}
                   </Accordion>
@@ -1940,7 +1942,7 @@ export function Property({
                 <div className="space-y-6">
                   <section>
                     <SectionTitle title="Location" />
-                    <div className="mt-6 overflow-hidden rounded-[18px]">
+                    <div className="mt-6 overflow-hidden border border-[#3D3D3D] shadow-[4px_4px_0px_#000000]">
                       <iframe
                         className="h-[300px] w-full"
                         loading="lazy"
@@ -1950,7 +1952,7 @@ export function Property({
                       />
                     </div>
                     <Link
-                      className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--vh-cyan)] hover:text-white"
+                      className="mt-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-[var(--np-yellow)] hover:underline font-['Gilroy',sans-serif]"
                       href={propertyHero.mapsHref}
                       target="_blank"
                     >
@@ -1961,14 +1963,14 @@ export function Property({
 
                   <section>
                     <SectionTitle title="Nearby" />
-                    <div className="mt-6 space-y-3">
+                    <div className="mt-6 space-y-3 border border-[#3D3D3D] bg-[#161616] p-5 shadow-[3px_3px_0px_#000000]">
                       {nearbyAttractions.map((place) => (
-                        <div key={place.name} className="flex items-center justify-between gap-4 border-b border-white/10 pb-3 last:border-b-0 last:pb-0">
+                        <div key={place.name} className="flex items-center justify-between gap-4 border-b border-[#3D3D3D] pb-3 last:border-b-0 last:pb-0 font-['Gilroy',sans-serif]">
                           <div>
-                            <p className="font-semibold text-white">{place.name}</p>
-                            <p className="text-xs uppercase tracking-[0.14em] text-white/48">{place.type}</p>
+                            <p className="font-extrabold uppercase tracking-[0.04em] text-white text-xs">{place.name}</p>
+                            <p className="text-[10px] uppercase tracking-[0.14em] text-white/50">{place.type}</p>
                           </div>
-                          <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/72">
+                          <span className="border border-[#3D3D3D] bg-[#121212] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-[var(--np-yellow)]">
                             {place.travel}
                           </span>
                         </div>
