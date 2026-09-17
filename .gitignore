@@ -18,6 +18,7 @@ guidelines/
 # Track the two public breakfast handoff documents while keeping other internal docs local.
 !docs/
 docs/*
+!docs/tds_fe_s3_static_export_implementation_handoff_2026-08-11.md
 !docs/breakfast/
 docs/breakfast/*
 !docs/breakfast/24_breakfast_stakeholder_workflow.md
@@ -41,3 +42,4 @@ context.md
 
 .playwright-mcp/
 *.tsbuildinfo
+.github/workflows/
