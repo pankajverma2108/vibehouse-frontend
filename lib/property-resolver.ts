@@ -212,18 +212,6 @@ export function resolveClientPropertyId(options: {
 }
 
 /**
- * React hook to resolve property_id on the client.
- * Use in client components that need the active property.
- */
-export function usePropertyId(explicit?: string | null): string {
-  if (typeof window === "undefined") {
-    return "";
-  }
-
-  return resolveClientPropertyId({ explicit });
-}
-
-/**
  * Get property name from property_id.
  * Returns empty string if property_id is unknown.
  */

@@ -53,7 +53,7 @@ import { getDefaultPropertyDestinationHref } from "@/lib/cx-api";
 import { getColivePropertyAddons } from "@/lib/colive-api";
 import { getStoredGuestToken } from "@/lib/guest-auth-api";
 import { isValidEmail, isValidPhone, normalizeEmail, normalizePhone } from "@/lib/guest-form-validation";
-import { usePropertyId } from "@/lib/property-resolver";
+import { usePropertyId } from "@/hooks/use-property-id";
 import { propertyGuidelines, propertyHero } from "@/content/rooms";
 
 type RazorpaySuccessResponse = {

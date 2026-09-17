@@ -318,12 +318,13 @@ function roomBadge(availableBeds: number, inventoryState: InventoryState, hasLiv
   return undefined;
 }
 
-async function fetchUnknownJson(path: string): Promise<unknown> {
+async function fetchUnknownJson(path: string, signal?: AbortSignal): Promise<unknown> {
   const url = `${apiBaseUrl()}${path}`;
 
   try {
     const response = await fetch(url, {
       cache: "no-store",
+      signal,
       headers: {
         Accept: "application/json",
       },
@@ -343,7 +344,11 @@ async function fetchUnknownJson(path: string): Promise<unknown> {
     } catch {
       return null;
     }
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw error;
+    }
+
     return null;
   }
 }
@@ -402,6 +407,7 @@ function normalizeEvent(event: RawEvent): EventCardProps {
 export async function getPublicEventsResult(options: {
   propertyId: string;
   limit?: number;
+  signal?: AbortSignal;
 }): Promise<PublicEventsResult> {
   const propertyId = sanitizePropertyId(options.propertyId);
   if (!propertyId) {
@@ -413,7 +419,7 @@ export async function getPublicEventsResult(options: {
 
   const limit = options.limit;
   const path = `/public/events?property_id=${encodeURIComponent(propertyId)}`;
-  const raw = await fetchUnknownJson(path);
+  const raw = await fetchUnknownJson(path, options.signal);
 
   if (!raw) {
     recordTelemetry({ type: "null_payload", source: "event" });
@@ -606,6 +612,7 @@ export async function getRoomCatalog(options?: {
  */
 export async function getRoomCatalogSnapshot(options: {
   propertyId: string;
+  signal?: AbortSignal;
 }): Promise<RoomAvailabilitySnapshot> {
   const propertyId = sanitizePropertyId(options.propertyId);
 
@@ -628,7 +635,7 @@ export async function getRoomCatalogSnapshot(options: {
   });
 
   const path = `/guest/booking/rooms?${params.toString()}`;
-  const raw = (await fetchUnknownJson(path)) as RawRoomAvailability | null;
+  const raw = (await fetchUnknownJson(path, options.signal)) as RawRoomAvailability | null;
 
   if (!raw) {
     recordTelemetry({ type: "null_payload", source: "room" });
@@ -682,6 +689,7 @@ export async function getRoomAvailabilitySnapshot(options: {
   propertyId: string;
   checkin?: string;
   checkout?: string;
+  signal?: AbortSignal;
 }): Promise<RoomAvailabilitySnapshot> {
   const propertyId = sanitizePropertyId(options.propertyId);
   const checkin = ensureString(options.checkin);
@@ -701,15 +709,14 @@ export async function getRoomAvailabilitySnapshot(options: {
     };
   }
 
-  const catalogSnapshot = await getRoomCatalogSnapshot({ propertyId });
-
-  const resolvedPropertyId = catalogSnapshot.propertyId || propertyId;
   const hasDateRange = Boolean(checkin && checkout);
 
   if (!hasDateRange) {
+    const catalogSnapshot = await getRoomCatalogSnapshot({ propertyId, signal: options.signal });
+
     return {
       ...catalogSnapshot,
-      propertyId: resolvedPropertyId,
+      propertyId: catalogSnapshot.propertyId || propertyId,
       checkin,
       checkout,
     };
@@ -722,7 +729,11 @@ export async function getRoomAvailabilitySnapshot(options: {
   });
 
   const path = `/guest/booking/availability?${params.toString()}`;
-  const raw = (await fetchUnknownJson(path)) as RawRoomAvailability | null;
+  const [catalogSnapshot, raw] = await Promise.all([
+    getRoomCatalogSnapshot({ propertyId, signal: options.signal }),
+    fetchUnknownJson(path, options.signal) as Promise<RawRoomAvailability | null>,
+  ]);
+  const resolvedPropertyId = catalogSnapshot.propertyId || propertyId;
 
   const resolvedLivePropertyId = ensureString(raw?.property_id, resolvedPropertyId);
   const availabilitySource = normalizeAvailabilitySource(raw?.availability_source, "unknown");

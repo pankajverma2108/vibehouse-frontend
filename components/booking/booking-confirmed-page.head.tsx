@@ -401,7 +401,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
                 <img
                   alt={propertyName}
                   className="h-[180px] w-full object-cover"
-                  src={propertyGallery[0]?.src || "/images/property/hero-1.jpg"}
+                  src={propertyGallery[0]?.src || "/images/property/hero-1-1600.webp"}
                 />
                 <div className="p-4">
                   <h3 className="text-lg font-bold text-white">{propertyName}</h3>
@@ -440,7 +440,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
                     <Link href="/bookings">My Bookings</Link>
                   </Button>
                   <Button asChild className="rounded-[10px] border border-white/15 bg-transparent text-white hover:bg-white/10" variant="outline">
-                    <Link href={checkinLink}>Open Web Check-In</Link>
+                    <DocumentLink href={checkinLink}>Open Web Check-In</DocumentLink>
                   </Button>
                 </div>
               </section>
@@ -457,3 +457,4 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
     </section>
   );
 }
+import { DocumentLink } from "@/components/static-export/document-link";

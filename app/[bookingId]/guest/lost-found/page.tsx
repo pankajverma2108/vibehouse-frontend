@@ -1,12 +1,5 @@
-import { redirect } from "next/navigation";
+import { ScopedGuestRedirect } from "@/components/guest/scoped-guest-redirect";
 
-import { getScopedGuestHubHref } from "@/lib/guest-hub";
-
-export default async function ScopedGuestLostFoundPage({
-  params,
-}: {
-  params: Promise<{ bookingId: string }>;
-}) {
-  const { bookingId } = await params;
-  redirect(getScopedGuestHubHref(bookingId, "#lost-found"));
+export default function Page() {
+  return <ScopedGuestRedirect subpath="#lost-found" />;
 }

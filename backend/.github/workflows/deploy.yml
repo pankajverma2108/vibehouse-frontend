@@ -1,0 +1,123 @@
+name: Deploy Backend to ECS
+
+on:
+  push:
+    branches: [main]
+
+# Only one main deploy at a time; a newer push cancels an older, superseded run so
+# we never deploy stale commits or pile up runs waiting on a runner.
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: tds-backend
+  ECS_CLUSTER: tds-production
+  ECS_SERVICE: tds-api
+  CONTAINER_NAME: tds-api
+  # Opt JavaScript actions into Node 24 (Node 20 deprecated, force-removed
+  # 2026-06-02). Keeps actions/checkout@v4 + configure-aws-credentials@v4
+  # working without upgrading their major versions.
+  # See: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_DEPLOY_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_DEPLOY_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Download current ECS task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition tds-backend \
+            --query taskDefinition \
+            --output json > task-definition.json
+
+      - name: Update ECS task definition with new image
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Inject AWS app credentials into task definition
+        env:
+          APP_KEY_ID: ${{ secrets.APP_AWS_ACCESS_KEY_ID }}
+          APP_SECRET:  ${{ secrets.APP_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          # The ECS task role covers S3/SQS but lacks ses:SendEmail.
+          # Injecting the app IAM credentials as container env vars lets the
+          # SES client pick them up explicitly regardless of what the task role has.
+          jq --arg kid "$APP_KEY_ID" --arg sec "$APP_SECRET" '
+            .containerDefinitions[0].environment = (
+              (.containerDefinitions[0].environment // [])
+              | map(select(.name != "AWS_ACCESS_KEY_ID" and .name != "AWS_SECRET_ACCESS_KEY"))
+              + [
+                  {"name": "AWS_ACCESS_KEY_ID",     "value": $kid},
+                  {"name": "AWS_SECRET_ACCESS_KEY",  "value": $sec}
+                ]
+            )
+          ' ${{ steps.task-def.outputs.task-definition }} > /tmp/task-def-injected.json
+
+      - name: Register updated task definition
+        id: register-task-def
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file:///tmp/task-def-injected.json \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "task-def-arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+
+      - name: Run Prisma migrations (inside VPC via ECS run-task)
+        run: |
+          # Run migration using the newly registered task definition revision so the
+          # container has the latest migration files before the service is updated.
+          TASK_ARN=$(aws ecs run-task \
+            --cluster tds-production \
+            --task-definition ${{ steps.register-task-def.outputs.task-def-arn }} \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[subnet-0336cdf666aef4dc1,subnet-051cd40f880567176],securityGroups=[sg-0fc5c1075b47b6bf7],assignPublicIp=ENABLED}" \
+            --overrides '{"containerOverrides":[{"name":"tds-api","command":["npx","prisma","migrate","deploy"]}]}' \
+            --query 'tasks[0].taskArn' --output text)
+          echo "Migration task: $TASK_ARN"
+          aws ecs wait tasks-stopped --cluster tds-production --tasks "$TASK_ARN"
+          EXIT_CODE=$(aws ecs describe-tasks --cluster tds-production --tasks "$TASK_ARN" \
+            --query 'tasks[0].containers[?name==`tds-api`].exitCode' --output text)
+          echo "Migration exit code: $EXIT_CODE"
+          if [ "$EXIT_CODE" != "0" ]; then echo "Migration failed" && exit 1; fi
+
+      - name: Deploy to ECS (rolling update)
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: /tmp/task-def-injected.json
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true

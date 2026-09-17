@@ -1,28 +1,18 @@
 import type { Metadata } from "next";
 
-import { FeedbackPage } from "@/components/feedback/feedback-page";
-
-type FeedbackRoutePageProps = {
-  params: Promise<{
-    token: string;
-  }>;
-};
-
-export const dynamic = "force-dynamic";
+import { FeedbackRoute } from "@/components/feedback/feedback-route";
+import { STATIC_ROUTE_SHELL_SEGMENT } from "@/lib/static-export-routes";
 
 export const metadata: Metadata = {
   title: "Support Feedback",
   description: "Rate a completed support request from The Daily Social.",
-  robots: {
-    index: false,
-    follow: false,
-  },
+  robots: { index: false, follow: false },
 };
 
-export default async function FeedbackRoutePage({
-  params,
-}: FeedbackRoutePageProps) {
-  const resolvedParams = await params;
+export function generateStaticParams() {
+  return [{ token: STATIC_ROUTE_SHELL_SEGMENT }];
+}
 
-  return <FeedbackPage token={resolvedParams.token} />;
+export default function Page() {
+  return <FeedbackRoute />;
 }

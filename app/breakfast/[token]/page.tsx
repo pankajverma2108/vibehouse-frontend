@@ -1,42 +1,19 @@
 import type { Metadata } from "next";
 
-import { BreakfastPage } from "@/components/breakfast/breakfast-page";
-import { getBreakfastTestScenario, isBreakfastTestToken } from "@/lib/breakfast-preview";
-
-type BreakfastRoutePageProps = {
-  params: Promise<{
-    token: string;
-  }>;
-};
-
-export const dynamic = "force-dynamic";
+import { BreakfastRoute } from "@/components/breakfast/breakfast-route";
+import { STATIC_ROUTE_SHELL_SEGMENT } from "@/lib/static-export-routes";
 
 export const metadata: Metadata = {
   title: "Breakfast Menu",
   description: "Choose breakfast for your stay.",
   referrer: "no-referrer",
-  robots: {
-    index: false,
-    follow: false,
-  },
+  robots: { index: false, follow: false },
 };
 
-export default async function BreakfastRoutePage({
-  params,
-}: BreakfastRoutePageProps) {
-  const resolvedParams = await params;
+export function generateStaticParams() {
+  return [{ token: STATIC_ROUTE_SHELL_SEGMENT }];
+}
 
-  if (isBreakfastTestToken(resolvedParams.token)) {
-    const scenario = getBreakfastTestScenario(resolvedParams.token);
-    return (
-      <BreakfastPage
-        initialLookup={scenario.response}
-        previewLabel={scenario.label}
-        simulateSubmit
-        token={resolvedParams.token}
-      />
-    );
-  }
-
-  return <BreakfastPage token={resolvedParams.token} />;
+export default function Page() {
+  return <BreakfastRoute />;
 }

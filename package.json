@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "npm run typecheck && next build",
-    "dev": "next dev --webpack",
+    "build:static": "npm run typecheck && node scripts/run-next-static-build.mjs",
+    "verify:static": "node scripts/verify-static-export.mjs",
+    "serve:static": "node scripts/serve-static-export.mjs",
+    "dev": "node --max-old-space-size=4096 ./node_modules/next/dist/bin/next dev --webpack",
     "dev:turbo": "next dev --turbopack",
     "start": "next start",
     "typecheck": "tsgo --project tsconfig.json --noEmit",
@@ -95,6 +98,7 @@
     "eslint": "^9.38.0",
     "eslint-config-next": "^16.2.1",
     "jsdom": "^29.1.1",
+    "puppeteer-core": "^25.11.0",
     "tailwindcss": "4.1.12",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"

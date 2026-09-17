@@ -13,6 +13,9 @@ export default defineConfig({
     include: [
       "lib/breakfast-*.test.ts",
       "components/breakfast/**/*.test.tsx",
+      "infra/cloudfront/**/*.test.ts",
+      "lib/cx-*.test.ts",
+      "lib/static-export-*.test.ts",
     ],
     setupFiles: ["./test/setup.ts"],
   },

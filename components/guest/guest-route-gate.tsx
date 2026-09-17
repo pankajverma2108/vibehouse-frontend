@@ -38,7 +38,7 @@ export function GuestHubEntryGate() {
   useEffect(() => {
     const nextBookingId = activeBooking?.ezee_reservation_id ?? fallbackBookingId;
     if (!isRestoringSession && isAuthenticated && nextBookingId) {
-      router.replace(getScopedGuestHubHref(nextBookingId));
+      window.location.replace(getScopedGuestHubHref(nextBookingId));
     }
   }, [activeBooking?.ezee_reservation_id, fallbackBookingId, isAuthenticated, isRestoringSession, router]);
 
@@ -224,7 +224,7 @@ export function GuestLegacyRouteRedirect({ subpath = "" }: { subpath?: string })
     }
 
     if (isAuthenticated && activeBooking) {
-      router.replace(getScopedGuestHubHref(activeBooking.ezee_reservation_id, subpath));
+      window.location.replace(getScopedGuestHubHref(activeBooking.ezee_reservation_id, subpath));
       return;
     }
 

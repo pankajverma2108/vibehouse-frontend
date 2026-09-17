@@ -37,6 +37,7 @@
   ],
   "exclude": [
     "node_modules",
+    "backend/**/*",
     "guidelines/**/*",
     "guidelines/Vibehouse_backend/**/*",
     "src/app/**/*",

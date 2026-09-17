@@ -84,19 +84,19 @@ export const propertyHero = {
 
 export const propertyGallery = [
   {
-    src: "/images/property/hero-1.jpg",
+    src: "/images/property/hero-1-1600.webp",
     alt: "The Daily Social dorm interior",
   },
   {
-    src: "/images/property/hero-2.jpg",
+    src: "/images/property/hero-2-1600.webp",
     alt: "Shared social seating area",
   },
   {
-    src: "/images/property/hero-3.jpg",
+    src: "/images/property/hero-3-1600.webp",
     alt: "Rooftop city-facing lounge",
   },
   {
-    src: "/images/property/hero-4.jpg",
+    src: "/images/property/hero-4-1600.webp",
     alt: "Private room interior",
   },
 ];

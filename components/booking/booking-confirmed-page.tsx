@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -426,9 +425,9 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
                 <div className="mt-auto pt-6 text-center">
                   <p className="mx-auto max-w-xs text-sm leading-6 text-white/68">Want the boring bits handled before arrival? Open the pre-arrival dashboard and sort it in one shot.</p>
                   <div className="mt-4 flex justify-center">
-                    <Link className="vh-cta-button px-7 py-3.5 text-base" href={checkinLink}>
+                    <DocumentLink className="vh-cta-button px-7 py-3.5 text-base" href={checkinLink}>
                       Open Pre-Arrival Dashboard
-                    </Link>
+                    </DocumentLink>
                   </div>
                 </div>
               </div>
@@ -712,3 +711,4 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
     </section>
   );
 }
+import { DocumentLink } from "@/components/static-export/document-link";

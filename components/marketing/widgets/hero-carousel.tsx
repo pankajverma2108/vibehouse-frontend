@@ -44,11 +44,25 @@ export function HeroCarousel({ images, titleParts }: HeroCarouselProps) {
         <div className="flex h-full">
           {images.map((image, index) => (
             <div key={image} className="relative min-w-0 flex-[0_0_100%]">
-              <ImageWithFallback
-                alt={`The Daily Social hero ${index + 1}`}
-                className="h-full w-full object-cover"
-                src={image}
-              />
+              <picture className="block h-full w-full">
+                <source
+                  sizes="100vw"
+                  srcSet={`${image.replace("-1600.webp", "-768.avif")} 768w, ${image.replace("-1600.webp", "-1600.avif")} 1600w`}
+                  type="image/avif"
+                />
+                <source
+                  sizes="100vw"
+                  srcSet={`${image.replace("-1600.webp", "-768.webp")} 768w, ${image} 1600w`}
+                  type="image/webp"
+                />
+                <ImageWithFallback
+                  alt={`The Daily Social hero ${index + 1}`}
+                  className="h-full w-full object-cover"
+                  fetchPriority={index === 0 ? "high" : "auto"}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  src={image}
+                />
+              </picture>
               <div className="absolute inset-0 bg-gradient-to-b from-[rgba(35,15,20,0.65)] to-[rgba(35,15,20,0.92)]" />
             </div>
           ))}

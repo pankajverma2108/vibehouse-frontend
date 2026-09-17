@@ -1,23 +1,17 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import { GuestBookingGate } from "@/components/guest/guest-route-gate";
-import { GuestHubShell } from "@/components/guest/guest-hub-shell";
-import { GuestExperienceProvider } from "@/state/guest-experience-provider";
+import { ScopedGuestLayout as ScopedGuestClientLayout } from "@/components/guest/scoped-guest-layout";
+import { STATIC_ROUTE_SHELL_SEGMENT } from "@/lib/static-export-routes";
 
-export default async function ScopedGuestLayout({
-  children,
-  params,
-}: {
-  children: ReactNode;
-  params: Promise<{ bookingId: string }>;
-}) {
-  const { bookingId } = await params;
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
-  return (
-    <GuestExperienceProvider initialBookingId={bookingId}>
-      <GuestHubShell>
-        <GuestBookingGate bookingId={bookingId}>{children}</GuestBookingGate>
-      </GuestHubShell>
-    </GuestExperienceProvider>
-  );
+export function generateStaticParams() {
+  return [{ bookingId: STATIC_ROUTE_SHELL_SEGMENT }];
+}
+
+export default function Layout({ children }: { children: ReactNode }) {
+  return <ScopedGuestClientLayout>{children}</ScopedGuestClientLayout>;
 }

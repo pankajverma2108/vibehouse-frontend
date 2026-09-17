@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import { BookOpen, ConciergeBell, Home, ShoppingBag } from "lucide-react";
 
 import { useGuestExperience } from "@/state/guest-experience-provider";
 import { cn } from "@/lib/utils";
+import { DocumentLink } from "@/components/static-export/document-link";
 
 type GuestNavBadge = "cart";
 
@@ -48,7 +48,7 @@ export function GuestNav() {
             const count = item.badge ? badgeCounts[item.badge] : 0;
 
             return (
-              <Link
+              <DocumentLink
                 key={item.label}
                 className={cn(
                   "group relative flex min-h-14 flex-col items-center justify-center gap-1 rounded-[8px] border border-transparent px-2 py-2 text-center text-[10px] font-black uppercase text-[#cbd5e1] transition duration-300 md:min-h-16 md:text-[11px]",
@@ -66,7 +66,7 @@ export function GuestNav() {
                     {count}
                   </span>
                 ) : null}
-              </Link>
+              </DocumentLink>
             );
           })}
         </div>

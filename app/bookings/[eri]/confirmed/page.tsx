@@ -1,13 +1,17 @@
-import { BookingConfirmedPage } from "@/components/booking/booking-confirmed-page";
+import type { Metadata } from "next";
 
-type BookingConfirmedRouteProps = {
-  params: Promise<{
-    eri: string;
-  }>;
+import { BookingConfirmedRoute } from "@/components/booking/booking-confirmed-route";
+import { STATIC_ROUTE_SHELL_SEGMENT } from "@/lib/static-export-routes";
+
+export const metadata: Metadata = {
+  title: "Booking Confirmed",
+  robots: { index: false, follow: false },
 };
 
-export default async function BookingConfirmedRoute({ params }: BookingConfirmedRouteProps) {
-  const { eri } = await params;
+export function generateStaticParams() {
+  return [{ eri: STATIC_ROUTE_SHELL_SEGMENT }];
+}
 
-  return <BookingConfirmedPage ezeeReservationId={decodeURIComponent(eri)} />;
+export default function Page() {
+  return <BookingConfirmedRoute />;
 }

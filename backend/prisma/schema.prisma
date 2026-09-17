@@ -1,0 +1,1281 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model addon_order_items {
+  id                   String                 @id @db.VarChar(36)
+  addon_order_id       String                 @db.VarChar(36)
+  product_id           String                 @db.VarChar(36)
+  quantity             Int                    @default(1)
+  unit_price           Decimal                @db.Decimal(10, 2)
+  total_price          Decimal                @db.Decimal(10, 2)
+  unit_code            String?                @db.VarChar(20)
+  addon_orders         addon_orders           @relation(fields: [addon_order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  product_catalog      product_catalog        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  returnable_checkouts returnable_checkouts[]
+}
+
+model addon_orders {
+  id                  String              @id @db.VarChar(36)
+  ezee_reservation_id String              @db.VarChar(100)
+  guest_id            String              @db.VarChar(36)
+  payment_id          String?             @db.VarChar(36)
+  phase               String              @db.VarChar(20)
+  status              String              @default("PENDING") @db.VarChar(20)
+  ezee_sync_status    String              @default("NOT_SYNCED") @db.VarChar(20)
+  created_at          DateTime            @default(now()) @db.Timestamp(6)
+  addon_order_items   addon_order_items[]
+  ezee_booking_cache  ezee_booking_cache  @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests              guests              @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payments            payments?           @relation(fields: [payment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  zoho_ticket_ref     zoho_ticket_ref[]
+
+  @@index([ezee_reservation_id], map: "idx_addon_orders_reservation")
+}
+
+model admin_activity_log {
+  id          String   @id @db.VarChar(36)
+  actor_type  String   @db.VarChar(20)
+  actor_id    String   @db.VarChar(100)
+  action      String   @db.VarChar(50)
+  entity_type String   @db.VarChar(50)
+  entity_id   String   @db.VarChar(36)
+  old_value   Json?
+  new_value   Json?
+  ip_address  String?  @db.VarChar(45)
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([actor_id, created_at], map: "idx_admin_log_actor")
+  @@index([entity_type, entity_id], map: "idx_admin_log_entity")
+}
+
+model admin_roles {
+  id           String        @id @db.VarChar(36)
+  name         String        @unique @db.VarChar(50)
+  display_name String        @db.VarChar(100)
+  permissions  Json
+  is_active    Boolean       @default(true)
+  created_at   DateTime      @default(now()) @db.Timestamp(6)
+  admin_users  admin_users[]
+}
+
+model admin_users {
+  id                                                                                   String                  @id @db.VarChar(36)
+  name                                                                                 String                  @db.VarChar(255)
+  email                                                                                String                  @unique @db.VarChar(255)
+  phone                                                                                String?                 @db.VarChar(20)
+  password_hash                                                                        String                  @db.VarChar(255)
+  role_id                                                                              String                  @db.VarChar(36)
+  is_active                                                                            Boolean                 @default(true)
+  two_fa_enabled                                                                       Boolean                 @default(false)
+  two_fa_secret                                                                        String?                 @db.VarChar(255)
+  last_login_at                                                                        DateTime?               @db.Timestamp(6)
+  created_at                                                                           DateTime                @default(now()) @db.Timestamp(6)
+  updated_at                                                                           DateTime                @default(now()) @db.Timestamp(6)
+  admin_roles                                                                          admin_roles             @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  admin_user_properties                                                                admin_user_properties[]
+  borrowable_checkouts                                                                 borrowable_checkouts[]
+  events                                                                               events[]
+  returnable_checkouts_returnable_checkouts_issued_by_admin_idToadmin_users            returnable_checkouts[]  @relation("returnable_checkouts_issued_by_admin_idToadmin_users")
+  returnable_checkouts_returnable_checkouts_returned_verified_by_admin_idToadmin_users returnable_checkouts[]  @relation("returnable_checkouts_returned_verified_by_admin_idToadmin_users")
+  coupons                                                                              coupons[]
+
+  @@index([email, is_active], map: "idx_admin_users_email_active")
+  @@index([role_id], map: "idx_admin_users_role")
+}
+
+model admin_user_properties {
+  admin_user_id String      @db.VarChar(36)
+  property_id   String      @db.VarChar(36)
+  created_at    DateTime    @default(now()) @db.Timestamptz(6)
+  admin_users   admin_users @relation(fields: [admin_user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  properties    properties  @relation(fields: [property_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@id([admin_user_id, property_id])
+  @@index([property_id], map: "idx_admin_user_properties_property")
+}
+
+model auth_providers {
+  id           String   @id @db.VarChar(36)
+  guest_id     String   @db.VarChar(36)
+  provider     String   @db.VarChar(50)
+  provider_uid String   @db.VarChar(255)
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  guests       guests   @relation(fields: [guest_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([provider, provider_uid])
+}
+
+model booking_guest_access {
+  id                                                       String             @id @db.VarChar(36)
+  ezee_reservation_id                                      String             @db.VarChar(100)
+  guest_id                                                 String             @db.VarChar(36)
+  role                                                     String             @db.VarChar(20)
+  status                                                   String             @default("PENDING_APPROVAL") @db.VarChar(30)
+  approved_by_guest_id                                     String?            @db.VarChar(36)
+  approved_at                                              DateTime?          @db.Timestamp(6)
+  created_at                                               DateTime           @default(now()) @db.Timestamp(6)
+  guests_booking_guest_access_approved_by_guest_idToguests guests?            @relation("booking_guest_access_approved_by_guest_idToguests", fields: [approved_by_guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ezee_booking_cache                                       ezee_booking_cache @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests_booking_guest_access_guest_idToguests             guests             @relation("booking_guest_access_guest_idToguests", fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([ezee_reservation_id, guest_id])
+  @@index([guest_id], map: "idx_booking_access_guest")
+  @@index([ezee_reservation_id], map: "idx_booking_access_reservation")
+}
+
+model booking_slots {
+  id                  String             @id @db.VarChar(36)
+  ezee_reservation_id String             @db.VarChar(100)
+  slot_number         Int
+  guest_id            String?            @db.VarChar(36)
+  label               String             @db.VarChar(50)
+  kyc_status          String             @default("NOT_STARTED") @db.VarChar(20)
+  created_at          DateTime           @default(now()) @db.Timestamp(6)
+  ezee_booking_cache  ezee_booking_cache @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests              guests?            @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  kyc_submissions     kyc_submissions[]
+
+  @@unique([ezee_reservation_id, slot_number])
+  @@index([ezee_reservation_id], map: "idx_booking_slots_eri")
+}
+
+model borrowable_checkouts {
+  id                                 String             @id @db.VarChar(36)
+  inventory_id                       String             @db.VarChar(36)
+  ezee_reservation_id                String             @db.VarChar(100)
+  guest_id                           String             @db.VarChar(36)
+  unit_code                          String             @db.VarChar(20)
+  checked_out_at                     DateTime           @default(now()) @db.Timestamp(6)
+  returned_at                        DateTime?          @db.Timestamp(6)
+  returned_verified_by_zoho_staff_id String?            @db.VarChar(100)
+  status                             String             @default("CHECKED_OUT") @db.VarChar(15)
+  issued_by_admin_id                 String?            @db.VarChar(255)
+  ezee_booking_cache                 ezee_booking_cache @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests                             guests             @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  inventory                          inventory          @relation(fields: [inventory_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users                        admin_users?       @relation(fields: [issued_by_admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_borrowable_issued_by")
+
+  @@index([guest_id, status], map: "idx_borrowable_guest_status")
+}
+
+model checkin_records {
+  id                        String             @id @db.VarChar(36)
+  ezee_reservation_id       String             @db.VarChar(100)
+  guest_id                  String             @db.VarChar(36)
+  selfie_url                String?            @db.VarChar(500)
+  face_match_score          Decimal?           @db.Decimal(4, 3)
+  face_match_status         String?            @db.VarChar(10)
+  onsite_scan_url           String?            @db.VarChar(500)
+  ssim_score                Decimal?           @db.Decimal(4, 3)
+  doc_match_status          String?            @db.VarChar(10)
+  gcard_pdf_url             String?            @db.VarChar(500)
+  signature_png_url         String?            @db.VarChar(500)
+  manual_override           Boolean            @default(false)
+  override_by_zoho_staff_id String?            @db.VarChar(100)
+  status                    String             @default("PENDING") @db.VarChar(20)
+  checked_in_at             DateTime?          @db.Timestamp(6)
+  ezee_booking_cache        ezee_booking_cache @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests                    guests             @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([ezee_reservation_id], map: "idx_checkin_reservation")
+}
+
+model events {
+  id           String       @id @db.VarChar(36)
+  property_id  String       @db.VarChar(36)
+  title        String       @db.VarChar(200)
+  description  String?
+  date         DateTime     @db.Date
+  time         String?      @db.VarChar(10)
+  location     String?      @db.VarChar(200)
+  capacity     Int?
+  price_text   String?      @db.VarChar(100)
+  contact_link String?      @db.VarChar(500)
+  poster_url   String?      @db.VarChar(500)
+  badge_label  String?      @db.VarChar(30)
+  badge_color  String?      @db.VarChar(10)
+  is_active    Boolean      @default(true)
+  created_by   String?      @db.VarChar(36)
+  created_at   DateTime     @default(now()) @db.Timestamp(6)
+  updated_at   DateTime     @default(now()) @db.Timestamp(6)
+  admin_users  admin_users? @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  properties   properties   @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([property_id, date], map: "idx_events_property_date")
+}
+
+model ezee_booking_cache {
+  ezee_reservation_id      String                 @id @db.VarChar(100)
+  property_id              String                 @db.VarChar(36)
+  guest_id                 String?                @db.VarChar(36)
+  booker_email             String?                @db.VarChar(255)
+  booker_phone             String?                @db.VarChar(20)
+  room_type_name           String?                @db.VarChar(100)
+  room_number              String?                @db.VarChar(20)
+  unit_code                String?                @db.VarChar(20)
+  checkin_date             DateTime?              @db.Date
+  checkout_date            DateTime?              @db.Date
+  no_of_guests             Int?                   @default(1)
+  no_of_adults             Int?
+  no_of_children           Int?
+  source                   String?                @db.VarChar(50)
+  status                   String?                @db.VarChar(30)
+  is_active                Boolean                @default(true)
+  fetched_at               DateTime               @db.Timestamp(6)
+  created_at               DateTime               @default(now()) @db.Timestamp(6)
+  ezee_reservation_no      String?                @db.VarChar(100)
+  ezee_sub_reservation_nos String?
+  booking_rooms_json       Json?
+  /// One entry per eZee BookingTran (sub-booking) — the room + guest eZee holds for it.
+  /// A multi-room reservation is a SINGLE cache row keyed on UniqueID, so without this the
+  /// 2nd..nth room's number, guest name and phone are lost. Shape:
+  /// [{ sub_id, room_number, room_type, name, email, phone }]
+  ezee_room_guests_json    Json?
+  coupon_id_auto           String?                @db.VarChar(36)
+  coupon_id_code           String?                @db.VarChar(36)
+  discount_total           Decimal                @default(0) @db.Decimal(10, 2)
+  tax_rate_pct             Decimal?               @db.Decimal(5, 2)
+  tax_total                Decimal?               @db.Decimal(10, 2)
+  folio_total_after_tax    Decimal?               @db.Decimal(10, 2)
+  folio_total_before_tax   Decimal?               @db.Decimal(10, 2)
+  ezee_sync_failed_at      DateTime?              @db.Timestamp(6)
+  payment_token            String?                @db.Char(32)
+  /// Admin-made booking that exists only to drive the guest flows (WhatsApp bot, breakfast)
+  /// against a live property without occupying a sellable room. Only POST /admin/bookings/test
+  /// ever sets this — eZee-ingested rows keep the false default, so every real booking is
+  /// untouched. It taints the row's side effects: reconciliation never pushes it to the live
+  /// eZee PMS, tickets it raises route only to test staff, and reporting counts it separately.
+  is_test                  Boolean                @default(false)
+  addon_orders             addon_orders[]
+  booking_guest_access     booking_guest_access[]
+  booking_slots            booking_slots[]
+  borrowable_checkouts     borrowable_checkouts[]
+  checkin_records          checkin_records[]
+  coupon_auto              coupons?               @relation("ezee_booking_cache_coupon_auto", fields: [coupon_id_auto], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  coupon_code              coupons?               @relation("ezee_booking_cache_coupon_code", fields: [coupon_id_code], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  coupon_redemptions       coupon_redemptions[]
+  guests                   guests?                @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  properties               properties             @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  kyc_submissions          kyc_submissions[]
+  payments                 payments[]
+  returnable_checkouts     returnable_checkouts[]
+  smart_lock_access        smart_lock_access[]
+  stay_extensions          stay_extensions[]
+  zoho_ticket_ref          zoho_ticket_ref[]
+
+  @@index([guest_id], map: "idx_ezee_cache_guest")
+  @@index([property_id, status], map: "idx_ezee_cache_property")
+  @@index([property_id, is_test], map: "idx_ezee_cache_test")
+}
+
+model ezee_connection {
+  id                 String     @id @db.VarChar(36)
+  property_id        String     @db.VarChar(36)
+  hotel_code         String     @db.VarChar(100)
+  api_key            String     @db.VarChar(255)
+  api_endpoint       String     @db.VarChar(500)
+  channel_manager_id String?    @db.VarChar(100)
+  is_active          Boolean    @default(true)
+  created_at         DateTime   @default(now()) @db.Timestamp(6)
+  updated_at         DateTime   @default(now()) @db.Timestamp(6)
+  properties         properties @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ezee_sync_log {
+  id                String    @id @db.VarChar(36)
+  entity_type       String    @db.VarChar(30)
+  entity_id         String    @db.VarChar(36)
+  action            String    @db.VarChar(50)
+  status            String    @default("PENDING") @db.VarChar(10)
+  attempts          Int       @default(0)
+  last_attempted_at DateTime? @db.Timestamp(6)
+  next_retry_at     DateTime? @db.Timestamp(6)
+  error_message     String?
+  created_at        DateTime  @default(now()) @db.Timestamp(6)
+
+  @@index([status, next_retry_at], map: "idx_ezee_sync_status_retry")
+}
+
+model guests {
+  id                                                                     String                  @id @db.VarChar(36)
+  name                                                                   String                  @db.VarChar(255)
+  email                                                                  String?                 @unique @db.VarChar(255)
+  phone                                                                  String?                 @unique @db.VarChar(20)
+  secondary_phone                                                        String?                 @db.VarChar(20)
+  date_of_birth                                                          DateTime?               @db.Date
+  password_hash                                                          String?                 @db.VarChar(255)
+  email_verified                                                         Boolean                 @default(false)
+  phone_verified                                                         Boolean                 @default(false)
+  two_fa_enabled                                                         Boolean                 @default(false)
+  is_anonymous                                                           Boolean                 @default(false)
+  profile_photo_url                                                      String?                 @db.VarChar(500)
+  created_at                                                             DateTime                @default(now()) @db.Timestamp(6)
+  addon_orders                                                           addon_orders[]
+  auth_providers                                                         auth_providers[]
+  booking_guest_access_booking_guest_access_approved_by_guest_idToguests booking_guest_access[]  @relation("booking_guest_access_approved_by_guest_idToguests")
+  booking_guest_access_booking_guest_access_guest_idToguests             booking_guest_access[]  @relation("booking_guest_access_guest_idToguests")
+  booking_slots                                                          booking_slots[]
+  borrowable_checkouts                                                   borrowable_checkouts[]
+  checkin_records                                                        checkin_records[]
+  ezee_booking_cache                                                     ezee_booking_cache[]
+  kyc_submissions_kyc_submissions_guest_idToguests                       kyc_submissions[]       @relation("kyc_submissions_guest_idToguests")
+  kyc_submissions_kyc_submissions_submitted_by_guest_idToguests          kyc_submissions[]       @relation("kyc_submissions_submitted_by_guest_idToguests")
+  notification_log                                                       notification_log[]
+  otp_logs                                                               otp_logs[]
+  payments                                                               payments[]
+  returnable_checkouts                                                   returnable_checkouts[]
+  smart_lock_access                                                      smart_lock_access[]
+  stay_extensions                                                        stay_extensions[]
+  zoho_ticket_ref                                                        zoho_ticket_ref[]
+  colive_quotes                                                          colive_quotes[]
+  colive_draft_bookings                                                  colive_draft_bookings[]
+  coupon_redemptions                                                     coupon_redemptions[]
+}
+
+model inventory {
+  id                   String                 @id @db.VarChar(36)
+  property_id          String                 @db.VarChar(36)
+  product_id           String                 @db.VarChar(36)
+  total_stock          Int
+  available_stock      Int
+  reserved_stock       Int                    @default(0)
+  sold_count           Int                    @default(0)
+  damaged_count        Int                    @default(0)
+  borrowed_out_count   Int                    @default(0)
+  low_stock_threshold  Int                    @default(5)
+  updated_at           DateTime               @default(now()) @db.Timestamp(6)
+  borrowable_checkouts borrowable_checkouts[]
+  product_catalog      product_catalog        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  properties           properties             @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  returnable_checkouts returnable_checkouts[]
+
+  @@unique([property_id, product_id])
+  @@index([property_id, product_id], map: "idx_inventory_product")
+}
+
+model kyc_submissions {
+  id                                                   String             @id @db.VarChar(36)
+  ezee_reservation_id                                  String             @db.VarChar(100)
+  guest_id                                             String             @db.VarChar(36)
+  nationality_type                                     String             @db.VarChar(20)
+  id_type                                              String             @db.VarChar(20)
+  front_image_url                                      String?            @db.VarChar(500)
+  back_image_url                                       String?            @db.VarChar(500)
+  ocr_name                                             String?            @db.VarChar(255)
+  ocr_dob                                              String?            @db.VarChar(20)
+  ocr_id_number                                        String?            @db.VarChar(100)
+  ocr_address                                          String?
+  coming_from                                          String?            @db.VarChar(255)
+  going_to                                             String?            @db.VarChar(255)
+  purpose                                              String?            @db.VarChar(255)
+  consent_given                                        Boolean            @default(false)
+  status                                               String             @default("PENDING") @db.VarChar(20)
+  submitted_at                                         DateTime?          @db.Timestamp(6)
+  created_at                                           DateTime           @default(now()) @db.Timestamp(6)
+  slot_id                                              String?            @db.VarChar(36)
+  full_name                                            String?            @db.VarChar(255)
+  date_of_birth                                        DateTime?          @db.Date
+  id_number                                            String?            @db.VarChar(100)
+  permanent_address                                    String?
+  contact_number                                       String?            @db.VarChar(20)
+  submitted_by_guest_id                                String?            @db.VarChar(36)
+  ezee_booking_cache                                   ezee_booking_cache @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests_kyc_submissions_guest_idToguests              guests             @relation("kyc_submissions_guest_idToguests", fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  booking_slots                                        booking_slots?     @relation(fields: [slot_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  guests_kyc_submissions_submitted_by_guest_idToguests guests?            @relation("kyc_submissions_submitted_by_guest_idToguests", fields: [submitted_by_guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([ezee_reservation_id, guest_id], map: "idx_kyc_reservation")
+  @@index([slot_id], map: "idx_kyc_slot")
+}
+
+model mygate_connection {
+  id                 String     @id @db.VarChar(36)
+  property_id        String     @db.VarChar(36)
+  mygate_property_id String     @db.VarChar(100)
+  api_key            String     @db.VarChar(255)
+  api_endpoint       String     @db.VarChar(500)
+  admin_phone        String?    @db.VarChar(20)
+  is_active          Boolean    @default(true)
+  created_at         DateTime   @default(now()) @db.Timestamp(6)
+  updated_at         DateTime   @default(now()) @db.Timestamp(6)
+  properties         properties @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model mygate_devices {
+  id                    String                  @id @db.VarChar(36)
+  property_id           String                  @db.VarChar(36)
+  room_number           String                  @db.VarChar(20)
+  mygate_room_id        String                  @db.VarChar(100)
+  lock_serial           String                  @db.VarChar(100)
+  lock_type             String                  @db.VarChar(20)
+  battery_pct           Int?
+  battery_status        String                  @default("OK") @db.VarChar(10)
+  last_health_at        DateTime?               @db.Timestamp(6)
+  has_manual_key        Boolean                 @default(true)
+  is_active             Boolean                 @default(true)
+  created_at            DateTime                @default(now()) @db.Timestamp(6)
+  properties            properties              @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  smart_lock_access     smart_lock_access[]
+  smart_lock_access_log smart_lock_access_log[]
+
+  @@index([property_id, is_active], map: "idx_device_property")
+}
+
+model notification_log {
+  id                      String   @id @db.VarChar(36)
+  recipient_guest_id      String?  @db.VarChar(36)
+  recipient_zoho_staff_id String?  @db.VarChar(100)
+  channel                 String   @db.VarChar(20)
+  type                    String   @db.VarChar(50)
+  payload                 Json?
+  status                  String   @default("SENT") @db.VarChar(10)
+  sent_at                 DateTime @default(now()) @db.Timestamp(6)
+  guests                  guests?  @relation(fields: [recipient_guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model otp_logs {
+  id         String    @id @db.VarChar(36)
+  guest_id   String?   @db.VarChar(36)
+  recipient  String    @db.VarChar(255)
+  channel    String    @db.VarChar(20)
+  purpose    String    @db.VarChar(50)
+  otp_hash   String    @db.VarChar(255)
+  expires_at DateTime  @db.Timestamp(6)
+  used_at    DateTime? @db.Timestamp(6)
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  guests     guests?   @relation(fields: [guest_id], references: [id], onUpdate: NoAction)
+}
+
+model ticket_feedback {
+  id             String    @id @db.VarChar(36)
+  ticket_id      String    @db.VarChar(36)
+  zoho_ticket_id String?   @db.VarChar(100)
+  guest_id       String?   @db.VarChar(36)
+  brand          String    @db.VarChar(20)
+  token_hash     String    @unique @db.VarChar(64)
+  rating         Int?      @db.SmallInt
+  sentiment      String?   @db.VarChar(10)
+  comment        String?   @db.VarChar(2000)
+  expires_at     DateTime  @db.Timestamp(6)
+  rated_at       DateTime? @db.Timestamp(6)
+  submitted_at   DateTime? @db.Timestamp(6)
+  pushed_to_zoho Boolean   @default(false)
+  created_at     DateTime  @default(now()) @db.Timestamp(6)
+
+  @@index([ticket_id])
+  @@index([guest_id])
+}
+
+model payments {
+  id                  String             @id @db.VarChar(36)
+  ezee_reservation_id String             @db.VarChar(100)
+  guest_id            String?            @db.VarChar(36)
+  property_id         String?            @db.VarChar(36)
+  razorpay_order_id   String?            @unique @db.VarChar(100)
+  razorpay_payment_id String?            @unique @db.VarChar(100)
+  amount              Decimal            @db.Decimal(10, 2)
+  currency            String             @default("INR") @db.VarChar(5)
+  purpose             String             @db.VarChar(30)
+  status              String             @default("PENDING") @db.VarChar(20)
+  payment_mode        String?            @db.VarChar(10)
+  source              String?            @db.VarChar(20)
+  ezee_method         String?            @db.VarChar(50)
+  expires_at          DateTime?          @db.Timestamp(6)
+  created_at          DateTime           @default(now()) @db.Timestamp(6)
+  updated_at          DateTime           @default(now()) @db.Timestamp(6)
+  addon_orders        addon_orders[]
+  coupon_redemptions  coupon_redemptions[]
+  ezee_booking_cache  ezee_booking_cache @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests              guests?            @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  stay_extensions     stay_extensions[]
+
+  @@index([ezee_reservation_id], map: "idx_payments_reservation")
+  @@index([status, expires_at], map: "idx_payments_status_expires")
+  @@index([property_id, status, created_at(sort: Desc)], map: "idx_payments_property_status_created")
+  @@index([payment_mode, status, created_at(sort: Desc)], map: "idx_payments_mode_status_created")
+  @@index([source], map: "idx_payments_source")
+}
+
+model product_catalog {
+  id                String              @id @db.VarChar(36)
+  property_id       String              @db.VarChar(36)
+  name              String              @db.VarChar(255)
+  description       String?
+  category          String              @db.VarChar(20)
+  base_price        Decimal             @default(0) @db.Decimal(10, 2)
+  is_active         Boolean             @default(true)
+  addon_order_items addon_order_items[]
+  inventory         inventory[]
+  properties        properties          @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// heist1.1 — WhatsApp service-request lifecycle (the Miro "Live" front door).
+/// Scalar-only (no Prisma relations) on purpose: the orchestrator does explicit
+/// lookups and this keeps the v1 ticket-engine models untouched. FK integrity is
+/// enforced in the DB by migration 20260619000001.
+model wa_service_request {
+  id                       String   @id @db.VarChar(36)
+  brand                    String   @db.VarChar(20)
+  wa_id                    String   @db.VarChar(20)
+  wati_message_id          String?  @unique @db.VarChar(100)
+  guest_id                 String?  @db.VarChar(36)
+  ezee_reservation_id      String?  @db.VarChar(100)
+  property_id              String?  @db.VarChar(36)
+  raw_text                 String
+  intent                   String?  @db.VarChar(40)
+  request_type             String?  @db.VarChar(20)
+  product_id               String?  @db.VarChar(36)
+  department               String?  @db.VarChar(30)
+  task_category            String?  @db.VarChar(20)
+  status                   String   @default("RECEIVED") @db.VarChar(20)
+  payment_id               String?  @db.VarChar(36)
+  addon_order_id           String?  @db.VarChar(36)
+  razorpay_payment_link_id String?  @db.VarChar(100)
+  ticket_id                String?  @db.VarChar(36)
+  created_at               DateTime @default(now()) @db.Timestamp(6)
+  updated_at               DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([wa_id, created_at], map: "idx_wa_service_request_wa_id")
+  @@index([status], map: "idx_wa_service_request_status")
+}
+
+/// Per-prospect WhatsApp session state for the NON-GUEST (prospect) front door.
+///
+/// A number that isn't a checked-in guest may ask about one of a brand's several
+/// properties (BUTEAK = BTM + Koramangala). We don't know which, so we ask them to
+/// tap a property in the `property_selector_v3` template. This table remembers that
+/// choice for the duration of a "chat session" — scoped by an idle window
+/// (PROSPECT_SESSION_TTL_HOURS) so a customer who returns the next day to ask about
+/// a DIFFERENT property is re-prompted rather than pinned to yesterday's pick.
+///
+/// One row per (brand, wa_id). `property_id` is null until they select. `pending_query`
+/// holds the question they asked before selecting, so the next stage can answer it once
+/// the property is known.
+model wa_prospect_session {
+  id               String    @id @db.VarChar(36)
+  brand            String    @db.VarChar(20)
+  wa_id            String    @db.VarChar(20)
+  property_id      String?   @db.VarChar(36)
+  pending_query    String?   @db.VarChar(2000)
+  selector_sent_at DateTime? @db.Timestamp(6)
+  last_message_at  DateTime  @default(now()) @db.Timestamp(6)
+  created_at       DateTime  @default(now()) @db.Timestamp(6)
+
+  @@unique([brand, wa_id], map: "uq_wa_prospect_session_brand_wa")
+}
+
+/// Group-booking room disambiguation state for the GUEST (checked-in) WhatsApp front door.
+///
+/// A checked-in guest whose booking spans several rooms (e.g. 101/102/103) sends a service
+/// request; we can't stamp all three rooms on a ticket, so the bot asks which room and stashes
+/// the original request here. The next inbound is read in that context — a bare "103" files the
+/// stashed request against room 103; anything that isn't one of their rooms re-prompts; a topic
+/// change (a greeting, a different ask) drops the pending request. Mirrors `wa_prospect_session`:
+/// one row per (brand, wa_id), an idle window (WA_ROOM_SELECTION_TTL_MIN) enforced in app code,
+/// the row deleted once the room is picked or the guest changes topic.
+model wa_pending_room_selection {
+  id              String   @id @db.VarChar(36)
+  brand           String   @db.VarChar(20)
+  wa_id           String   @db.VarChar(20)
+  eri             String   @db.VarChar(50)
+  guest_id        String?  @db.VarChar(36)
+  property_id     String   @db.VarChar(36)
+  pending_text    String   @db.VarChar(2000)
+  candidate_rooms String   @db.VarChar(500)
+  asked_at        DateTime @db.Timestamp(6)
+  last_message_at DateTime @default(now()) @db.Timestamp(6)
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+
+  @@unique([brand, wa_id], map: "uq_wa_pending_room_brand_wa")
+}
+
+model properties {
+  id                       String                    @id @db.VarChar(36)
+  name                     String                    @db.VarChar(255)
+  address                  String
+  city                     String                    @db.VarChar(100)
+  brand                    String                    @default("TDS") @db.VarChar(20)
+  branding_config          Json?
+  tax_rate_pct             Decimal                   @default(0) @db.Decimal(5, 2)
+  allow_anonymous_booking  Boolean                   @default(false)
+  created_at               DateTime                  @default(now()) @db.Timestamp(6)
+  admin_user_properties    admin_user_properties[]
+  events                   events[]
+  ezee_booking_cache       ezee_booking_cache[]
+  ezee_connection          ezee_connection[]
+  inventory                inventory[]
+  mygate_connection        mygate_connection[]
+  mygate_devices           mygate_devices[]
+  product_catalog          product_catalog[]
+  room_types               room_types[]
+  colive_property_content  colive_property_content[]
+  colive_room_options      colive_room_options[]
+  colive_addons            colive_addons[]
+  colive_quotes            colive_quotes[]
+  colive_draft_bookings    colive_draft_bookings[]
+  coupon_properties        coupon_properties[]
+  coupon_redemptions       coupon_redemptions[]
+  staff                    staff[]
+  escalation_levels        escalation_levels[]
+
+  @@index([brand], map: "idx_properties_brand")
+}
+
+// ─── COLIVE LONG-STAY TABLES ─────────────────────────────────────────────────
+
+model colive_locations {
+  id                      String                    @id @db.VarChar(36)
+  slug                    String                    @unique @db.VarChar(50)
+  label                   String                    @db.VarChar(100)
+  is_active               Boolean                   @default(true)
+  created_at              DateTime                  @default(now()) @db.Timestamp(6)
+  colive_property_content colive_property_content[]
+}
+
+model colive_plans {
+  id                    String   @id @db.VarChar(36)
+  slug                  String   @unique @db.VarChar(50)
+  title                 String   @db.VarChar(100)
+  description           String?
+  recommended_stay_type String   @db.VarChar(20)
+  accent_hex            String?  @db.VarChar(10)
+  badge_copy            String?  @db.VarChar(50)
+  sort_order            Int      @default(0)
+  is_active             Boolean  @default(true)
+  created_at            DateTime @default(now()) @db.Timestamp(6)
+}
+
+model colive_property_content {
+  id                    String           @id @db.VarChar(36)
+  property_id           String           @db.VarChar(36)
+  location_id           String           @db.VarChar(36)
+  slug                  String           @unique @db.VarChar(100)
+  headline              String?          @db.VarChar(200)
+  subheadline           String?          @db.VarChar(300)
+  description           String?
+  microcopy             String?          @db.VarChar(300)
+  hero_image_url        String?          @db.VarChar(500)
+  secondary_image_url   String?          @db.VarChar(500)
+  supporting_image_urls Json?            @default("[]")
+  gallery_count         Int?
+  primary_tag           String?          @db.VarChar(50)
+  secondary_tag         String?          @db.VarChar(50)
+  rating                Decimal?         @db.Decimal(2, 1)
+  rating_label          String?          @db.VarChar(50)
+  amenities             Json?            @default("[]")
+  benefits              Json?            @default("[]")
+  stories               Json?            @default("[]")
+  checkout_notes        Json?            @default("[]")
+  recommended_for       Json?            @default("[]")
+  is_active             Boolean          @default(true)
+  created_at            DateTime         @default(now()) @db.Timestamp(6)
+  updated_at            DateTime         @default(now()) @db.Timestamp(6)
+  properties            properties       @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  colive_locations      colive_locations @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([property_id], map: "idx_colive_content_property")
+  @@index([location_id], map: "idx_colive_content_location")
+}
+
+model colive_room_options {
+  id                   String                  @id @db.VarChar(36)
+  property_id          String                  @db.VarChar(36)
+  room_type_id         String                  @db.VarChar(36)
+  slug                 String                  @db.VarChar(50)
+  name                 String                  @db.VarChar(100)
+  description          String?
+  feature_points       Json?                   @default("[]")
+  max_guests           Int?                    @default(1)
+  recommended_for      Json?                   @default("[]")
+  thumbnail_url        String?                 @db.VarChar(500)
+  sort_order           Int                     @default(0)
+  is_active            Boolean                 @default(true)
+  created_at           DateTime                @default(now()) @db.Timestamp(6)
+  properties           properties              @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  room_types           room_types              @relation(fields: [room_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([property_id, slug])
+  @@index([property_id, is_active], map: "idx_colive_rooms_property")
+}
+
+model colive_addons {
+  id                   String     @id @db.VarChar(36)
+  property_id          String     @db.VarChar(36)
+  slug                 String     @db.VarChar(50)
+  name                 String     @db.VarChar(100)
+  description          String?
+  pricing_model        String     @db.VarChar(20)
+  unit_price           Decimal    @db.Decimal(10, 2)
+  currency             String     @default("INR") @db.VarChar(5)
+  max_quantity         Int?
+  default_quantity     Int?       @default(0)
+  category             String?    @db.VarChar(30)
+  icon_hint            String?    @db.VarChar(50)
+  is_available         Boolean    @default(true)
+  availability_message String?    @db.VarChar(200)
+  sort_order           Int        @default(0)
+  is_active            Boolean    @default(true)
+  created_at           DateTime   @default(now()) @db.Timestamp(6)
+  properties           properties @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([property_id, slug])
+  @@index([property_id, is_active], map: "idx_colive_addons_property")
+}
+
+model colive_search_sessions {
+  id              String   @id @db.VarChar(36)
+  location_id     String?  @db.VarChar(36)
+  location_slug   String?  @db.VarChar(50)
+  move_in_date    String?  @db.VarChar(10)
+  duration_months Int?
+  stay_type       String?  @db.VarChar(20)
+  guest_count     Int?
+  plan_id         String?  @db.VarChar(36)
+  currency        String?  @default("INR") @db.VarChar(5)
+  result_count    Int?
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([location_slug, created_at], map: "idx_colive_search_location")
+}
+
+model colive_quotes {
+  id                  String     @id @db.VarChar(36)
+  property_id         String     @db.VarChar(36)
+  guest_id            String?    @db.VarChar(36)
+  room_option_id      String     @db.VarChar(36)
+  move_in_date        DateTime   @db.Date
+  duration_days       Int
+  stay_type           String     @db.VarChar(20)
+  room_line_total     Decimal    @db.Decimal(10, 2)
+  addons_json         Json?      @default("[]")
+  included_items_json Json?      @default("[]")
+  room_subtotal       Decimal    @db.Decimal(10, 2)
+  addon_subtotal      Decimal    @db.Decimal(10, 2)
+  discount_total      Decimal    @default(0) @db.Decimal(10, 2)
+  deposit_total       Decimal    @default(0) @db.Decimal(10, 2)
+  tax_total           Decimal    @db.Decimal(10, 2)
+  grand_total         Decimal    @db.Decimal(10, 2)
+  monthly_savings     Decimal?   @db.Decimal(10, 2)
+  total_savings       Decimal?   @db.Decimal(10, 2)
+  pricing_notes_json  Json?      @default("[]")
+  coupon_code         String?    @db.VarChar(30)
+  currency            String     @default("INR") @db.VarChar(5)
+  ezee_rate_per_night Decimal?   @db.Decimal(10, 2)
+  expires_at          DateTime   @db.Timestamp(6)
+  created_at          DateTime   @default(now()) @db.Timestamp(6)
+  properties          properties @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  guests              guests?    @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([guest_id], map: "idx_colive_quotes_guest")
+  @@index([expires_at], map: "idx_colive_quotes_expiry")
+}
+
+model colive_draft_bookings {
+  id                  String     @id @db.VarChar(36)
+  booking_reference   String     @unique @db.VarChar(30)
+  quote_id            String     @db.VarChar(36)
+  property_id         String     @db.VarChar(36)
+  guest_id            String?    @db.VarChar(36)
+  room_option_id      String     @db.VarChar(36)
+  room_type_id        String     @db.VarChar(36)
+  move_in_date        DateTime   @db.Date
+  duration_days       Int
+  stay_type           String     @db.VarChar(20)
+  estimated_checkout  DateTime?  @db.Date
+  first_name          String     @db.VarChar(100)
+  last_name           String     @db.VarChar(100)
+  email               String     @db.VarChar(255)
+  phone               String     @db.VarChar(20)
+  addons_json         Json?      @default("[]")
+  room_subtotal       Decimal    @db.Decimal(10, 2)
+  addon_subtotal      Decimal    @db.Decimal(10, 2)
+  tax_total           Decimal    @db.Decimal(10, 2)
+  grand_total         Decimal    @db.Decimal(10, 2)
+  source              String     @default("web_colive_flow") @db.VarChar(30)
+  notes               String?
+  status              String     @default("draft") @db.VarChar(30)
+  payment_id          String?    @db.VarChar(36)
+  razorpay_order_id   String?    @db.VarChar(100)
+  ezee_reservation_no String?    @db.VarChar(100)
+  ezee_sync_status    String     @default("NOT_SYNCED") @db.VarChar(20)
+  onboarding_json     Json?      @default("{}")
+  created_at          DateTime   @default(now()) @db.Timestamp(6)
+  updated_at          DateTime   @default(now()) @db.Timestamp(6)
+  properties          properties @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  guests              guests?    @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([guest_id], map: "idx_colive_draft_guest")
+  @@index([status], map: "idx_colive_draft_status")
+  @@index([booking_reference], map: "idx_colive_draft_ref")
+}
+
+model returnable_checkouts {
+  id                                                                          String             @id @db.VarChar(36)
+  inventory_id                                                                String             @db.VarChar(36)
+  addon_order_item_id                                                         String             @db.VarChar(36)
+  ezee_reservation_id                                                         String             @db.VarChar(100)
+  guest_id                                                                    String             @db.VarChar(36)
+  unit_code                                                                   String?            @db.VarChar(20)
+  quantity                                                                    Int                @default(1)
+  issued_at                                                                   DateTime           @default(now()) @db.Timestamp(6)
+  returned_at                                                                 DateTime?          @db.Timestamp(6)
+  returned_verified_by_admin_id                                               String?            @db.VarChar(36)
+  condition_on_return                                                         String?            @db.VarChar(15)
+  status                                                                      String             @default("ISSUED") @db.VarChar(15)
+  issued_by_admin_id                                                          String?            @db.VarChar(36)
+  notes                                                                       String?
+  addon_order_items                                                           addon_order_items  @relation(fields: [addon_order_item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ezee_booking_cache                                                          ezee_booking_cache @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests                                                                      guests             @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  inventory                                                                   inventory          @relation(fields: [inventory_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_returnable_checkouts_issued_by_admin_idToadmin_users            admin_users?       @relation("returnable_checkouts_issued_by_admin_idToadmin_users", fields: [issued_by_admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  admin_users_returnable_checkouts_returned_verified_by_admin_idToadmin_users admin_users?       @relation("returnable_checkouts_returned_verified_by_admin_idToadmin_users", fields: [returned_verified_by_admin_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([guest_id, status], map: "idx_ret_guest_status")
+  @@index([addon_order_item_id], map: "idx_ret_order_item")
+  @@index([ezee_reservation_id, status], map: "idx_ret_reservation")
+}
+
+model room_types {
+  id                   String                @id @db.VarChar(36)
+  property_id          String                @db.VarChar(36)
+  name                 String                @db.VarChar(100)
+  slug                 String                @db.VarChar(50)
+  type                 String                @db.VarChar(20)
+  total_rooms          Int
+  beds_per_room        Int                   @default(1)
+  total_beds           Int
+  base_price_per_night Decimal               @db.Decimal(10, 2)
+  floor_range          String?               @db.VarChar(20)
+  amenities            Json?                 @default("[]")
+  is_active            Boolean?              @default(true)
+  created_at           DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at           DateTime?             @default(now()) @db.Timestamp(6)
+  ezee_room_type_id    String?               @db.VarChar(50)
+  ezee_rate_plan_id    String?               @db.VarChar(50)
+  ezee_rate_type_id    String?               @db.VarChar(50)
+  colive_price_month   Decimal?              @db.Decimal(10, 2)
+  // Physical occupancy limits, synchronized with eZee room config (Max A/C).
+  // NULL = unconfigured → callers fall back to the legacy generous per-unit
+  // ceiling, so existing properties are unaffected until seeded. Set per
+  // physical room type, so EP/CP rate-plan siblings share identical limits.
+  base_adults          Int?
+  base_children        Int?
+  max_adults           Int?
+  max_children         Int?
+  properties           properties            @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  colive_room_options  colive_room_options[]
+
+  @@unique([property_id, slug])
+  @@index([property_id, is_active], map: "idx_room_types_property")
+}
+
+// SLA timing per task class (global — one row per T0..T3). Urgency tiers,
+// department-agnostic. Two timers (ack + completion) + the gap between
+// escalation ladder steps. The ladder (who) lives in escalation_levels.
+model sla_config {
+  id                     String   @id @db.VarChar(36)
+  task_category          String   @unique @db.VarChar(20)
+  completion_timeout_min Int // TAT — time to RESOLVE after acknowledging (= guest turn-around)
+  ack_percent            Int // primary ack window = this % of TAT; escalate if unacked by then
+  escalation_gap_min     Int // base wait between successive ladder levels
+  snooze_percent         Int      @default(100) // escalated-level ack/snooze window = this % of escalation_gap_min
+  is_active              Boolean  @default(true)
+  updated_at             DateTime @default(now()) @db.Timestamp(6)
+}
+
+model smart_lock_access {
+  id                    String                  @id @db.VarChar(36)
+  ezee_reservation_id   String                  @db.VarChar(100)
+  guest_id              String                  @db.VarChar(36)
+  device_id             String                  @db.VarChar(36)
+  room_number           String                  @db.VarChar(20)
+  mygate_pin            String                  @db.VarChar(20)
+  pin_type              String                  @default("AUTO") @db.VarChar(10)
+  pin_validity          String                  @default("TIMED") @db.VarChar(10)
+  is_master_pin         Boolean                 @default(false)
+  pin_status            String                  @default("ACTIVE") @db.VarChar(10)
+  valid_from            DateTime                @db.Timestamp(6)
+  valid_until           DateTime?               @db.Timestamp(6)
+  created_at            DateTime                @default(now()) @db.Timestamp(6)
+  revoked_at            DateTime?               @db.Timestamp(6)
+  mygate_devices        mygate_devices          @relation(fields: [device_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ezee_booking_cache    ezee_booking_cache      @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests                guests                  @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  smart_lock_access_log smart_lock_access_log[]
+
+  @@index([device_id, pin_status], map: "idx_lock_access_device")
+  @@index([ezee_reservation_id, pin_status], map: "idx_lock_access_reservation")
+}
+
+model smart_lock_access_log {
+  id                String             @id @db.VarChar(36)
+  device_id         String             @db.VarChar(36)
+  pin_id            String?            @db.VarChar(36)
+  event_type        String             @db.VarChar(20)
+  event_source      String             @db.VarChar(20)
+  event_at          DateTime           @db.Timestamp(6)
+  raw_payload       Json?
+  created_at        DateTime           @default(now()) @db.Timestamp(6)
+  mygate_devices    mygate_devices     @relation(fields: [device_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  smart_lock_access smart_lock_access? @relation(fields: [pin_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([device_id, event_at], map: "idx_lock_log_device")
+  @@index([pin_id], map: "idx_lock_log_pin")
+}
+
+model stay_extensions {
+  id                  String             @id @db.VarChar(36)
+  ezee_reservation_id String             @db.VarChar(100)
+  guest_id            String             @db.VarChar(36)
+  payment_id          String?            @db.VarChar(36)
+  old_checkout_date   DateTime           @db.Date
+  new_checkout_date   DateTime           @db.Date
+  rate_per_night      Decimal            @db.Decimal(10, 2)
+  total_amount        Decimal            @db.Decimal(10, 2)
+  same_bed_available  Boolean
+  disclaimer_accepted Boolean            @default(false)
+  ezee_sync_status    String             @default("NOT_SYNCED") @db.VarChar(20)
+  status              String             @default("PENDING") @db.VarChar(20)
+  created_at          DateTime           @default(now()) @db.Timestamp(6)
+  ezee_booking_cache  ezee_booking_cache @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests              guests             @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payments            payments?          @relation(fields: [payment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model zoho_ticket_ref {
+  id                  String              @id @db.VarChar(36)
+  zoho_ticket_id      String              @unique @db.VarChar(100)
+  ezee_reservation_id String?             @db.VarChar(100)
+  guest_id            String?             @db.VarChar(36)
+  addon_order_id      String?             @db.VarChar(36)
+  ticket_type         String              @db.VarChar(20)
+  department          String              @db.VarChar(30)
+  room_number         String?             @db.VarChar(20)
+  unit_code           String?             @db.VarChar(20)
+  status              String              @default("OPEN") @db.VarChar(20)
+  subject             String?             @db.VarChar(255)
+  task_category       String?             @db.VarChar(5)
+  priority            String              @default("MEDIUM") @db.VarChar(10)
+  assigned_staff_id   String?             @db.VarChar(36)
+  /// Assignee's name pinned at assignment. Survives the staff row being hard-deleted, so a
+  /// historic ticket still shows who worked it once `assigned_staff_id` is nulled out.
+  assigned_staff_name String?             @db.VarChar(255)
+  guest_phone         String?             @db.VarChar(20)
+  is_escalated        Boolean             @default(false)
+  escalation_level    Int                 @default(0)
+  next_deadline       DateTime?           @db.Timestamp(6)
+  sla_breach_at       DateTime?           @db.Timestamp(6)
+  acked_at            DateTime?           @db.Timestamp(6)
+  completed_at        DateTime?           @db.Timestamp(6)
+  synced_at           DateTime            @db.Timestamp(6)
+  created_at          DateTime            @default(now()) @db.Timestamp(6)
+  /// Raised by a test booking. Pinned at creation from `ezee_booking_cache.is_test` rather than
+  /// joined, for the same reason as `assigned_staff_name` above — the ticket keeps its own truth
+  /// — and so every routing/reporting filter stays a single-table predicate.
+  is_test             Boolean             @default(false)
+  addon_orders        addon_orders?       @relation(fields: [addon_order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ezee_booking_cache  ezee_booking_cache? @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  guests              guests?             @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  staff               staff?              @relation(fields: [assigned_staff_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([ezee_reservation_id], map: "idx_zoho_ticket_reservation")
+  @@index([status], map: "idx_zoho_ticket_status")
+  @@index([status, next_deadline], map: "idx_zoho_ticket_watchdog")
+  @@index([assigned_staff_id], map: "idx_zoho_ticket_assigned_staff")
+}
+
+model staff {
+  id                  String            @id @db.VarChar(36)
+  property_id         String            @db.VarChar(36)
+  name                String            @db.VarChar(255)
+  phone               String            @db.VarChar(20)
+  role                String            @db.VarChar(30)
+  department          String            @db.VarChar(30)
+  is_available        Boolean           @default(false)
+  active_ticket_count Int               @default(0)
+  is_active           Boolean           @default(true)
+  created_at          DateTime          @default(now()) @db.Timestamp(6)
+  updated_at          DateTime          @default(now()) @db.Timestamp(6)
+  properties          properties        @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  zoho_ticket_ref     zoho_ticket_ref[]
+
+  @@unique([property_id, phone], map: "uq_staff_property_phone")
+  @@index([property_id, role, is_available, is_active], map: "idx_staff_assignment")
+}
+
+model escalation_levels {
+  id            String     @id @db.VarChar(36)
+  property_id   String     @db.VarChar(36)
+  level         Int
+  role          String     @db.VarChar(30)
+  lookup_source String     @default("staff") @db.VarChar(20)
+  channel       String     @default("WATI") @db.VarChar(20)
+  is_active     Boolean    @default(true)
+  properties    properties @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([property_id, level], map: "uq_escalation_levels_property_level")
+}
+
+// Brand-wide catalog of staff role types (HOUSEKEEPING, SUPERVISOR, …). The set of
+// role *types* is global; which person fills a role at which hotel lives in `staff`,
+// and where a role sits in a hotel's ladder lives in `escalation_levels`. Both the
+// staff form and the escalation-ladder role picker validate against this catalog so a
+// typo/casing mismatch can't silently page nobody.
+model staff_roles {
+  id         String   @id @db.VarChar(36)
+  name       String   @unique @db.VarChar(30) // canonical, UPPER_SNAKE (e.g. FRONT_OFFICE)
+  label      String?  @db.VarChar(60) // human display label (e.g. "Front Office")
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+}
+
+// Per-ticket flow trace: one row per module step (webhook → classify → identity →
+// assign → ticket → zoho → notify → escalate → ack/complete) with input/output/latency.
+// `trace_id` groups a whole request; `ticket_id` is stamped once the ticket exists
+// (pre-ticket steps are back-linked), so the whole flow is queryable ticket-wise.
+model flow_log {
+  id         String   @id @db.VarChar(36)
+  trace_id   String   @db.VarChar(36)
+  ticket_id  String?  @db.VarChar(36)
+  brand      String?  @db.VarChar(20)
+  module     String   @db.VarChar(40) // WA_INBOUND | IDENTITY | LLM_CLASSIFY | CATALOG | TICKET_CREATE | ZOHO_CREATE | NOTIFY_STAFF | NOTIFY_GUEST | ESCALATION | ACK | COMPLETE
+  input      String? // summarised / redacted
+  output     String?
+  status     String   @default("OK") @db.VarChar(10) // OK | ERROR | SKIP
+  error      String?
+  latency_ms Int?
+  created_at DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([ticket_id], map: "idx_flow_log_ticket")
+  @@index([trace_id], map: "idx_flow_log_trace")
+}
+
+// ─── COUPONS ─────────────────────────────────────────────────────────────────
+
+model coupons {
+  id                         String                @id @db.VarChar(36)
+  code                       String?               @unique @db.VarChar(50)
+  name                       String?               @db.VarChar(60)
+  description                String?               @db.VarChar(255)
+  type                       String                @db.VarChar(20)
+  discount_type              String                @db.VarChar(10)
+  discount_value             Decimal               @db.Decimal(10, 2)
+  max_discount_amount        Decimal?              @db.Decimal(10, 2)
+  min_stay_nights            Int?
+  min_booking_amount         Decimal               @default(0) @db.Decimal(10, 2)
+  max_uses_per_guest         Int                   @default(1)
+  max_total_uses             Int?
+  applies_to_all_properties  Boolean               @default(false)
+  valid_from                 DateTime?             @db.Timestamp(6)
+  valid_until                DateTime?             @db.Timestamp(6)
+  is_active                  Boolean               @default(true)
+  is_hidden                  Boolean               @default(false)
+  admin_note                 String?
+  created_by                 String                @db.VarChar(36)
+  created_at                 DateTime              @default(now()) @db.Timestamp(6)
+  updated_at                 DateTime              @default(now()) @db.Timestamp(6)
+  admin_users                admin_users           @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  coupon_properties          coupon_properties[]
+  coupon_redemptions         coupon_redemptions[]
+  ezee_booking_cache_auto    ezee_booking_cache[]  @relation("ezee_booking_cache_coupon_auto")
+  ezee_booking_cache_code    ezee_booking_cache[]  @relation("ezee_booking_cache_coupon_code")
+
+  @@index([type, is_active], map: "idx_coupons_type_active")
+  @@index([valid_from, valid_until], map: "idx_coupons_valid_window")
+}
+
+model coupon_properties {
+  coupon_id   String     @db.VarChar(36)
+  property_id String     @db.VarChar(36)
+  coupons     coupons    @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  properties  properties @relation(fields: [property_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([coupon_id, property_id])
+  @@index([property_id], map: "idx_coupon_properties_property")
+}
+
+model coupon_redemptions {
+  id                  String             @id @db.VarChar(36)
+  coupon_id           String             @db.VarChar(36)
+  guest_id            String             @db.VarChar(36)
+  ezee_reservation_id String             @db.VarChar(100)
+  property_id         String             @db.VarChar(36)
+  payment_id          String?            @db.VarChar(36)
+  discount_amount     Decimal            @db.Decimal(10, 2)
+  applied_at          DateTime           @default(now()) @db.Timestamp(6)
+  kind                String             @db.VarChar(10)
+  coupons             coupons            @relation(fields: [coupon_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  guests              guests             @relation(fields: [guest_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ezee_booking_cache  ezee_booking_cache @relation(fields: [ezee_reservation_id], references: [ezee_reservation_id], onDelete: NoAction, onUpdate: NoAction)
+  payments            payments?          @relation(fields: [payment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  properties          properties         @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([coupon_id], map: "idx_redemptions_coupon")
+  @@index([guest_id, coupon_id], map: "idx_redemptions_guest_coupon")
+  @@index([ezee_reservation_id], map: "idx_redemptions_eri")
+  @@index([payment_id], map: "idx_redemptions_payment")
+}
+
+/// Breakfast pre-ordering (BRD docs/plans/breakfast_brd.md, Phase 1).
+/// Cross-domain refs (property_id / ezee_reservation_id / guest_id) are scalar-only —
+/// same decoupled style as `ticket_feedback` / `wa_service_request` — so the shared
+/// `properties`/`guests`/`ezee_booking_cache` models are untouched; those FKs are
+/// enforced in the DB by the breakfast migration. Relations WITHIN the breakfast domain
+/// (order ↔ items ↔ slot) are modelled so nested reads (`include`) stay clean.
+
+/// Admin-managed breakfast menu catalog (per property). No inventory/stock tracking in
+/// Phase 1 — remove = soft-delete (`is_active=false`) so historic orders keep resolving.
+model breakfast_menu_item {
+  id                    String                 @id @db.VarChar(36)
+  property_id           String                 @db.VarChar(36)
+  name                  String                 @db.VarChar(255)
+  description           String?
+  category              String                 @default("MAIN") @db.VarChar(20)
+  is_veg                Boolean                @default(true)
+  forecast_key          String?                @db.VarChar(100)
+  sort_order            Int                    @default(0)
+  is_active             Boolean                @default(true)
+  created_at            DateTime               @default(now()) @db.Timestamp(6)
+  updated_at            DateTime               @default(now()) @db.Timestamp(6)
+  breakfast_order_items breakfast_order_item[]
+
+  @@index([property_id, is_active], map: "idx_breakfast_menu_property")
+}
+
+/// Delivery-slot DEFINITIONS (recur daily). Per-date booked counts are derived by
+/// counting PLACED orders — no per-date slot rows. `capacity` is admin-configurable.
+model breakfast_slot {
+  id               String            @id @db.VarChar(36)
+  property_id      String            @db.VarChar(36)
+  slot_number      Int
+  label            String            @db.VarChar(50)
+  start_min        Int
+  end_min          Int
+  capacity         Int               @default(12)
+  sort_order       Int               @default(0)
+  is_active        Boolean           @default(true)
+  created_at       DateTime          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime          @default(now()) @db.Timestamp(6)
+  breakfast_plates breakfast_plate[]
+
+  @@unique([property_id, slot_number], map: "uq_breakfast_slot_property_number")
+  @@index([property_id, is_active], map: "idx_breakfast_slot_property")
+}
+
+/// One breakfast order per ROOM per service_date. A multi-room eZee booking is ONE reservation
+/// (one cache row) with one BookingTran per room, so the room key is `sub_booking_id` (eZee's
+/// SubBookingId, e.g. "109-2"), falling back to the reservation id for single-room bookings and
+/// for rows eZee gave no sub-booking for. A resubmit MODIFIES the same row (unique on
+/// eri+sub+date). The room's meals are its `breakfast_plates` — one plate per adult who wants
+/// breakfast; each plate carries its OWN delivery slot + dishes. `no_of_guests` snapshots the
+/// plate count. room_number is snapshotted for the admin board.
+model breakfast_order {
+  id                  String            @id @db.VarChar(36)
+  property_id         String            @db.VarChar(36)
+  ezee_reservation_id String            @db.VarChar(100)
+  sub_booking_id      String            @db.VarChar(100)
+  guest_id            String?           @db.VarChar(36)
+  brand               String            @db.VarChar(20)
+  service_date        DateTime          @db.Date
+  status              String            @default("PLACED") @db.VarChar(20)
+  no_of_guests        Int?
+  room_number         String?           @db.VarChar(20)
+  placed_via          String            @default("CX_LINK") @db.VarChar(20)
+  created_at          DateTime          @default(now()) @db.Timestamp(6)
+  updated_at          DateTime          @default(now()) @db.Timestamp(6)
+  /// Ordered against a test booking. Denormalised from `ezee_booking_cache.is_test` because
+  /// `ezee_reservation_id` here is a scalar-only cross-domain FK (see the note on that field) —
+  /// there is no relation to join through. The kitchen forecast subtracts these: nobody should
+  /// cook a plate for a guest who doesn't exist.
+  is_test             Boolean           @default(false)
+  breakfast_plates    breakfast_plate[]
+
+  @@unique([ezee_reservation_id, sub_booking_id, service_date], map: "uq_breakfast_order_eri_sub_date")
+  @@index([property_id, service_date], map: "idx_breakfast_order_property_date")
+}
+
+/// One plate = one adult's breakfast: its own delivery `slot_id` and its own dishes
+/// (`breakfast_order_items`). Plates belong to a room order; `plate_number` is 1..N within
+/// the room. Slot CAPACITY is counted in PLATES (not rooms). Cascade-deleted when the
+/// order is replaced.
+model breakfast_plate {
+  id                    String                 @id @db.VarChar(36)
+  order_id              String                 @db.VarChar(36)
+  plate_number          Int
+  slot_id               String                 @db.VarChar(36)
+  status                String                 @default("PLACED") @db.VarChar(20)
+  special_requests      String?                @db.VarChar(500)
+  created_at            DateTime               @default(now()) @db.Timestamp(6)
+  updated_at            DateTime               @default(now()) @db.Timestamp(6)
+  breakfast_order       breakfast_order        @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  breakfast_slot        breakfast_slot         @relation(fields: [slot_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  breakfast_order_items breakfast_order_item[]
+
+  @@index([order_id], map: "idx_breakfast_plate_order")
+  @@index([slot_id], map: "idx_breakfast_plate_slot")
+}
+
+/// Line items on a PLATE (dishes for that one adult). qty per item. Cascade-deleted when
+/// the plate is replaced/removed.
+model breakfast_order_item {
+  id                  String              @id @db.VarChar(36)
+  plate_id            String              @db.VarChar(36)
+  menu_item_id        String              @db.VarChar(36)
+  qty                 Int                 @default(1)
+  created_at          DateTime            @default(now()) @db.Timestamp(6)
+  breakfast_plate     breakfast_plate     @relation(fields: [plate_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  breakfast_menu_item breakfast_menu_item @relation(fields: [menu_item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([plate_id], map: "idx_breakfast_order_item_plate")
+}
+
+/// Per-stay Cx link credential. Only the SHA-256 of the token is stored (never the raw
+/// token) — same discipline as `ticket_feedback`/`otp_logs`. One reusable token per stay;
+/// live validity is still gated by the booking's CHECKED_IN state, `expires_at` is a backstop.
+model breakfast_access_token {
+  id                  String    @id @db.VarChar(36)
+  ezee_reservation_id String    @db.VarChar(100)
+  guest_id            String?   @db.VarChar(36)
+  property_id         String    @db.VarChar(36)
+  brand               String    @db.VarChar(20)
+  token_hash          String    @unique @db.VarChar(64)
+  issued_at           DateTime  @default(now()) @db.Timestamp(6)
+  revoked_at          DateTime? @db.Timestamp(6)
+  expires_at          DateTime  @db.Timestamp(6)
+  created_at          DateTime  @default(now()) @db.Timestamp(6)
+
+  @@index([ezee_reservation_id], map: "idx_breakfast_token_eri")
+}
+
+/// Per-property breakfast on/off toggle (admin-controlled). One row per property
+/// (property_id is the PK). Absent row ⇒ disabled (opt-in). When disabled: the Cx page
+/// returns `disabled`, invites are skipped, and ordering is blocked — but menu/slot
+/// setup stays editable so a property can be configured before it goes live.
+model breakfast_config {
+  property_id           String    @id @db.VarChar(36)
+  is_enabled            Boolean   @default(false)
+  /// Ordering window (IST, per property). Orders open at `order_open_hour` the evening before
+  /// and freeze at `order_freeze_hour` on the service morning (default 11:00 open → 07:00 freeze,
+  /// i.e. frozen 07:00–11:00). Admin-configurable so the inactive hours aren't hardcoded.
+  order_open_hour       Int       @default(11)
+  order_freeze_hour     Int       @default(7)
+  /// Auto-send scheduler: fire at `invite_anchor_min` (mins from IST midnight, default
+  /// 18:00) then every `invite_interval_hours` (default 24 = once daily). `last_invite_run_at`
+  /// dedupes firings across the poll tick. Gated by `invite_cron_enabled` (per-property) under
+  /// the global BREAKFAST_INVITE_CRON_ENABLED master switch.
+  invite_cron_enabled   Boolean   @default(false)
+  invite_anchor_min     Int       @default(1080)
+  invite_interval_hours Int       @default(24)
+  last_invite_run_at    DateTime? @db.Timestamp(6)
+  created_at            DateTime  @default(now()) @db.Timestamp(6)
+  updated_at            DateTime  @default(now()) @db.Timestamp(6)
+}

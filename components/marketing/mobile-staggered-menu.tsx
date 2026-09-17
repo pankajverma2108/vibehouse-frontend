@@ -21,6 +21,7 @@ import { hostelNavItems } from "@/content/nav-menu";
 import { navFontStyles } from "@/content/typography";
 import { getDefaultPropertyDestinationHref } from "@/lib/cx-api";
 import { getScopedGuestHubHref } from "@/lib/guest-hub";
+import { StaticAwareLink } from "@/components/static-export/static-aware-link";
 import { cn } from "@/lib/utils";
 
 type MobileNavTile = {
@@ -503,7 +504,7 @@ export function MobileStaggeredMenu({ activeGuestHubBookingId = null, isAuthenti
                                         {content}
                                       </a>
                                     ) : (
-                                      <Link
+                                      <StaticAwareLink
                                         className="flex h-full w-full cursor-pointer flex-col items-start justify-between text-left"
                                         href={tile.href}
                                         onClick={(event) => {
@@ -518,7 +519,7 @@ export function MobileStaggeredMenu({ activeGuestHubBookingId = null, isAuthenti
                                         }}
                                       >
                                         {content}
-                                      </Link>
+                                      </StaticAwareLink>
                                     )}
 
                                     {isHostels ? (

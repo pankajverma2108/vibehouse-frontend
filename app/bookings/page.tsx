@@ -268,7 +268,7 @@ function AutoSyncedBookingCard({ booking, tab }: { booking: GuestBookingMineItem
 
   return (
     <article className="relative mx-auto w-full max-w-[340px] pt-5 sm:max-w-none sm:pt-6">
-      <Link
+      <DocumentLink
         aria-label={`Open booking ${booking.ezee_reservation_id}`}
         className="group block focus-visible:outline-none"
         href={destinationHref}
@@ -309,7 +309,7 @@ function AutoSyncedBookingCard({ booking, tab }: { booking: GuestBookingMineItem
             </div>
           </div>
         </div>
-      </Link>
+      </DocumentLink>
     </article>
   );
 }
@@ -624,3 +624,4 @@ export default function BookingsPage() {
     </BookingPageShell>
   );
 }
+import { DocumentLink } from "@/components/static-export/document-link";

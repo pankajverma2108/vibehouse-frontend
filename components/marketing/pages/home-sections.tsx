@@ -43,6 +43,7 @@ import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { FadeIn, FloatCard, Stagger, StaggerItem } from "@/components/shared/motion";
 import { StickerTag } from "@/components/shared/sticker-tag";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const TestimonialsMarquee = dynamic(() => import("@/components/testimonials-with-marquee"));
 
@@ -168,7 +169,25 @@ function InlineSectionState({
   );
 }
 
-function RoomsSection({ roomError, rooms }: { roomError?: string | null; rooms: RoomCardProps[] }) {
+function SectionCardSkeletons() {
+  return (
+    <div aria-busy="true" className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <span className="sr-only">Live content is being prepared.</span>
+      {[0, 1, 2].map((item) => (
+        <div className="overflow-hidden rounded-[18px] border border-white/10 bg-white/[0.03]" key={item}>
+          <Skeleton className="h-[220px] w-full bg-white/8" />
+          <div className="space-y-3 p-5">
+            <Skeleton className="h-7 w-2/3 bg-white/8" />
+            <Skeleton className="h-4 w-full bg-white/8" />
+            <Skeleton className="h-4 w-4/5 bg-white/8" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function RoomsSection({ pending, roomError, rooms }: { pending?: boolean; roomError?: string | null; rooms: RoomCardProps[] }) {
   const roomItems = rooms;
   const roomGridClass =
     roomItems.length <= 1
@@ -190,7 +209,9 @@ function RoomsSection({ roomError, rooms }: { roomError?: string | null; rooms: 
             text={sectionHeaderStickers.rooms.text}
           />
         </FadeIn>
-        {roomError ? (
+        {pending ? (
+          <SectionCardSkeletons />
+        ) : roomError ? (
           <FadeIn>
             <InlineSectionState body={roomError} title="Rooms did not load" />
           </FadeIn>
@@ -212,7 +233,7 @@ function RoomsSection({ roomError, rooms }: { roomError?: string | null; rooms: 
   );
 }
 
-function EventsSection({ eventError, events }: { eventError?: string | null; events: EventCardProps[] }) {
+function EventsSection({ eventError, events, pending }: { eventError?: string | null; events: EventCardProps[]; pending?: boolean }) {
   const eventItems = events;
   const eventGridClass =
     eventItems.length <= 1
@@ -234,7 +255,9 @@ function EventsSection({ eventError, events }: { eventError?: string | null; eve
             text={sectionHeaderStickers.events.text}
           />
         </FadeIn>
-        {eventError ? (
+        {pending ? (
+          <SectionCardSkeletons />
+        ) : eventError ? (
           <FadeIn>
             <InlineSectionState body={eventError} title="Events did not load" />
           </FadeIn>
@@ -537,27 +560,31 @@ function CtaSection({ destinationHref = "/property" }: { destinationHref?: strin
 export function HomeSections({
   order = homeSectionOrder,
   eventError = null,
+  eventsPending = false,
   homeEvents = [],
   homeRooms = [],
   propertyDestinationHref = "/property",
   roomError = null,
+  roomsPending = false,
 }: {
   order?: HomeSectionId[];
   eventError?: string | null;
+  eventsPending?: boolean;
   homeEvents?: EventCardProps[];
   homeRooms?: RoomCardProps[];
   propertyDestinationHref?: string;
   roomError?: string | null;
+  roomsPending?: boolean;
 }) {
   return (
     <>
       {order.map((sectionId) => {
         if (sectionId === "rooms") {
-          return <RoomsSection key={sectionId} roomError={roomError} rooms={homeRooms} />;
+          return <RoomsSection key={sectionId} pending={roomsPending} roomError={roomError} rooms={homeRooms} />;
         }
 
         if (sectionId === "events") {
-          return <EventsSection eventError={eventError} key={sectionId} events={homeEvents} />;
+          return <EventsSection eventError={eventError} events={homeEvents} key={sectionId} pending={eventsPending} />;
         }
 
         const sectionComponents: Record<Exclude<HomeSectionId, "rooms" | "events">, () => ReactNode> = {

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import Image from "next/image";
-import Link from "next/link";
 import {
   ArrowRight,
   BadgeCheck,
@@ -173,7 +172,7 @@ function QuickActionCard({ action, href }: { action: QuickAction; href: string }
   const cardId = `stay-console-card-${action.title.toLowerCase().replaceAll(" ", "-")}`;
 
   return (
-    <Link
+    <DocumentLink
       className="group relative flex min-h-[190px] flex-col justify-between overflow-hidden rounded-[8px] border border-dashed border-white/24 bg-[#07070a] p-5 shadow-[0_18px_42px_rgba(0,0,0,0.24)] transition duration-300 hover:-translate-y-1 hover:border-[var(--vh-pink)]/60"
       href={href}
       id={cardId}
@@ -198,7 +197,7 @@ function QuickActionCard({ action, href }: { action: QuickAction; href: string }
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
         </span>
       </div>
-    </Link>
+    </DocumentLink>
   );
 }
 
@@ -213,7 +212,7 @@ function HeroStayCard({ booking }: { booking: GuestDashboardBooking | null }) {
           className="h-full min-h-[440px] w-full object-cover"
           height={820}
           priority
-          src={propertyGallery[0]?.src ?? "/images/property/hero-1.jpg"}
+          src={propertyGallery[0]?.src ?? "/images/property/hero-1-1600.webp"}
           width={980}
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,10,0.18)_0%,rgba(7,7,10,0.84)_74%,#07070a_100%)]" />
@@ -411,7 +410,7 @@ export function GuestDashboard() {
                 </a>
               </Button>
               <Button asChild className="vh-cta-button h-10 rounded-[4px] bg-white px-4 text-xs text-[#07070a] hover:bg-white/90" variant="secondary">
-                <Link href={getGuestRouteHref("services")}>Open services</Link>
+                <DocumentLink href={getGuestRouteHref("services")}>Open services</DocumentLink>
               </Button>
             </div>
           </div>
@@ -517,13 +516,14 @@ export function GuestDashboard() {
             <p className="mt-2 max-w-3xl text-sm leading-6 text-[#cbd5e1]">Review add-ons, rentals, and totals in one place before you close out the stay.</p>
           </div>
           <Button asChild className="vh-cta-button h-10 rounded-[4px] bg-white px-5 text-xs text-[#07070a] hover:bg-white/90">
-            <Link href={getGuestRouteHref("checkout")}>
+            <DocumentLink href={getGuestRouteHref("checkout")}>
               <KeyRound className="mr-2 h-4 w-4" />
               Checkout summary
-            </Link>
+            </DocumentLink>
           </Button>
         </div>
       </section>
     </div>
   );
 }
+import { DocumentLink } from "@/components/static-export/document-link";

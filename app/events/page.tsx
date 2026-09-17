@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { EventCard } from "@/components/marketing/event-card";
 import MagicBento from "@/components/marketing/magic-bento";
 import { SectionHeading } from "@/components/marketing/section-heading";
@@ -5,16 +8,44 @@ import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { FadeIn, Stagger, StaggerItem } from "@/components/shared/motion";
 import { eventPageContent, pastEventImages, weeklyLineup } from "@/content/events";
 import { getPublicEventsResult } from "@/lib/cx-api";
-import { resolveServerPropertyId } from "@/lib/property-resolver";
-import { headers } from "next/headers";
+import { usePropertyId } from "@/hooks/use-property-id";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function EventsPage() {
-  const headerList = await headers();
-  const hostname = headerList.get("host") || "";
-  const propertyId = resolveServerPropertyId({ hostname });
+export default function EventsPage() {
+  const propertyId = usePropertyId();
+  const [eventsState, setEventsState] = useState({
+    propertyId: "",
+    result: { events: [], error: null } as Awaited<ReturnType<typeof getPublicEventsResult>>,
+  });
   const eventsResult = propertyId
-    ? await getPublicEventsResult({ propertyId })
+    ? eventsState.result
     : { events: [], error: "Property ID is required." };
+  const isPending = Boolean(propertyId) && eventsState.propertyId !== propertyId;
+
+  useEffect(() => {
+    if (!propertyId) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    void getPublicEventsResult({ propertyId, signal: controller.signal })
+      .then((result) => setEventsState({ propertyId, result }))
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted) {
+          setEventsState({
+            propertyId,
+            result: {
+              events: [],
+              error: error instanceof Error ? error.message : "Events are unavailable right now.",
+            },
+          });
+        }
+      });
+
+    return () => controller.abort();
+  }, [propertyId]);
+
   const liveEvents = eventsResult.events;
 
   const eventGridClass =
@@ -54,7 +85,21 @@ export default async function EventsPage() {
       <section className="vh-section">
         <div className="vh-container">
           <SectionHeading align="center" subtitle={eventPageContent.upcomingSubtitle} title="This Week" />
-          {eventsResult.error ? (
+          {isPending ? (
+            <div aria-busy="true" className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <span className="sr-only">Current experiences are being prepared.</span>
+              {[0, 1, 2].map((item) => (
+                <div className="overflow-hidden rounded-[18px] border border-white/10 bg-white/[0.03]" key={item}>
+                  <Skeleton className="h-[220px] w-full bg-white/8" />
+                  <div className="space-y-3 p-5">
+                    <Skeleton className="h-7 w-2/3 bg-white/8" />
+                    <Skeleton className="h-4 w-full bg-white/8" />
+                    <Skeleton className="h-4 w-4/5 bg-white/8" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : eventsResult.error ? (
             <FadeIn className="rounded-[18px] border border-dashed border-white/20 bg-white/5 px-6 py-8 text-center text-white">
               <p className="font-['Geologica'] text-xl font-semibold">Events did not load</p>
               <p className="mx-auto mt-2 max-w-[560px] text-sm leading-7 text-white/72">{eventsResult.error}</p>

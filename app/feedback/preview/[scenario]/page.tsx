@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { FeedbackPage } from "@/components/feedback/feedback-page";
 import {
+  FEEDBACK_PREVIEW_SCENARIOS,
   getFeedbackPreviewConfig,
   isFeedbackPreviewScenario,
 } from "@/lib/feedback-preview";
@@ -13,7 +14,9 @@ type FeedbackPreviewScenarioPageProps = {
   }>;
 };
 
-export const dynamic = "force-dynamic";
+export function generateStaticParams() {
+  return FEEDBACK_PREVIEW_SCENARIOS.map((scenario) => ({ scenario }));
+}
 
 export async function generateMetadata({
   params,

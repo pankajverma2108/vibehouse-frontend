@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Prisma generated client
+/generated/
+src/generated/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Test coverage
+coverage/
+
+# TypeScript
+*.tsbuildinfo
+
+# Test Scripts
+test_Scripts/
+
+# Compiled one-off tools (built in Docker; never committed)
+dist-tools/
+ZOHO_WEBHOOK_SECRET.local.txt
+
+# Uploaded guest documents (local dev storage)
+uploads/
+*.tmp
+

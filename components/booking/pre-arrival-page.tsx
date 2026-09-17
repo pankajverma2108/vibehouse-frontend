@@ -1059,7 +1059,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
         }
 
         if (areAllSlotsCompleted(cachedSlots.slots)) {
-          router.replace(`/bookings/${encodeURIComponent(ezeeReservationId)}/confirmed`);
+          window.location.replace(`/bookings/${encodeURIComponent(ezeeReservationId)}/confirmed`);
           return;
         }
       }
@@ -1102,7 +1102,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
         });
 
         if (areAllSlotsCompleted(slotResponse.slots)) {
-          router.replace(`/bookings/${encodeURIComponent(ezeeReservationId)}/confirmed`);
+          window.location.replace(`/bookings/${encodeURIComponent(ezeeReservationId)}/confirmed`);
           return;
         }
 
@@ -1143,7 +1143,6 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
       guestPrefill,
       isRestoringSession,
       loadSlotDetail,
-      router,
     ],
   );
 
@@ -2214,7 +2213,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                 className="h-14 rounded-full bg-white px-10 text-sm font-black uppercase tracking-[0.08em] text-black hover:bg-white/90"
                 onClick={() => {
                   setIsCompletionModalOpen(false);
-                  router.push(`/bookings/${encodeURIComponent(ezeeReservationId)}/confirmed`);
+                  window.location.assign(`/bookings/${encodeURIComponent(ezeeReservationId)}/confirmed`);
                 }}
                 type="button"
               >

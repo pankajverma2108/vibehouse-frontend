@@ -1,13 +1,17 @@
-import { PreArrivalPage } from "@/components/booking/pre-arrival-page";
+import type { Metadata } from "next";
 
-type WebCheckInRouteProps = {
-  params: Promise<{
-    eri: string;
-  }>;
+import { WebCheckInRoute } from "@/components/booking/web-check-in-route";
+import { STATIC_ROUTE_SHELL_SEGMENT } from "@/lib/static-export-routes";
+
+export const metadata: Metadata = {
+  title: "Web Check-In",
+  robots: { index: false, follow: false },
 };
 
-export default async function WebCheckInRoute({ params }: WebCheckInRouteProps) {
-  const { eri } = await params;
+export function generateStaticParams() {
+  return [{ eri: STATIC_ROUTE_SHELL_SEGMENT }];
+}
 
-  return <PreArrivalPage ezeeReservationId={decodeURIComponent(eri)} />;
+export default function Page() {
+  return <WebCheckInRoute />;
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { CalendarDays, ChevronRight, MapPin, ShieldCheck } from "lucide-react";
 
@@ -203,11 +202,12 @@ export function BookingEmptyState({
       <h2 className="text-3xl font-black tracking-tight text-white">{title}</h2>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-[#99A1AF]">{description}</p>
       <Button asChild className="mt-6 rounded-[10px] bg-[var(--vh-pink)] px-6 text-white hover:bg-[var(--vh-pink-soft)]">
-        <Link href={ctaHref}>
+        <DocumentLink href={ctaHref}>
           {ctaLabel}
           <ChevronRight className="ml-2 h-4 w-4" />
-        </Link>
+        </DocumentLink>
       </Button>
     </div>
   );
 }
+import { DocumentLink } from "@/components/static-export/document-link";

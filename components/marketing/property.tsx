@@ -38,6 +38,7 @@ import {
 import { toast } from "sonner";
 import { buildBookingSignature, saveBookingDraft, type BookingDraftRoom } from "@/lib/booking-session";
 import type { CxRoomCategory } from "@/lib/cx-api";
+import { loadCxRooms, type CxRoomsPayload } from "@/lib/cx-rooms-client";
 import {
   buildSelectionSignature,
   consumeReviewResumeIntent,
@@ -108,15 +109,7 @@ const roomFeatureIcons: Record<string, typeof Wifi> = {
 
 type RoomCategory = CxRoomCategory;
 
-type RoomApiPayload = {
-  categories?: unknown;
-  property_id?: unknown;
-  mode?: unknown;
-  availability_source?: unknown;
-  has_live_availability?: unknown;
-  availability_error?: unknown;
-  message?: unknown;
-};
+type RoomApiPayload = Partial<CxRoomsPayload>;
 
 type AvailabilitySource = "catalog" | "ezee_live" | "live_provider" | "local_db_estimate" | "unknown";
 
@@ -138,15 +131,6 @@ function roomCacheKey(params: { propertyId?: string; checkin?: string; checkout?
 
 function getRoomSelectionKey(room: RoomCategory): string {
   return room.roomTypeId?.trim() || room.slug;
-}
-
-function parseRoomsApiError(payload: unknown, fallback: string): string {
-  if (!payload || typeof payload !== "object") {
-    return fallback;
-  }
-
-  const message = (payload as { message?: unknown }).message;
-  return typeof message === "string" && message.trim() ? message : fallback;
 }
 
 function readCategories(payload: RoomApiPayload): RoomCategory[] {
@@ -1208,28 +1192,12 @@ export function Property({
       roomResponseCacheRef.current.delete(cacheKey);
     }
 
-    const query = new URLSearchParams();
-    if (resolvedPropertyId) {
-      query.set("property_id", resolvedPropertyId);
-    }
-    if (params.checkin && params.checkout) {
-      query.set("checkin", params.checkin);
-      query.set("checkout", params.checkout);
-    }
-
-    const url = query.size > 0 ? `/api/cx/rooms?${query.toString()}` : "/api/cx/rooms";
-    const response = await fetch(url, {
-      cache: "no-store",
+    const safePayload = await loadCxRooms({
+      propertyId: resolvedPropertyId,
+      checkin: params.checkin,
+      checkout: params.checkout,
       signal: params.signal,
     });
-
-    const payload = (await response.json().catch(() => null)) as RoomApiPayload | null;
-
-    if (!response.ok) {
-      throw new Error(parseRoomsApiError(payload, "Unable to load rooms right now."));
-    }
-
-    const safePayload = payload ?? {};
     const availabilitySource = readAvailabilitySource(safePayload);
     const shouldCache = !isAvailabilityRequest || availabilitySource !== "local_db_estimate";
 

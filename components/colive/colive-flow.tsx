@@ -44,8 +44,10 @@ import {
 import { formatINRPlain } from "@/lib/format-price";
 import { buildBookingSignature, saveBookingDraft, type BookingDraftRoom } from "@/lib/booking-session";
 import type { CxRoomCategory } from "@/lib/cx-api";
+import { loadCxRooms, type CxRoomsPayload } from "@/lib/cx-rooms-client";
 import type { ColiveStayType } from "@/lib/colive-api";
 import { formatColiveDate, getDefaultMoveInDate, toIsoDate } from "@/lib/colive-flow-state";
+import { usePropertyId } from "@/hooks/use-property-id";
 import {
   buildSelectionSignature,
   consumeReviewResumeIntent,
@@ -53,17 +55,10 @@ import {
   savePropertySelection,
   saveReviewResumeIntent,
 } from "@/lib/property-selection-session";
-import { usePropertyId, getPropertyName } from "@/lib/property-resolver";
+import { getPropertyName } from "@/lib/property-resolver";
 import { cn } from "@/lib/utils";
 
-type RoomApiPayload = {
-  categories?: unknown;
-  property_id?: unknown;
-  availability_source?: unknown;
-  availability_error?: unknown;
-  has_live_availability?: unknown;
-  message?: unknown;
-};
+type RoomApiPayload = Partial<CxRoomsPayload>;
 
 type RoomCategory = CxRoomCategory;
 
@@ -100,15 +95,6 @@ function getRoomSelectionKey(room: RoomCategory): string {
 
 function readCategories(payload: RoomApiPayload): RoomCategory[] {
   return Array.isArray(payload.categories) ? (payload.categories as RoomCategory[]) : [];
-}
-
-function parseRoomsApiError(payload: unknown, fallback: string): string {
-  if (!payload || typeof payload !== "object") {
-    return fallback;
-  }
-
-  const message = (payload as { message?: unknown }).message;
-  return typeof message === "string" && message.trim() ? message : fallback;
 }
 
 function readAvailabilityError(payload: RoomApiPayload): string | null {
@@ -228,19 +214,11 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     setIsLoadingRooms((current) => rooms.length === 0 || current);
 
     try {
-      const query = new URLSearchParams({
-        property_id: propertyId,
+      const safePayload = await loadCxRooms({
+        propertyId,
         checkin: moveIn,
         checkout: checkoutDate,
       });
-      const response = await fetch(`/api/cx/rooms?${query.toString()}`, { cache: "no-store" });
-      const payload = (await response.json().catch(() => null)) as RoomApiPayload | null;
-
-      if (!response.ok) {
-        throw new Error(parseRoomsApiError(payload, "Unable to load Colive rooms right now."));
-      }
-
-      const safePayload = payload ?? {};
       const nextError = readAvailabilityError(safePayload);
       const nextRooms = readCategories(safePayload);
 

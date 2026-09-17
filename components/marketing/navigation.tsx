@@ -21,6 +21,7 @@ import { navFontStyles } from "@/content/typography";
 import { getDefaultPropertyDestinationHref } from "@/lib/cx-api";
 import { isStandalonePublicRoute } from "@/lib/feedback-route";
 import { getActiveGuestHubBooking, getScopedGuestHubHref } from "@/lib/guest-hub";
+import { StaticAwareLink } from "@/components/static-export/static-aware-link";
 import { cn } from "@/lib/utils";
 
 type DesktopNavLink = {
@@ -360,7 +361,7 @@ export function Navigation() {
                             const active = matchesNavLink(pathname, searchParams, resolvedHref);
 
                             return (
-                              <Link
+                              <StaticAwareLink
                                 key={`${card.label}-${resolvedHref}-${linkIndex}`}
                                 className="inline-flex items-center gap-1.5 text-[15px] transition-opacity hover:opacity-100"
                                 href={resolvedHref}
@@ -378,7 +379,7 @@ export function Navigation() {
                               >
                                 <ArrowUpRight className="h-4 w-4 shrink-0" />
                                 <span>{link.label}</span>
-                              </Link>
+                              </StaticAwareLink>
                             );
                           })}
                         </div>

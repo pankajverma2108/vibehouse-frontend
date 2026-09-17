@@ -13,10 +13,10 @@ export type HomeSectionId =
   | "cta";
 
 export const heroImages = [
-  "/images/property/hero-1.jpg",
-  "/images/property/hero-2.jpg",
-  "/images/property/hero-3.jpg",
-  "/images/property/hero-4.jpg",
+  "/images/property/hero-1-1600.webp",
+  "/images/property/hero-2-1600.webp",
+  "/images/property/hero-3-1600.webp",
+  "/images/property/hero-4-1600.webp",
 ];
 
 export const assurances = [
