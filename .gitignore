@@ -14,32 +14,19 @@ dist/
 .vscode/
 docs/
 guidelines/
+migration-logs/
+migration-plan/
 
-# Track the two public breakfast handoff documents while keeping other internal docs local.
-!docs/
-docs/*
-!docs/tds_fe_s3_static_export_implementation_handoff_2026-08-11.md
-!docs/breakfast/
-docs/breakfast/*
-!docs/breakfast/24_breakfast_stakeholder_workflow.md
-!docs/breakfast/25_breakfast_preview_and_test_routes.md
-!docs/breakfast/26_breakfast_buteak_website_agent_context.md
-!docs/breakfast/27_breakfast_operations_manual.md
+# Config / Env files
+.env
+.env.*
+*.env
 
-# Track only the dated frontend-to-backend breakfast handoff.
-!docs/fe_to_be/
-docs/fe_to_be/*
-!docs/fe_to_be/breakfast_guest_order_prod_handoff_2026-07-13.md
-
-# Internal planning and workflow docs (not for remote repo)
-# guidelines/finalised_workflows/
-# guidelines/api_routes/
-# guidelines/
-# docs/
+# Internal / Temporary
 BUILD_PLAN.md
 ATTRIBUTIONS.md
 context.md
-
 .playwright-mcp/
 *.tsbuildinfo
 .github/workflows/
+.mcp.json
