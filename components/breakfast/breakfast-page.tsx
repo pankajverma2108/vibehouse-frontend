@@ -96,13 +96,13 @@ function BreakfastBrandHeader({ brand, previewLabel }: { brand?: BreakfastBrand;
   return (
     <header className="pb-8 pt-5 sm:pb-10 sm:pt-8">
       {previewLabel ? (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-white/14 pb-4">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-[#3D3D3D] pb-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#f3c96b]">Design preview</p>
             <p className="mt-1 text-sm text-white/62">{previewLabel} - test order, nothing will be saved</p>
           </div>
           <Link
-            className="inline-flex min-h-11 items-center rounded-[10px] border border-white/15 px-4 text-sm font-bold text-white hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3c96b]"
+            className="inline-flex min-h-11 items-center rounded-none border border-[#3D3D3D] px-4 text-sm font-bold text-white hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3c96b]"
             href="/breakfast/preview"
           >
             All test links
@@ -122,7 +122,7 @@ function BreakfastBrandHeader({ brand, previewLabel }: { brand?: BreakfastBrand;
               width={brand === "BUTEAK" ? 76 : 128}
             />
           ) : (
-            <div aria-hidden="true" className="inline-flex size-14 items-center justify-center rounded-full border border-white/16 bg-white/[0.04] text-[#f3c96b]">
+            <div aria-hidden="true" className="inline-flex size-14 items-center justify-center rounded-none border border-[#3D3D3D] bg-white/[0.04] text-[#f3c96b]">
               <UtensilsCrossed className="size-6" />
             </div>
           )}
@@ -139,7 +139,7 @@ function BreakfastBrandHeader({ brand, previewLabel }: { brand?: BreakfastBrand;
       </div>
 
       <div className="mt-6 max-w-2xl">
-        <h1 className="font-sectiontitle text-pretty text-[38px] leading-[1.02] text-white sm:text-[50px]">
+        <h1 className="font-['Cirka',serif] tracking-tight text-pretty text-[38px] leading-[1.02] text-white sm:text-[50px]">
           {presentation?.heading ?? "Breakfast Menu"}
         </h1>
         <p className="mt-3 max-w-xl text-pretty text-base leading-7 text-white/66">
@@ -154,7 +154,7 @@ function BreakfastStayContext({ response }: { response: BreakfastValidResponse }
   const roomLabel = response.rooms.length === 1 ? response.rooms[0].room_number : `${response.rooms.length} rooms`;
 
   return (
-    <dl className="grid gap-4 border-y border-dashed border-white/16 py-5 sm:grid-cols-3">
+    <dl className="grid gap-4 border-y border-dashed border-[#3D3D3D] py-5 sm:grid-cols-3">
       <div className="flex gap-3">
         <MapPin aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-[#f3c96b]" />
         <div>
@@ -485,8 +485,8 @@ export function BreakfastPage({ token, previewLabel, simulateSubmit = false, ini
   const skipRoom = validLookup?.rooms.find((room) => room.ezee_reservation_id === skipReservationId);
 
   return (
-    <main className="relative min-h-[100dvh] overflow-x-clip bg-[#07070a] text-white" style={{ colorScheme: "dark" }}>
-      <a className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[260] focus:not-sr-only focus:rounded-[10px] focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-[#07070a]" href="#breakfast-content">
+    <main className="relative min-h-[100dvh] overflow-x-clip bg-[#0D0D0D] text-white" style={{ colorScheme: "dark" }}>
+      <a className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[260] focus:not-sr-only focus:rounded-none focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-[#07070a]" href="#breakfast-content">
         Skip to breakfast content
       </a>
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(198,40,40,0.14),transparent_34%),radial-gradient(circle_at_90%_8%,rgba(215,166,74,0.08),transparent_25%)]" />
@@ -513,7 +513,7 @@ export function BreakfastPage({ token, previewLabel, simulateSubmit = false, ini
                 <BreakfastOrderSummary
                   actions={validLookup.window.state === "open" ? (
                     <Button
-                      className="h-12 rounded-[12px] bg-[var(--vh-pink)] px-5 font-bold text-white hover:bg-[var(--vh-pink-soft)]"
+                      className="h-12 rounded-none bg-[var(--np-yellow)] px-5 font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
                       onClick={handleEdit}
                       type="button"
                     >
@@ -547,8 +547,8 @@ export function BreakfastPage({ token, previewLabel, simulateSubmit = false, ini
               ) : null}
 
               {validLookup.window.state === "frozen" && summaryRooms.length === 0 ? (
-                <section className="border-y border-dashed border-white/16 py-8">
-                  <h2 className="font-sectiontitle text-[28px] text-white">No breakfast order yet</h2>
+                <section className="border-y border-dashed border-[#3D3D3D] py-8">
+                  <h2 className="font-['Cirka',serif] tracking-tight text-[28px] text-white">No breakfast order yet</h2>
                   <p className="mt-2 text-sm leading-6 text-white/64">Return when breakfast ordering opens.</p>
                 </section>
               ) : null}

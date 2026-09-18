@@ -116,29 +116,29 @@ export function QrScanner({
   }
 
   return (
-    <div className="rounded-[14px] border border-white/10 bg-[#161616] p-3">
-      <div className="relative overflow-hidden rounded-[12px] border border-white/10 bg-black">
+    <div className="rounded-none border border-[#3D3D3D] bg-[#161616] p-3 shadow-[4px_4px_0px_#000000]">
+      <div className="relative overflow-hidden rounded-none border border-[#3D3D3D] bg-black">
         <div
           id={scannerRegionId}
-          className="h-[280px] w-full [&>div]:h-full [&>div]:w-full [&_video]:h-full [&_video]:w-full [&_video]:object-cover"
+          className="h-[280px] w-full [&>div]:h-full [&>div]:w-full [&_video]:h-full [&_video]:object-cover"
         />
 
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="h-[200px] w-[200px] rounded-[18px] border-2 border-[var(--vh-pink)] shadow-[0_0_0_9999px_rgba(0,0,0,0.22)]" />
+          <div className="h-[200px] w-[200px] rounded-none border-2 border-[var(--np-yellow)] shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]" />
         </div>
 
         {booting ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/45">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-xs text-white/85">
-              <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+            <div className="inline-flex items-center gap-2 rounded-none border border-[#3D3D3D] bg-[#121212] px-3 py-1.5 text-xs text-white">
+              <LoaderCircle className="h-3.5 w-3.5 animate-spin text-[var(--np-yellow)]" />
               Starting camera
             </div>
           </div>
         ) : null}
       </div>
 
-      <div className="mt-3 flex items-center gap-2 text-xs text-[#99A1AF]">
-        <CameraOff className="h-3.5 w-3.5" />
+      <div className="mt-3 flex items-center gap-2 text-xs text-white/60 font-mono">
+        <CameraOff className="h-3.5 w-3.5 text-[var(--np-yellow)]" />
         <span aria-live="polite">{status}</span>
       </div>
     </div>

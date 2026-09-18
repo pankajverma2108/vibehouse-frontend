@@ -57,12 +57,12 @@ function BreakfastDialogFrame({
             <Dialog.Content asChild forceMount onEscapeKeyDown={(event) => { if (closeDisabled) event.preventDefault(); }} onPointerDownOutside={(event) => { if (closeDisabled) event.preventDefault(); }}>
               <motion.section
                 animate={{ opacity: 1 }}
-                className="fixed left-1/2 top-1/2 z-[241] flex max-h-[min(88dvh,760px)] w-[calc(100vw-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-[16px] border border-white/16 bg-[#09090d] text-white shadow-[0_30px_90px_rgba(0,0,0,0.62)] focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3c96b]"
+                className="fixed left-1/2 top-1/2 z-[241] flex max-h-[min(88dvh,760px)] w-[calc(100vw-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-none border border-[#3D3D3D] bg-[#161616] text-white shadow-[6px_6px_0px_#000000] focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--np-yellow)]"
                 exit={{ opacity: 0 }}
                 initial={{ opacity: 0 }}
                 transition={transition}
               >
-                <header className="flex items-start justify-between gap-4 border-b border-dashed border-white/14 bg-[#150a0d] p-5 sm:p-6">
+                <header className="flex items-start justify-between gap-4 border-b border-dashed border-[#3D3D3D] bg-[#150a0d] p-5 sm:p-6">
                   <div className="min-w-0">
                     {sticker ? (
                       <StickerTag
@@ -73,7 +73,7 @@ function BreakfastDialogFrame({
                         text="#230f14"
                       />
                     ) : null}
-                    <Dialog.Title className="font-sectiontitle mt-3 break-words text-[28px] leading-tight text-white sm:text-[34px]">
+                    <Dialog.Title className="font-['Cirka',serif] tracking-tight mt-3 break-words text-[28px] leading-tight text-white sm:text-[34px]">
                       {title}
                     </Dialog.Title>
                     <Dialog.Description className="mt-2 text-sm leading-6 text-white/64">
@@ -83,7 +83,7 @@ function BreakfastDialogFrame({
                   <Dialog.Close asChild>
                     <button
                       aria-label={closeLabel}
-                      className="inline-flex size-11 shrink-0 touch-manipulation items-center justify-center rounded-[12px] border border-white/16 bg-white/[0.04] text-white transition-colors hover:bg-white/[0.09] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3c96b] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="inline-flex size-11 shrink-0 touch-manipulation items-center justify-center rounded-none border border-[#3D3D3D] bg-white/[0.04] text-white transition-colors hover:bg-white/[0.09] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3c96b] disabled:cursor-not-allowed disabled:opacity-40"
                       disabled={closeDisabled}
                       type="button"
                     >
@@ -95,7 +95,7 @@ function BreakfastDialogFrame({
                   {children}
                 </div>
                 {footer ? (
-                  <footer className="border-t border-dashed border-white/14 bg-[#150a0d] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-5">
+                  <footer className="border-t border-dashed border-[#3D3D3D] bg-[#150a0d] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-5">
                     {footer}
                   </footer>
                 ) : null}
@@ -140,7 +140,7 @@ export function BreakfastConfirmationDialog({
 
   const editingButton = canEdit ? (
     <Button
-      className="h-12 rounded-[12px] border border-white/24 bg-[#15151b] px-5 font-bold text-white shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] hover:bg-[#202029]"
+      className="h-12 rounded-none border border-[#3D3D3D] bg-[#121212] px-5 font-bold text-white shadow-[0_1px_0_rgba(255,255,255,0.08)_inset] hover:bg-[#202029]"
       disabled={pending}
       onClick={() => {
         onOpenChange(false);
@@ -165,7 +165,7 @@ export function BreakfastConfirmationDialog({
       footer={mode === "review" ? (
         <div className="flex flex-col gap-3 sm:flex-row-reverse">
           <Button
-            className="h-12 rounded-[12px] bg-[var(--vh-pink)] px-5 font-bold text-white hover:bg-[var(--vh-pink-soft)]"
+            className="h-12 rounded-none bg-[var(--np-yellow)] px-5 font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
             loading={pending}
             loadingText="Placing order..."
             onClick={onConfirm}
@@ -208,7 +208,7 @@ export function BreakfastSkipDialog({
       footer={(
         <div className="flex flex-col gap-3 sm:flex-row-reverse">
           <Button
-            className="h-12 rounded-[12px] bg-[var(--vh-pink)] px-5 font-bold text-white hover:bg-[var(--vh-pink-soft)]"
+            className="h-12 rounded-none bg-[var(--np-yellow)] px-5 font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
             loading={pending}
             loadingText="Updating choice..."
             onClick={onConfirm}
@@ -218,7 +218,7 @@ export function BreakfastSkipDialog({
           </Button>
           <Dialog.Close asChild>
             <Button
-              className="h-12 rounded-[12px] border border-white/24 bg-[#15151b] px-5 font-bold text-white hover:bg-[#202029]"
+              className="h-12 rounded-none border border-[#3D3D3D] bg-[#121212] px-5 font-bold text-white hover:bg-[#202029]"
               disabled={pending}
               type="button"
               variant="outline"

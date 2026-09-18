@@ -91,10 +91,10 @@ function FeedbackShell({
   children: ReactNode;
 }) {
   return (
-    <section className="min-h-screen bg-[#07070a] py-6 sm:py-8 md:py-12">
+    <section className="min-h-screen bg-[#0D0D0D] py-6 sm:py-8 md:py-12">
       <div className="vh-container px-4 sm:px-6">
         <div className="mx-auto max-w-[760px]">
-          <header className="mb-4 flex items-center justify-between gap-3 border-b border-dashed border-white/14 pb-3 sm:mb-5 sm:gap-4 sm:pb-4">
+          <header className="mb-4 flex items-center justify-between gap-3 border-b border-dashed border-[#3D3D3D] pb-3 sm:mb-5 sm:gap-4 sm:pb-4">
             <Link
               aria-label="The Daily Social home"
               className="inline-flex items-center"
@@ -140,10 +140,10 @@ function ContextPanel({
 
   return (
     <div className="order-1 h-full">
-      <div className="flex h-full flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:p-5 md:rounded-[22px] md:p-6">
+      <div className="flex h-full flex-col rounded-none border border-dashed border-[#3D3D3D] bg-[#0D0D0D] p-4 shadow-[6px_6px_0px_#000000] sm:p-5 md:rounded-none md:p-6">
         <div className="space-y-3 sm:space-y-4">
           <p className="font-caption text-white/55">The Daily Social</p>
-          <h1 className="font-sectiontitle text-[25px] leading-[1.02] text-white sm:text-[32px] md:text-[42px]">
+          <h1 className="font-['Cirka',serif] text-2xl text-white tracking-tight text-[25px] leading-[1.02] text-white sm:text-[32px] md:text-[42px]">
             {displayTitle}
           </h1>
           <p className="text-[15px] leading-7 text-white/72 sm:text-base">
@@ -161,14 +161,14 @@ function LoadingPanel() {
       <div
         aria-busy="true"
         aria-live="polite"
-        className="flex min-h-[280px] flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-[22px] md:p-6"
+        className="flex min-h-[280px] flex-col rounded-none border border-dashed border-[#3D3D3D] bg-[#0D0D0D] p-4 shadow-[6px_6px_0px_#000000] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-none md:p-6"
         role="status"
       >
         <div className="my-auto text-left">
           <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#f9cb37]">
             Checking Link
           </p>
-          <h2 className="font-sectiontitle mt-3 text-[22px] text-white">
+          <h2 className="font-['Cirka',serif] text-2xl text-white tracking-tight mt-3 text-[22px] text-white">
             Validating this feedback request.
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/72">
@@ -190,10 +190,10 @@ function RetryPanel({
 }) {
   return (
     <div className="h-full">
-      <div className="flex min-h-[280px] flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-[22px] md:p-6">
+      <div className="flex min-h-[280px] flex-col rounded-none border border-dashed border-[#3D3D3D] bg-[#0D0D0D] p-4 shadow-[6px_6px_0px_#000000] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-none md:p-6">
         <div className="my-auto">
           <p className="font-caption text-white/55">Service Unavailable</p>
-          <h2 className="font-sectiontitle mt-3 text-[22px] text-white">
+          <h2 className="font-['Cirka',serif] text-2xl text-white tracking-tight mt-3 text-[22px] text-white">
             We couldn't load this feedback request.
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/72">
@@ -210,7 +210,7 @@ function RetryPanel({
             </Button>
             <Button
               asChild
-              className="h-11 rounded-[14px] border border-white/12 bg-transparent px-5 text-sm font-bold uppercase text-white hover:bg-white/[0.05]"
+              className="h-11 rounded-none border border-[#3D3D3D] bg-transparent px-5 text-sm font-bold uppercase text-white hover:bg-white/[0.05]"
               variant="outline"
             >
               <Link href="/">Back to site</Link>
@@ -233,10 +233,10 @@ function TerminalPanel({
 
   return (
     <div className="h-full">
-      <div className="flex min-h-[280px] flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-[22px] md:p-6">
+      <div className="flex min-h-[280px] flex-col rounded-none border border-dashed border-[#3D3D3D] bg-[#0D0D0D] p-4 shadow-[6px_6px_0px_#000000] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-none md:p-6">
         <div className="my-auto">
           <p className="font-caption text-white/55">{copy.eyebrow}</p>
-          <h2 className="font-sectiontitle mt-3 text-[22px] text-white sm:text-[24px]">
+          <h2 className="font-['Cirka',serif] text-2xl text-white tracking-tight mt-3 text-[22px] text-white sm:text-[24px]">
             {copy.title}
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/72 sm:text-base">
@@ -272,10 +272,10 @@ function SuccessPanel({
 }) {
   return (
     <div className="h-full">
-      <div className="flex min-h-[280px] flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-[22px] md:p-6">
+      <div className="flex min-h-[280px] flex-col rounded-none border border-dashed border-[#3D3D3D] bg-[#0D0D0D] p-4 shadow-[6px_6px_0px_#000000] sm:min-h-[320px] sm:p-5 md:min-h-[420px] md:rounded-none md:p-6">
         <div className="my-auto">
           <p className="font-caption text-white/55">Feedback Submitted</p>
-          <h2 className="font-sectiontitle mt-3 text-[22px] text-white">
+          <h2 className="font-['Cirka',serif] text-2xl text-white tracking-tight mt-3 text-[22px] text-white">
             Your feedback has been sent.
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/72 sm:text-base">
@@ -301,7 +301,7 @@ function SuccessPanel({
           </div>
 
           {comment ? (
-            <div className="mt-6 border-t border-dashed border-white/14 pt-5">
+            <div className="mt-6 border-t border-dashed border-[#3D3D3D] pt-5">
               <p className="font-caption text-white/55">Your note</p>
               <p className="mt-2 text-sm leading-7 text-white/72">
                 {comment}
@@ -526,11 +526,11 @@ export function FeedbackPage({
       ) : (
         <div className="order-2 h-full">
           <form
-            className="flex flex-col rounded-[20px] border border-dashed border-[rgba(255,255,255,0.26)] bg-[#07070a] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.2)] sm:p-5 md:rounded-[22px] md:p-6"
+            className="flex flex-col rounded-none border border-dashed border-[#3D3D3D] bg-[#0D0D0D] p-4 shadow-[6px_6px_0px_#000000] sm:p-5 md:rounded-none md:p-6"
             onSubmit={handleSubmit}
           >
             <div className="space-y-4 sm:space-y-5">
-              <div className="border-t border-dashed border-white/14 pt-1">
+              <div className="border-t border-dashed border-[#3D3D3D] pt-1">
                 <RatingPicker
                   disabled={isSubmitting}
                   onChange={setRating}
@@ -538,7 +538,7 @@ export function FeedbackPage({
                 />
               </div>
 
-              <div className="border-t border-dashed border-white/14 pt-4">
+              <div className="border-t border-dashed border-[#3D3D3D] pt-4">
                 <GuestTextArea
                   disabled={isSubmitting}
                   helper={`${comment.length}/${MAX_COMMENT_LENGTH} characters`}

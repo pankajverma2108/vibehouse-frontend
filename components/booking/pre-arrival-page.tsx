@@ -1486,14 +1486,14 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
         <div aria-busy="true" aria-live="polite" className="space-y-6" role="status">
           <span className="sr-only">Loading web check-in details.</span>
 
-          <div className="mx-auto flex w-full max-w-[980px] items-center justify-between rounded-[18px] border border-white/10 bg-[var(--vh-panel-strong)] px-5 py-4">
+          <div className="mx-auto flex w-full max-w-[980px] items-center justify-between rounded-none border border-[#3D3D3D] bg-[#161616] px-5 py-4">
             <Skeleton className="h-5 w-32 bg-white/12" />
             <Skeleton className="h-5 w-24 bg-white/12" />
           </div>
 
           <div className="mx-auto grid w-full max-w-[980px] gap-3 md:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="rounded-[16px] border border-white/10 bg-[var(--vh-panel-strong)] p-4">
+              <div key={index} className="rounded-none border border-[#3D3D3D] bg-[#161616] p-4">
                 <Skeleton className="h-4 w-20 bg-white/12" />
                 <Skeleton className="mt-3 h-3 w-28 bg-white/10" />
               </div>
@@ -1501,29 +1501,29 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
           </div>
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
-            <div className="rounded-[28px] border border-white/12 bg-[var(--vh-panel-strong)] p-6 md:p-8">
+            <div className="rounded-none border border-[#3D3D3D] bg-[#161616] p-6 md:p-8">
               <Skeleton className="h-7 w-44 bg-white/12" />
               <Skeleton className="mt-4 h-4 w-full max-w-[420px] bg-white/10" />
               <div className="mt-6 space-y-4">
-                <Skeleton className="h-14 w-full rounded-[12px] bg-white/10" />
-                <Skeleton className="h-14 w-full rounded-[12px] bg-white/10" />
-                <Skeleton className="h-14 w-full rounded-[12px] bg-white/10" />
+                <Skeleton className="h-14 w-full rounded-none bg-white/10" />
+                <Skeleton className="h-14 w-full rounded-none bg-white/10" />
+                <Skeleton className="h-14 w-full rounded-none bg-white/10" />
               </div>
               <div className="mt-8 flex justify-end gap-3">
-                <Skeleton className="h-11 w-28 rounded-full bg-white/10" />
-                <Skeleton className="h-11 w-36 rounded-full bg-white/12" />
+                <Skeleton className="h-11 w-28 rounded-none bg-white/10" />
+                <Skeleton className="h-11 w-36 rounded-none bg-white/12" />
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-[24px] border border-white/12 bg-[var(--vh-panel-strong)] p-5">
+              <div className="rounded-none border border-[#3D3D3D] bg-[#161616] p-5">
                 <Skeleton className="h-4 w-24 bg-white/12" />
-                <Skeleton className="mt-4 h-10 w-full rounded-[10px] bg-white/10" />
-                <Skeleton className="mt-3 h-10 w-full rounded-[10px] bg-white/10" />
+                <Skeleton className="mt-4 h-10 w-full rounded-none bg-white/10" />
+                <Skeleton className="mt-3 h-10 w-full rounded-none bg-white/10" />
               </div>
-              <div className="rounded-[24px] border border-white/12 bg-[var(--vh-panel-strong)] p-5">
+              <div className="rounded-none border border-[#3D3D3D] bg-[#161616] p-5">
                 <Skeleton className="h-4 w-28 bg-white/12" />
-                <Skeleton className="mt-4 h-20 w-full rounded-[12px] bg-white/10" />
+                <Skeleton className="mt-4 h-20 w-full rounded-none bg-white/10" />
               </div>
             </div>
           </div>
@@ -1539,12 +1539,12 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
         title="Sign in to continue"
         description="Web check-in is tied to your guest session for this booking."
       >
-        <div className="rounded-[28px] border border-white/12 bg-[var(--vh-panel-strong)] p-8 text-center shadow-[var(--vh-shadow-lg)]">
+        <div className="rounded-none border border-[#3D3D3D] bg-[#161616] p-8 text-center shadow-[var(--vh-shadow-lg)]">
           <p className="text-lg font-semibold text-white">Guest sign-in required</p>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-white/70">
             Sign in with the same account used for this booking, then continue web check-in.
           </p>
-          <Button className="mt-6 rounded-full px-6" onClick={() => openAuthModal("signin")} type="button">
+          <Button className="mt-6 rounded-none px-6" onClick={() => openAuthModal("signin")} type="button">
             Sign in to continue
           </Button>
         </div>
@@ -1604,20 +1604,20 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
   }
 
   return (
-    <section className="min-h-screen bg-[#07070a] pb-12 pt-24 animate-vh-fade-in md:pt-28">
+    <section className="min-h-screen bg-[#0D0D0D] pb-12 pt-24 animate-vh-fade-in md:pt-28">
       <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
         <div className="mx-auto max-w-[980px]">
           <div className="relative min-h-10">
             <Button
               asChild
-              className="absolute left-0 top-1/2 h-10 w-10 -translate-y-1/2 rounded-full border border-white/10 bg-transparent p-0 text-white shadow-none hover:bg-white/10"
+              className="absolute left-0 top-1/2 h-10 w-10 -translate-y-1/2 rounded-none border border-[#3D3D3D] bg-transparent p-0 text-white shadow-none hover:bg-white/10"
               variant="ghost"
             >
               <Link aria-label="Back to bookings" href="/bookings">
                 <ArrowLeft className="h-4 w-4" />
               </Link>
             </Button>
-            <h1 className="vh-title text-center text-[26px] leading-[1.12] text-white md:text-[30px]">Web Check-In</h1>
+            <h1 className="font-['Cirka',serif] text-center text-3xl leading-[1.12] text-white tracking-tight md:text-4xl">Web Check-In</h1>
           </div>
 
           <p className="mt-2 text-center text-sm text-[#99A1AF]">{propertyName}</p>
@@ -1625,12 +1625,12 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
           <p className="mt-1 text-center text-xs uppercase tracking-[0.12em] text-[#6A7282]">Reservation ID: {ezeeReservationId}</p>
 
           {errorMessage ? (
-            <div className="mt-4 rounded-[12px] border border-[rgba(255,106,95,0.35)] bg-[rgba(255,106,95,0.1)] px-4 py-3 text-sm text-[#ffd9d4]" role="alert">
+            <div className="mt-4 rounded-none border border-[rgba(255,106,95,0.35)] bg-[rgba(255,106,95,0.1)] px-4 py-3 text-sm text-[#ffd9d4]" role="alert">
               {errorMessage}
             </div>
           ) : null}
 
-          <section className="mt-6 rounded-[16px] border border-white/10 bg-[var(--vh-panel-strong)] p-4 md:p-5">
+          <section className="mt-6 rounded-none border border-[#3D3D3D] bg-[#161616] p-4 md:p-5">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-base font-bold text-white">Select Guest Slot</h2>
@@ -1640,7 +1640,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     : "Guest slot selected. You can switch to another editable slot if needed."}
                 </p>
               </div>
-              <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-white/70">
+              <span className="rounded-none border border-[#3D3D3D] bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-white/70">
                 {editableSlots.length} editable
               </span>
             </div>
@@ -1652,10 +1652,10 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                   <button
                     key={slot.slot_id}
                     className={cn(
-                      "rounded-[12px] border px-4 py-3 text-left transition",
+                      "rounded-none border px-4 py-3 text-left transition",
                       isActive
                         ? "border-[var(--vh-pink)] bg-[rgba(198,40,40,0.14)] text-white"
-                        : "border-white/12 bg-[#212121] text-white hover:border-white/25",
+                        : "border-[#3D3D3D] bg-[#121212] text-white hover:border-white/25",
                     )}
                     disabled={isResolvingSlot}
                     onClick={() => {
@@ -1683,7 +1683,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
             ) : null}
 
             {slotSelectionError ? (
-              <p className="mt-3 text-xs text-[#ff6a5f]" role="alert">{slotSelectionError}</p>
+              <p className="mt-3 text-xs text-[#EE4D37]" role="alert">{slotSelectionError}</p>
             ) : null}
           </section>
 
@@ -1703,7 +1703,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                       <div className={`pointer-events-none absolute left-1/2 top-6 ml-6 h-[2px] w-[calc(100%-3rem)] ${activeStep > step.id ? "bg-[var(--vh-pink)]" : "bg-transparent"}`} />
                     ) : null}
                     <button
-                      className={`inline-flex h-12 w-12 items-center justify-center rounded-[14px] ${stepTabButtonClasses(isCurrent, isDone)}`}
+                      className={`inline-flex h-12 w-12 items-center justify-center rounded-none ${stepTabButtonClasses(isCurrent, isDone)}`}
                       onClick={() => {
                         if (step.id <= activeStep) {
                           setActiveStep(step.id);
@@ -1717,7 +1717,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                       <p className={`text-center text-[11px] font-bold uppercase tracking-[0.08em] ${isCurrent || isDone ? "text-white" : "text-white/45"}`}>
                         {step.label}
                       </p>
-                      <span className={`rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${isCurrent || isDone ? "bg-white/10 text-white/75" : "bg-white/5 text-white/35"}`}>
+                      <span className={`rounded-none px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${isCurrent || isDone ? "bg-white/10 text-white/75" : "bg-white/5 text-white/35"}`}>
                         {step.sticker}
                       </span>
                     </div>
@@ -1728,7 +1728,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
           </div>
 
           <div className={cn("mt-6", activeStep === 3 && "mx-auto w-full md:w-[calc(53.333%+3rem)]")}>
-            <div className="rounded-[16px] border border-white/5 bg-[#1A1A1A] p-5 md:p-8">
+            <div className="rounded-none border border-[#3D3D3D] bg-[#161616] p-5 md:p-8">
               {activeStep === 1 ? (
                 <section>
                   <div className="flex items-center justify-between gap-3">
@@ -1740,35 +1740,35 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">First Name</span>
                       <input
-                        className={`h-12 w-full rounded-[10px] border bg-[#212121] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.first_name ? "border-[#ff6a5f]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.first_name ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
                         onChange={(event) => setField("first_name", event.target.value)}
                         placeholder="First name"
                         value={editorState.first_name}
                       />
-                      {fieldErrors.first_name ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.first_name}</p> : null}
+                      {fieldErrors.first_name ? <p className="text-xs text-[#EE4D37]">{fieldErrors.first_name}</p> : null}
                     </label>
 
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Last Name</span>
                       <input
-                        className={`h-12 w-full rounded-[10px] border bg-[#212121] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.last_name ? "border-[#ff6a5f]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.last_name ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
                         onChange={(event) => setField("last_name", event.target.value)}
                         placeholder="Last name"
                         value={editorState.last_name}
                       />
-                      {fieldErrors.last_name ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.last_name}</p> : null}
+                      {fieldErrors.last_name ? <p className="text-xs text-[#EE4D37]">{fieldErrors.last_name}</p> : null}
                     </label>
 
                     <label className="space-y-2 md:col-span-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Email</span>
                       <input
-                        className={`h-12 w-full rounded-[10px] border bg-[#212121] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.email ? "border-[#ff6a5f]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.email ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
                         onChange={(event) => setField("email", event.target.value)}
                         placeholder="Email"
                         type="email"
                         value={editorState.email}
                       />
-                      {fieldErrors.email ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.email}</p> : null}
+                      {fieldErrors.email ? <p className="text-xs text-[#EE4D37]">{fieldErrors.email}</p> : null}
                     </label>
 
                     <label className="space-y-2">
@@ -1776,17 +1776,17 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                       <Popover onOpenChange={setDobPickerOpen} open={dobPickerOpen}>
                         <PopoverTrigger asChild>
                           <button
-                            className={`flex h-12 w-full items-center justify-between rounded-[10px] border bg-[#212121] px-4 text-left text-sm text-white outline-none ${fieldErrors.date_of_birth ? "border-[#ff6a5f]" : "border-white/10 hover:border-white/20"}`}
+                            className={`flex h-12 w-full items-center justify-between rounded-none border bg-[#121212] px-4 text-left text-sm text-white outline-none ${fieldErrors.date_of_birth ? "border-[#EE4D37]" : "border-[#3D3D3D] hover:border-white/20"}`}
                             type="button"
                           >
                             <span>{formatDobDate(editorState.date_of_birth)}</span>
                             <ChevronDown className="h-4 w-4 text-[#99A1AF]" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent align="start" className="z-[220] w-auto border-white/10 bg-[#10111a] p-2">
+                        <PopoverContent align="start" className="z-[220] w-auto border-[#3D3D3D] bg-[#10111a] p-2">
                           <Calendar
                             captionLayout="dropdown"
-                            className="vh-calendar-dark vh-calendar-balanced rounded-[16px]"
+                            className="vh-calendar-dark vh-calendar-balanced rounded-none"
                             disabled={{ after: new Date() }}
                             fromYear={1900}
                             mode="single"
@@ -1803,7 +1803,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                           />
                         </PopoverContent>
                       </Popover>
-                      {fieldErrors.date_of_birth ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.date_of_birth}</p> : null}
+                      {fieldErrors.date_of_birth ? <p className="text-xs text-[#EE4D37]">{fieldErrors.date_of_birth}</p> : null}
                     </label>
 
                     <label className="space-y-2">
@@ -1824,7 +1824,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Nationality</span>
                       <Select onValueChange={(value) => setField("nationality_type", value)} value={editorState.nationality_type}>
-                        <SelectTrigger className={fieldErrors.nationality_type ? "border-[#ff6a5f]" : ""}>
+                        <SelectTrigger className={fieldErrors.nationality_type ? "border-[#EE4D37]" : ""}>
                           <SelectValue placeholder="Select nationality" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1832,29 +1832,29 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                           <SelectItem value="OTHER">Other Nationality</SelectItem>
                         </SelectContent>
                       </Select>
-                      {fieldErrors.nationality_type ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.nationality_type}</p> : null}
+                      {fieldErrors.nationality_type ? <p className="text-xs text-[#EE4D37]">{fieldErrors.nationality_type}</p> : null}
                     </label>
 
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Contact Number</span>
                       <input
-                        className={`h-12 w-full rounded-[10px] border bg-[#212121] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.contact_number ? "border-[#ff6a5f]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.contact_number ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
                         onChange={(event) => setField("contact_number", normalizeContactNumber(event.target.value))}
                         placeholder="+918765432109"
                         value={editorState.contact_number}
                       />
-                      {fieldErrors.contact_number ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.contact_number}</p> : null}
+                      {fieldErrors.contact_number ? <p className="text-xs text-[#EE4D37]">{fieldErrors.contact_number}</p> : null}
                     </label>
 
                     <label className="space-y-2 md:col-span-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Address</span>
                       <textarea
-                        className={`min-h-[120px] w-full resize-y rounded-[10px] border bg-[#212121] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.permanent_address ? "border-[#ff6a5f]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
+                        className={`min-h-[120px] w-full resize-y rounded-none border bg-[#121212] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.permanent_address ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
                         onChange={(event) => setField("permanent_address", event.target.value)}
                         placeholder="Full address"
                         value={editorState.permanent_address}
                       />
-                      {fieldErrors.permanent_address ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.permanent_address}</p> : null}
+                      {fieldErrors.permanent_address ? <p className="text-xs text-[#EE4D37]">{fieldErrors.permanent_address}</p> : null}
                     </label>
                   </div>
                 </section>
@@ -1866,17 +1866,17 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                   <div className="mt-5 grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)]">
                     <div className="space-y-5">
                       <p className="text-sm text-[#99A1AF]">Choose one document to upload.</p>
-                      {fieldErrors.id_type ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.id_type}</p> : null}
+                      {fieldErrors.id_type ? <p className="text-xs text-[#EE4D37]">{fieldErrors.id_type}</p> : null}
 
                       <div className="grid gap-3">
                         {ID_TYPES.map((idType) => (
                           <button
                             key={idType.value}
                             className={cn(
-                              "flex items-center justify-between rounded-[14px] border px-4 py-4 text-left transition-colors",
+                              "flex items-center justify-between rounded-none border px-4 py-4 text-left transition-colors",
                               editorState.id_type === idType.value
                                 ? "border-[var(--vh-pink)] bg-[rgba(198,40,40,0.12)] text-[var(--vh-pink)]"
-                                : "border-white/10 bg-[#212121] text-white hover:border-white/20",
+                                : "border-[#3D3D3D] bg-[#121212] text-white hover:border-white/20",
                             )}
                             onClick={() => setField("id_type", idType.value)}
                             type="button"
@@ -1891,7 +1891,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                         <label className="space-y-2">
                           <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">ID Number</span>
                           <input
-                            className={`h-12 w-full rounded-[10px] border bg-[#212121] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${idNumberErrorMessage ? "border-[#ff6a5f]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
+                            className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${idNumberErrorMessage ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
                             onChange={(event) => handleIdNumberInputChange(event.target.value)}
                             placeholder="You can Enter ID Number Manually, No Prob!"
                             value={editorState.id_number}
@@ -1903,11 +1903,11 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                                 : "Detected ID Type: Not recognized yet"}
                             </p>
                           ) : null}
-                          {idNumberErrorMessage ? <p className="text-xs text-[#ff6a5f]">{idNumberErrorMessage}</p> : null}
+                          {idNumberErrorMessage ? <p className="text-xs text-[#EE4D37]">{idNumberErrorMessage}</p> : null}
                         </label>
                       </div>
 
-                      <div className="space-y-3 rounded-[12px] border border-white/10 bg-[#212121] p-4">
+                      <div className="space-y-3 rounded-none border border-[#3D3D3D] bg-[#121212] p-4">
                         <label className="flex items-start gap-3 text-sm text-[#D1D5DC]">
                           <input
                             checked={editorState.consent_terms}
@@ -1920,7 +1920,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                             I understand my data is encrypted and processed according to <Link className="underline decoration-white/40 underline-offset-4" href="/policies/privacy">Privacy Policy</Link>.
                           </span>
                         </label>
-                        {fieldErrors.consent_terms ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.consent_terms}</p> : null}
+                        {fieldErrors.consent_terms ? <p className="text-xs text-[#EE4D37]">{fieldErrors.consent_terms}</p> : null}
 
                         <label className="flex items-start gap-3 text-sm text-[#D1D5DC]">
                           <input
@@ -1931,7 +1931,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                           />
                           I confirm that I am above the age of 18.
                         </label>
-                        {fieldErrors.consent_age ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.consent_age}</p> : null}
+                        {fieldErrors.consent_age ? <p className="text-xs text-[#EE4D37]">{fieldErrors.consent_age}</p> : null}
                       </div>
                     </div>
 
@@ -1989,13 +1989,13 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                           ) : null}
                         </button>
                         <div className="px-2 pt-4">
-                          <div className="h-[9px] rounded-[12px] bg-[#F1F5F9]" />
+                          <div className="h-[9px] rounded-none bg-[#F1F5F9]" />
                         </div>
                       </div>
 
                       <div className="mt-3 flex justify-center">
                         <Button
-                          className="w-[80%] rounded-[10px] bg-[var(--vh-pink)] text-white hover:bg-[var(--vh-pink-soft)]"
+                          className="w-[80%] rounded-none bg-[var(--np-yellow)] font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
                           disabled={!canEditActiveSlot || !editorState.document_file_key}
                           loading={isRunningOcr}
                           loadingText="Scanning ID"
@@ -2012,7 +2012,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                       ) : null}
 
                       {documentUploadErrorMessage ? (
-                        <p className="text-xs text-[#ff6a5f]" role="alert">{documentUploadErrorMessage}</p>
+                        <p className="text-xs text-[#EE4D37]" role="alert">{documentUploadErrorMessage}</p>
                       ) : null}
                     </div>
                   </div>
@@ -2030,7 +2030,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Time of Arrival</span>
                       <Select onValueChange={(value) => setField("arrival_time", value)} value={editorState.arrival_time}>
-                        <SelectTrigger className={fieldErrors.arrival_time ? "border-[#ff6a5f]" : ""}>
+                        <SelectTrigger className={fieldErrors.arrival_time ? "border-[#EE4D37]" : ""}>
                           <SelectValue placeholder="Select arrival slot" />
                         </SelectTrigger>
                         <SelectContent>
@@ -2039,29 +2039,29 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                           ))}
                         </SelectContent>
                       </Select>
-                      {fieldErrors.arrival_time ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.arrival_time}</p> : null}
+                      {fieldErrors.arrival_time ? <p className="text-xs text-[#EE4D37]">{fieldErrors.arrival_time}</p> : null}
                     </label>
 
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Coming From</span>
                       <input
-                        className={`h-12 w-full rounded-[10px] border bg-[#212121] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.coming_from ? "border-[#ff6a5f]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.coming_from ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
                         onChange={(event) => setField("coming_from", event.target.value)}
                         placeholder="e.g. Delhi"
                         value={editorState.coming_from}
                       />
-                      {fieldErrors.coming_from ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.coming_from}</p> : null}
+                      {fieldErrors.coming_from ? <p className="text-xs text-[#EE4D37]">{fieldErrors.coming_from}</p> : null}
                     </label>
 
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Next Destination</span>
                       <input
-                        className={`h-12 w-full rounded-[10px] border bg-[#212121] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.going_to ? "border-[#ff6a5f]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.going_to ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
                         onChange={(event) => setField("going_to", event.target.value)}
                         placeholder="e.g. Goa"
                         value={editorState.going_to}
                       />
-                      {fieldErrors.going_to ? <p className="text-xs text-[#ff6a5f]">{fieldErrors.going_to}</p> : null}
+                      {fieldErrors.going_to ? <p className="text-xs text-[#EE4D37]">{fieldErrors.going_to}</p> : null}
                     </label>
 
                   </div>
@@ -2070,7 +2070,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
 
               <div className="mt-8 flex items-center justify-between gap-3">
                 <Button
-                  className="rounded-[10px] border border-white/20 bg-transparent text-white hover:bg-white/10"
+                  className="rounded-none border border-white/20 bg-transparent text-white hover:bg-white/10"
                   onClick={previousStep}
                   type="button"
                   variant="outline"
@@ -2080,7 +2080,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
 
                 {activeStep < 3 ? (
                   <Button
-                    className="rounded-[10px] bg-[var(--vh-pink)] text-white hover:bg-[var(--vh-pink-soft)] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="rounded-none bg-[var(--np-yellow)] font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90 disabled:cursor-not-allowed disabled:opacity-45"
                     disabled={!canAdvanceToNextStep}
                     onClick={nextStep}
                     type="button"
@@ -2090,7 +2090,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                   </Button>
                 ) : (
                   <Button
-                    className="rounded-[10px] bg-[var(--vh-pink)] text-white hover:bg-[var(--vh-pink-soft)]"
+                    className="rounded-none bg-[var(--np-yellow)] font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
                     disabled={!canEditActiveSlot}
                     loading={isSubmitting}
                     loadingText="Finishing check-in"
@@ -2123,12 +2123,12 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
 
       {showUploadPreviewModal ? (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 px-4">
-          <div className="w-full max-w-[448px] overflow-hidden rounded-[16px] border border-white/10 bg-[#1A1A1A] shadow-[0_25px_50px_rgba(0,0,0,0.35)]">
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+          <div className="w-full max-w-[448px] overflow-hidden rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[0_25px_50px_rgba(0,0,0,0.35)]">
+            <div className="flex items-center justify-between border-b border-[#3D3D3D] px-4 py-3">
               <p className="text-lg font-bold text-white">Crop Image</p>
               <button
                 aria-label="Close image preview"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#99A1AF] hover:bg-white/10"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-none text-[#99A1AF] hover:bg-white/10"
                 onClick={dismissUploadPreview}
                 type="button"
               >
@@ -2137,7 +2137,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
             </div>
 
             <div className="p-4">
-              <div className="relative h-[288px] overflow-hidden rounded-[10px] border border-[#4A5565] bg-[#1E2939]">
+              <div className="relative h-[288px] overflow-hidden rounded-none border border-[#4A5565] bg-[#1E2939]">
                 <Cropper
                   aspect={4 / 3}
                   crop={cropPosition}
@@ -2175,14 +2175,14 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
 
               <div className="mt-5 grid grid-cols-2 gap-3">
                 <Button
-                  className="rounded-[10px] border border-white/20 bg-transparent text-white hover:bg-white/10"
+                  className="rounded-none border border-white/20 bg-transparent text-white hover:bg-white/10"
                   onClick={dismissUploadPreview}
                   type="button"
                   variant="outline"
                 >
                   Cancel
                 </Button>
-                <Button className="rounded-[10px] bg-[var(--vh-pink)] text-white hover:bg-[var(--vh-pink-soft)]" onClick={() => void applyUploadPreview()} type="button">
+                <Button className="rounded-none bg-[var(--np-yellow)] font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90" onClick={() => void applyUploadPreview()} type="button">
                   Apply
                 </Button>
               </div>
@@ -2194,8 +2194,8 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
       {isCompletionModalOpen ? (
         <div className="fixed inset-0 z-[130] flex items-center justify-center bg-[rgba(17,17,17,0.95)] px-4">
           <div className="w-full max-w-xl text-center">
-            <div className="mx-auto flex h-40 w-40 items-center justify-center rounded-full border border-[rgba(0,201,80,0.2)] bg-[rgba(0,201,80,0.1)] shadow-[0_0_100px_rgba(34,197,94,0.2)]">
-              <div className="flex h-[142px] w-[142px] items-center justify-center rounded-full border border-[rgba(0,201,80,0.3)]">
+            <div className="mx-auto flex h-40 w-40 items-center justify-center rounded-none border-2 border-[var(--np-green)] bg-[#121F17] shadow-[6px_6px_0px_var(--np-green)]">
+              <div className="flex h-[142px] w-[142px] items-center justify-center rounded-none border border-[rgba(0,201,80,0.3)]">
                 <CheckCircle2 className="h-14 w-14 text-[#00C950]" />
               </div>
             </div>
@@ -2210,7 +2210,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
 
             <div className="mt-8 flex justify-center">
               <Button
-                className="h-14 rounded-full bg-white px-10 text-sm font-black uppercase tracking-[0.08em] text-black hover:bg-white/90"
+                className="h-12 rounded-none bg-[var(--np-yellow)] px-10 text-sm font-bold uppercase tracking-[0.08em] text-black border border-[var(--np-yellow)] shadow-[4px_4px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
                 onClick={() => {
                   setIsCompletionModalOpen(false);
                   window.location.assign(`/bookings/${encodeURIComponent(ezeeReservationId)}/confirmed`);
