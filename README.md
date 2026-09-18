@@ -29,6 +29,12 @@ An expressive, dark-first digital hospitality platform where travelers, remote n
 
 ---
 
+<div align="center">
+
+![Vibehouse NeoPOP Homepage Hero & Live Booking Bar](./public/readme/hero-showcase.png)
+
+</div>
+
 ## The Guest Experience
 
 Vibehouse merges modern hostel culture with high-precision digital product design. Across every screen, the interface adheres to a strict neo-brutalist geometry, pitch-black layered surfaces, and authentic CRED NeoPOP 3D plunk physics.
@@ -74,26 +80,47 @@ Vibehouse merges modern hostel culture with high-precision digital product desig
 
 ## Designed For Momentum
 
-The visual language of Vibehouse is an authentic, local React 19-compatible adaptation of the **CRED NeoPOP** design system. Rather than layering a theme over generic controls, every surface has been architected with raw physical intention:
+Vibehouse's visual system is a local React 19-compatible adaptation of the **CRED NeoPOP** design system. The interface uses an absolute `#0D0D0D` pitch-black canvas, sharp zero-radius geometry, 3px 45-degree beveled edges, directional offset shadows, and tactile 120ms press physics.
 
-```
-┌────────────────────────────────────────────────────────┐
-│  PITCH-BLACK CANVAS (#0D0D0D)                          │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  LAYERED RAISED SURFACE (#161616)                │  │
-│  │  BORDER: 1PX SOLID #3D3D3D                       │  │
-│  │  SHADOW: 6PX 6PX 0PX #000000                     │  │
-│  │                                                  │  │
-│  │  [CIRKA DISPLAY HEADLINE]                        │  │
-│  │  GILROY MONOSPACE TRACKED KICKER                 │  │
-│  │                                                  │  │
-│  │  ┌────────────────────────────────────────────┐  │  │
-│  │  │ [AFFIRMATIVE YELLOW PLUNK CTA]             │  │  │
-│  │  │ BG: #FFCB45 | BEVEL: 3PX 45° | TEXT: BLACK │  │  │
-│  │  └────────────────────────────────────────────┘  │  │
-│  └──────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────┘
-```
+### 1. Coliving Duration Engine & Real-Time Receipt Quote
+> Select between 1, 2, 3, or 6-month resident passes with live price calculation, dynamic addon configuration, and digital receipt breakdown.
+
+<div align="center">
+
+![Vibehouse Coliving Duration Engine](./public/readme/colive-engine.png)
+
+</div>
+
+### 2. Curated Properties & Room Catalog
+> Sharp category filter tokens, live bed capacity markers, and brutalist room specifications.
+
+<div align="center">
+
+![Vibehouse Property & Rooms Showcase](./public/readme/property-rooms.png)
+
+</div>
+
+### 3. Community Events & Social Lineup Bento
+> High-contrast event poster cards, neon status tokens, and tactile RSVP plunk triggers.
+
+<div align="center">
+
+![Vibehouse Community Events & Lineup](./public/readme/events-bento.png)
+
+</div>
+
+### 4. Frictionless Web Check-In & Digital Boarding Ticket
+> Multi-guest slot accordion, Gov. ID upload dropzone with mock OCR, and Razorpay-verified digital ticket with 6px offset shadows.
+
+<div align="center">
+
+| Multi-Guest Web Check-In & KYC | Razorpay Verified Digital Ticket |
+| :---: | :---: |
+| ![Web Check-In Portal](./public/readme/web-checkin.png) | ![Digital Ticket Confirmation](./public/readme/digital-ticket.png) |
+
+</div>
+
+<br/>
 
 ### Semantic Momentum Palette
 
