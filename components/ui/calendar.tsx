@@ -36,7 +36,7 @@ function Calendar({
 
   return (
     <DayPicker
-      className={cn("rounded-[18px] p-2", className)}
+      className={cn("rounded-none border border-[#3D3D3D] bg-[#121212] p-2 shadow-[6px_6px_0px_#000000]", className)}
       classNames={mergedClassNames}
       {...props}
     />

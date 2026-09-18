@@ -592,18 +592,15 @@ select optgroup {
   }
 
   .vh-card {
-    @apply rounded-[12px] border-2 border-[var(--vh-border)] bg-[var(--vh-surface)] shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.18)];
+    @apply rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[6px_6px_0px_#000000];
   }
 
   .vh-panel {
-    @apply rounded-[24px] border border-white/12;
-    background: var(--vh-panel);
-    box-shadow: var(--vh-shadow);
+    @apply rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[6px_6px_0px_#000000];
   }
 
   .vh-panel-soft {
-    @apply rounded-[20px] border border-white/10;
-    background: var(--vh-panel-soft);
+    @apply rounded-none border border-[#3D3D3D] bg-[#121212];
   }
 
   .vh-bento-tile {
@@ -613,28 +610,24 @@ select optgroup {
   }
 
   .vh-chip {
-    @apply inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/72;
-    background: var(--vh-chip);
+    @apply inline-flex items-center gap-2 rounded-none border border-[#3D3D3D] bg-[#1F1F1F] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white;
   }
 
   .vh-icon-pill {
-    @apply inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/78;
-    background: var(--vh-chip);
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#1F1F1F] text-white;
   }
 
   .vh-outline-button {
-    @apply inline-flex items-center justify-center rounded-[4px] border-2 border-white/30 bg-white/10 px-4 py-2 text-sm font-bold uppercase text-white;
+    @apply inline-flex items-center justify-center rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-2 text-sm font-bold uppercase text-white hover:bg-[#202029];
   }
 
   .vh-primary-button {
-    @apply inline-flex items-center justify-center rounded-[4px] bg-[var(--vh-pink)] px-6 py-3 text-sm font-bold uppercase text-white shadow-[4px_4px_0px_0px_var(--vh-border)];
+    @apply inline-flex items-center justify-center rounded-none bg-[var(--np-yellow)] border border-[var(--np-yellow)] px-6 py-3 text-sm font-bold uppercase text-black shadow-[4px_4px_0px_#000000] hover:bg-[var(--np-yellow)]/90;
   }
 
   .vh-cta-button {
-    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[14px] bg-[var(--vh-pink)] px-6 py-3 text-center text-[18px] font-bold uppercase leading-7 text-white transition-all outline-none hover:bg-[#8e1b1b] focus-visible:ring-[3px] focus-visible:ring-white/30;
-    font-family: var(--font-geologica);
-    box-shadow: 4px 4px 0 0 rgba(128, 128, 128, 0.5);
-    letter-spacing: 0.9px;
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none bg-[var(--np-yellow)] border border-[var(--np-yellow)] px-6 py-3 text-center text-[18px] font-bold uppercase leading-7 text-black shadow-[4px_4px_0px_#000000] transition-all outline-none hover:bg-[var(--np-yellow)]/90 focus-visible:ring-[3px] focus-visible:ring-[var(--np-yellow)];
+    font-family: var(--font-gilroy);
   }
 
   .vh-motion-press {
@@ -735,7 +728,7 @@ select optgroup {
   }
 
   .vh-input {
-    @apply w-full rounded-[4px] border-2 border-[var(--vh-border)] bg-[#1b1d27] px-3 py-2 text-sm text-white outline-none focus:border-[var(--vh-pink)] focus:shadow-[0_0_0_3px_rgba(198,40,40,0.3)] transition-all;
+    @apply w-full rounded-none border border-[#3D3D3D] bg-[#121212] px-3 py-2 text-sm text-white outline-none focus:border-[var(--np-yellow)] transition-all;
   }
 
   .vh-rot-1 {

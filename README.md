@@ -18,11 +18,12 @@
 
 ## ✨ Features
 
-- **Immersive User Experience:** Smooth micro-interactions powered by [Framer Motion](https://motion.dev/) and [GSAP](https://gsap.com/).
-- **Modern Tech Stack:** Built on **Next.js** with **React 19** and strictly typed with **TypeScript**.
-- **Stunning UI Components:** Leveraging [shadcn/ui](https://ui.shadcn.com/) and [Radix UI](https://www.radix-ui.com/) for accessible, beautiful, and customizable elements.
-- **Vibrant Aesthetics:** Tailwind CSS v4 for utility-first styling with sleek dark modes, glassmorphism, and dynamic layouts.
-- **Optimized Performance:** Server-Side Rendering (SSR) and Turbopack ready for lightning-fast delivery.
+- **CRED NeoPOP Design System:** Full neo-brutalist overhaul inspired by [CRED NeoPOP](https://github.com/cred-club/neopop-web) with strict zero border radius (`rounded-none`, `0px`), pitch-black `#0D0D0D` canvas, layered surfaces (`#121212`, `#161616`), and `#3D3D3D` crisp hairlines.
+- **Tactile 3D Plunk Buttons:** Custom `NeoPopButton` primitives with 3px 45-degree beveled edges, directional offset shadows, and authentic physical press response (`translate3d(2px, 2px, 0)`).
+- **Editorial Display Typography:** High-contrast `Cirka` display serif headlines paired with `Gilroy` UI body copy, tabular numbers, and uppercase tracked utility kickers.
+- **Immersive Micro-Interactions:** Smooth animations powered by [Framer Motion](https://motion.dev/) and [GSAP](https://gsap.com/) with full `@media (prefers-reduced-motion: reduce)` accessibility compliance.
+- **End-to-End Hospitality Engine:** Booking availability engine, coliving duration tier selectors, itemized digital receipts, Razorpay payment flow, KYC & OCR web check-in, tokenized breakfast orders, and CSAT feedback.
+- **Modern Tech Stack:** Built on **Next.js 16 (Turbopack)** with **React 19** and strictly typed with **TypeScript**.
 
 ## 🚀 Quick Start
 
