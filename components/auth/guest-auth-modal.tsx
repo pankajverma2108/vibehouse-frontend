@@ -281,7 +281,7 @@ export function GuestAuthModal({
         type="button"
       />
 
-      <div className="relative z-10 w-full max-w-[560px] rounded-[24px] border border-white/14 bg-[radial-gradient(110%_84%_at_4%_0%,rgba(0,209,255,0.09),transparent_54%),radial-gradient(120%_100%_at_90%_84%,rgba(198,40,40,0.08),transparent_58%),linear-gradient(170deg,#250F16_0%,#180A12_58%,#130811_100%)] p-4 shadow-[0_26px_70px_rgba(0,0,0,0.45)] md:p-6">
+      <div className="relative z-10 w-full max-w-[560px] rounded-none border border-[#3D3D3D] bg-[#161616] p-4 shadow-[6px_6px_0px_#000000] md:p-6">
         <button
           aria-label="Close"
           className="absolute right-4 top-4 inline-flex h-5 w-5 items-center justify-center text-white/85 hover:text-white"
@@ -292,7 +292,7 @@ export function GuestAuthModal({
         </button>
 
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold uppercase tracking-[-0.8px] text-white md:text-[42px] md:leading-[1]">{headline}</h2>
+          <h2 className="font-['Cirka',serif] text-3xl font-bold tracking-tight text-white md:text-[40px] md:leading-[1]">{headline}</h2>
           {description && (
             <p className="mt-2 text-sm text-[#cbd5e1] font-medium font-['Space_Grotesk']">
               {description}
@@ -360,7 +360,7 @@ export function GuestAuthModal({
                     type="button"
                     onClick={onResendOtp}
                     disabled={countdown > 0 || pending}
-                    className="text-sm font-semibold text-[var(--vh-cyan)] disabled:opacity-50"
+                    className="text-sm font-semibold text-[var(--np-yellow)] disabled:opacity-50"
                   >
                     {countdown > 0 ? `Resend in 00:${countdown.toString().padStart(2, "0")}` : "Didn't receive it? Resend"}
                   </button>
@@ -404,7 +404,7 @@ export function GuestAuthModal({
               <label className="inline-flex items-center gap-2.5">
                 <input
                   checked={rememberMe}
-                  className="h-[18px] w-[18px] rounded border border-white/20 bg-white/5 accent-[var(--vh-pink)]"
+                  className="h-[18px] w-[18px] rounded-none border border-[#3D3D3D] bg-[#121212] accent-[var(--np-yellow)]"
                   onChange={(event) => setRememberMe(event.target.checked)}
                   type="checkbox"
                 />
@@ -412,7 +412,7 @@ export function GuestAuthModal({
               </label>
 
               <button 
-                className="font-semibold text-[var(--vh-cyan)]" 
+                className="font-semibold text-[var(--np-yellow)]" 
                 type="button"
                 onClick={() => switchMode("forgot-password")}
               >
@@ -420,17 +420,17 @@ export function GuestAuthModal({
               </button>
             </div>
           ) : mode === "signup" ? (
-            <label className="block rounded-[10px] border border-dashed border-white/25 bg-white/[0.03] px-4 py-3 text-sm text-white/85">
+            <label className="block rounded-none border border-dashed border-[#3D3D3D] bg-[#121212] px-4 py-3 text-sm text-white/85">
               <span className="inline-flex items-start gap-2.5">
                 <input
                   checked={agreed}
-                  className="mt-[3px] h-[18px] w-[18px] rounded border border-white/20 bg-white/5 accent-[var(--vh-cyan)]"
+                  className="mt-[3px] h-[18px] w-[18px] rounded-none border border-[#3D3D3D] bg-[#121212] accent-[var(--np-yellow)]"
                   onChange={(event) => setAgreed(event.target.checked)}
                   type="checkbox"
                 />
                 <span>
-                  I agree to the <Link className="font-bold text-[var(--vh-cyan)]" href="/policies/terms">Terms & Conditions</Link> and{" "}
-                  <Link className="font-bold text-[var(--vh-cyan)]" href="/policies/privacy">Privacy Policy</Link>
+                  I agree to the <Link className="font-bold text-[var(--np-yellow)]" href="/policies/terms">Terms & Conditions</Link> and{" "}
+                  <Link className="font-bold text-[var(--np-yellow)]" href="/policies/privacy">Privacy Policy</Link>
                 </span>
               </span>
             </label>
@@ -438,7 +438,7 @@ export function GuestAuthModal({
 
           <button
             aria-busy={pending || undefined}
-            className={`inline-flex h-14 w-full items-center justify-center rounded-[10px] border-2 border-[#0F172A] text-lg font-extrabold uppercase tracking-[0.4px] shadow-[4px_4px_0px_rgba(0,0,0,0.30)] transition hover:-translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`inline-flex h-12 w-full items-center justify-center rounded-none bg-[var(--np-yellow)] border border-[var(--np-yellow)] text-base font-bold uppercase tracking-[0.08em] text-black shadow-[4px_4px_0px_#000000] hover:bg-[var(--np-yellow)]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
               mode === "signin" ? "bg-[var(--vh-pink)] text-white" : "bg-[var(--vh-lime)] text-[#0F172A]"
             }`}
             disabled={pending || (mode === "signup" && !isSignupValid)}
@@ -455,7 +455,7 @@ export function GuestAuthModal({
           </button>
 
           {(localError || errorMessage) ? (
-            <p className="rounded-lg border border-[#c62828]/50 bg-[#c62828]/10 px-3 py-2 text-sm text-[#FDECEC]">{localError ?? errorMessage}</p>
+            <p className="rounded-none border border-[#EE4D37] bg-[#EE4D37]/10 px-3 py-2 text-sm text-white">{localError ?? errorMessage}</p>
           ) : null}
 
           {(mode === "signin" || mode === "signup") ? (
@@ -467,7 +467,7 @@ export function GuestAuthModal({
               </div>
 
               <button
-                className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-[10px] border border-[#39FF14]/35 bg-[#1E293B] text-sm font-medium text-[#F1F5F9] hover:bg-[#22314a]"
+                className="inline-flex h-11 w-full items-center justify-center gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] text-sm font-bold text-white shadow-[3px_3px_0px_#000000] hover:bg-[#202029]"
                 onClick={onGoogleAuth}
                 type="button"
               >
@@ -523,7 +523,7 @@ function LabelledInput({
       <span className="mb-1.5 block text-xs font-bold uppercase tracking-[1.2px] text-[#F1F5F9]">{label}</span>
       <input
         autoComplete={autoComplete}
-        className="h-[40px] w-full rounded-[10px] border-2 border-white/25 bg-white/5 px-3 text-sm text-white outline-none placeholder:text-white/40 focus:border-[var(--vh-cyan)]"
+        className="h-[42px] w-full rounded-none border border-[#3D3D3D] bg-[#121212] px-3 text-sm text-white outline-none placeholder:text-white/40 focus:border-[var(--np-yellow)]"
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         type={type}
@@ -566,12 +566,12 @@ function OtpSlot({ index }: { index: number }) {
 
   return (
     <div
-      className={`relative flex h-12 w-11 items-center justify-center rounded-[10px] border-2 bg-white/5 text-lg font-bold text-white transition sm:h-14 sm:w-12 ${
-        slot?.isActive ? "border-[var(--vh-cyan)]" : "border-white/25"
+      className={`relative flex h-12 w-11 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#121212] text-lg font-bold text-white transition sm:h-14 sm:w-12 ${
+        slot?.isActive ? "border-[var(--np-yellow)] shadow-[2px_2px_0px_var(--np-yellow)]" : "border-white/25"
       }`}
     >
       {slot?.char ?? ""}
-      {slot?.hasFakeCaret ? <div className="absolute h-5 w-px animate-pulse bg-[var(--vh-cyan)]" /> : null}
+      {slot?.hasFakeCaret ? <div className="absolute h-5 w-px animate-pulse bg-[var(--np-yellow)]" /> : null}
     </div>
   );
 }

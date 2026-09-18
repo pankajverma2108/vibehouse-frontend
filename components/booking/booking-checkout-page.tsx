@@ -550,11 +550,14 @@ function isItemDisabled(item: StoreCatalogItem): boolean {
 }
 
 function tabButtonClasses(isActive: boolean, isComplete: boolean) {
-  if (isActive || isComplete) {
-    return "bg-[#c62828] text-white shadow-[4px_4px_0px_rgba(0,0,0,0.45)] outline outline-1 outline-black";
+  if (isActive) {
+    return "bg-[var(--np-yellow)] text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000]";
+  }
+  if (isComplete) {
+    return "bg-[#3BFFAD] text-black border border-[#3BFFAD] shadow-[3px_3px_0px_#000000]";
   }
 
-  return "bg-white/5 text-white/45 outline outline-1 outline-white/20";
+  return "bg-[#121212] text-white/45 border border-[#3D3D3D]";
 }
 
 export function BookingCheckoutPage() {
@@ -1377,12 +1380,12 @@ export function BookingCheckoutPage() {
     return (
       <section className="vh-section min-h-screen pt-28 md:pt-32">
         <div className="mx-auto w-full max-w-[1200px] px-4 md:px-6 lg:px-10">
-          <div className="rounded-[28px] border border-white/12 bg-[rgba(15,16,26,0.92)] p-8 text-center shadow-[var(--vh-shadow-lg)]">
+          <div className="rounded-none border border-[#3D3D3D] bg-[#161616] p-8 text-center shadow-[6px_6px_0px_#000000]">
             <h1 className="text-3xl font-bold uppercase tracking-[-0.04em] text-white">No active booking draft</h1>
             <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/70">
               Pick your dates and room selection on the property page first, then come back here to review the booking.
             </p>
-            <Button asChild className="mt-6 rounded-full px-6">
+            <Button asChild className="mt-6 rounded-none bg-[var(--np-yellow)] px-6 font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90">
               <Link href={returnToPropertyHref}>
                 Return to property
                 <ArrowLeft className="ml-2 h-4 w-4" />
@@ -1396,17 +1399,17 @@ export function BookingCheckoutPage() {
 
   const bookingSummaryDesktop = (
     <aside className="relative hidden self-start lg:sticky lg:top-28 lg:block">
-      <div className="rounded-[22px] border border-dashed border-[rgba(255,255,255,0.28)] bg-[#07070a] shadow-[0_20px_45px_rgba(0,0,0,0.24)]">
+      <div className="rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[6px_6px_0px_#000000]">
         <div className="p-6">
-          <h2 className="font-sectiontitle text-[22px] text-white">Booking details</h2>
+          <h2 className="font-['Cirka',serif] text-[22px] tracking-tight text-white">Booking details</h2>
 
-          <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-[18px] border border-white/10 bg-white/5 px-4 py-4">
+          <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-4">
             <div>
               <p className="font-caption text-white/55">{isColiveBooking ? "Move-in" : "Check-in"}</p>
               <p className="font-subtitle mt-1 text-white">{formatDateLabel(draft.checkinDate)}</p>
               <p className="text-[11px] text-white/48">{isColiveBooking ? "monthly stay" : `from ${propertyGuidelines.checkIn}`}</p>
             </div>
-            <div className="rounded bg-[#f9cb37] px-2 py-1 text-[10px] font-bold uppercase text-black">
+            <div className="rounded-none bg-[var(--np-yellow)] px-2 py-1 text-[10px] font-bold uppercase text-black border border-[var(--np-yellow)] shadow-[2px_2px_0px_#000000]">
               {stayUnitCount} {stayUnitLabel}
             </div>
             <div className="text-right">
@@ -1456,12 +1459,12 @@ export function BookingCheckoutPage() {
                 <p className="font-caption text-white/48">{activeAddons.length === 0 ? "None" : `${activeAddons.length} selected`}</p>
               </div>
               {activeAddons.length === 0 ? (
-                <p className="rounded-[12px] border border-dashed border-white/12 bg-black/20 px-3 py-3 text-xs text-white/55">
+                <p className="rounded-none border border-dashed border-[#3D3D3D] bg-[#121212] px-3 py-3 text-xs text-white/55">
                   No extras added yet.
                 </p>
               ) : (
                 activeAddons.map((addon) => (
-                  <div key={addon.productId} className="flex items-start justify-between gap-3 rounded-[12px] border border-white/10 bg-black/20 px-3 py-3">
+                  <div key={addon.productId} className="flex items-start justify-between gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] px-3 py-3">
                     <div>
                       <p className="font-body text-sm text-white/92">{addon.name}</p>
                       <p className="text-xs text-white/48">
@@ -1486,7 +1489,7 @@ export function BookingCheckoutPage() {
                 Taxes
                 <span className="group relative inline-flex">
                   <Info className="h-3.5 w-3.5 text-white/45" />
-                  <span className="pointer-events-none absolute left-0 top-[calc(100%+8px)] hidden min-w-[220px] rounded-md border border-white/15 bg-[#10111a] px-3 py-2 text-[11px] leading-4 text-white/85 shadow-[0_10px_28px_rgba(0,0,0,0.35)] group-hover:block">
+                  <span className="pointer-events-none absolute left-0 top-[calc(100%+8px)] hidden min-w-[220px] rounded-none border border-[#3D3D3D] bg-[#121212] px-3 py-2 text-[11px] leading-4 text-white/85 shadow-[0_10px_28px_rgba(0,0,0,0.35)] group-hover:block">
                     <span className="block">Room GST - {formatCurrency(roomTaxExact)}</span>
                     {Object.entries(addonTaxBreakdown).map(([label, value]) => (
                       <span key={label} className="mt-1 block">
@@ -1510,7 +1513,7 @@ export function BookingCheckoutPage() {
           {checkoutError ? <p className="mb-3 text-sm text-[#ff8b8b]">{checkoutError}</p> : null}
           {activeTab === "guest" ? (
             <button
-              className="vh-cta-button w-full justify-center text-base"
+              className="inline-flex h-12 w-full items-center justify-center rounded-none bg-[var(--np-yellow)] px-6 font-bold text-black border border-[var(--np-yellow)] shadow-[4px_4px_0px_#000000] hover:bg-[var(--np-yellow)]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all text-base"
               onClick={openAddonsTab}
               type="button"
             >
@@ -1518,7 +1521,7 @@ export function BookingCheckoutPage() {
             </button>
           ) : (
             <Button
-              className="vh-cta-button w-full justify-center text-base disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-12 w-full items-center justify-center rounded-none bg-[var(--np-yellow)] px-6 font-bold text-black border border-[var(--np-yellow)] shadow-[4px_4px_0px_#000000] hover:bg-[var(--np-yellow)]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all text-base disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isPaying}
               loading={isPaying}
               loadingText="Continue to payment"
@@ -1539,16 +1542,16 @@ export function BookingCheckoutPage() {
   ];
 
   const eventCta = (
-    <div className="rounded-[20px] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
+    <div className="rounded-none border border-[#3D3D3D] bg-[#161616] p-5 shadow-[6px_6px_0px_#000000]">
       <div className="flex items-start gap-4">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[18px] bg-[linear-gradient(135deg,#fb7185,#f59e0b_52%,#fde68a)] text-[#2f1100] shadow-[0_14px_30px_rgba(249,115,22,0.26)]">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#121212] text-[var(--np-yellow)] shadow-[3px_3px_0px_#000000]">
           <PartyPopper className="h-8 w-8" strokeWidth={2.2} />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#f7c948]">Events</p>
-              <h2 className="mt-2 font-sectiontitle text-[22px] text-white md:text-[24px]">Step out after check-in.</h2>
+              <h2 className="mt-2 font-['Cirka',serif] text-[22px] tracking-tight text-white md:text-[24px]">Step out after check-in.</h2>
             </div>
             <StickerTag label="After hours" bg="#3b82f6" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" text="#ffffff" rotate="rotate-[6deg]" />
           </div>
@@ -1556,10 +1559,10 @@ export function BookingCheckoutPage() {
             Keep this booking compact, then jump into the event lineup for live music, mixers, and rooftop scenes.
           </p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <Link className="vh-cta-button w-full justify-center sm:w-auto" href="/events">
+            <Link className="inline-flex h-11 items-center justify-center rounded-none bg-[var(--np-yellow)] px-5 font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90 sm:w-auto" href="/events">
               Explore events
             </Link>
-            <Link className="inline-flex items-center justify-center rounded-[14px] border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-white/10 sm:w-auto" href="/events?tab=rsvp">
+            <Link className="inline-flex items-center justify-center rounded-none border border-[#3D3D3D] bg-[#121212] px-5 py-3 text-sm font-bold uppercase tracking-[0.08em] text-white hover:bg-[#202029] sm:w-auto" href="/events?tab=rsvp">
               RSVP board
             </Link>
           </div>
@@ -1569,13 +1572,13 @@ export function BookingCheckoutPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#07070a] pb-28 text-white lg:pb-12">
+    <div className="min-h-screen bg-[#0D0D0D] pb-28 text-white lg:pb-12">
       <section className="mx-auto w-full max-w-[1200px] px-4 pb-8 pt-20 md:px-6 md:pb-12 md:pt-24">
-        <div className="bg-[#07070a] px-4 py-5 sm:px-5 sm:py-6 md:px-8 md:py-8">
+        <div className="bg-transparent px-4 py-5 sm:px-5 sm:py-6 md:px-8 md:py-8">
           <div className="relative space-y-4 sm:space-y-5">
             <div className="space-y-4 sm:space-y-5">
               <div>
-                <h1 className="vh-title mt-3 max-w-4xl text-center text-[28px] leading-[1.04] text-white sm:mt-4 md:text-[42px] lg:text-[56px]">
+                <h1 className="mt-3 max-w-4xl text-center font-['Cirka',serif] text-[32px] font-normal leading-[1.04] text-white sm:mt-4 md:text-[46px] lg:text-[56px]">
                   Lock the bunk. Add the fun.
                 </h1>
               </div>
@@ -1593,10 +1596,9 @@ export function BookingCheckoutPage() {
               return (
                 <div key={tab.key} className="relative flex flex-col items-center gap-3">
                   {index < reviewTabs.length - 1 ? (
-                    <div className={`absolute left-[calc(50%+28px)] top-6 hidden h-[2px] w-[calc(100%-56px)] md:block ${activeTab !== "guest" && index === 0 ? "bg-[#c62828]" : "bg-white/10"}`} />
+                    <div className={`absolute left-[calc(50%+28px)] top-6 hidden h-[2px] w-[calc(100%-56px)] md:block ${activeTab !== "guest" && index === 0 ? "bg-[var(--np-yellow)]" : "bg-[#3D3D3D]"}`} />
                   ) : null}
-                  <button
-                    className={`inline-flex h-12 w-12 items-center justify-center rounded-[14px] ${tabButtonClasses(isActive, isComplete)}`}
+                  <button className={`inline-flex h-12 w-12 items-center justify-center rounded-none ${tabButtonClasses(isActive, isComplete)}`}
                     onClick={() => handleTabClick(tab.key)}
                     type="button"
                   >
@@ -1617,16 +1619,16 @@ export function BookingCheckoutPage() {
           <div className="space-y-6">
             {activeTab === "guest" ? (
               <>
-                <div className="overflow-hidden rounded-[22px] border border-dashed border-[rgba(255,255,255,0.28)] bg-[#07070a] shadow-[0_20px_45px_rgba(0,0,0,0.24)]">
+                <div className="overflow-hidden rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[6px_6px_0px_#000000]">
                   <div className="p-6 md:p-8">
                     <div className="mb-6 flex items-start justify-between gap-4">
                       <div>
-                        <h2 className="font-sectiontitle text-[22px] text-white md:text-[24px]">Guest details</h2>
+                        <h2 className="font-['Cirka',serif] text-[22px] tracking-tight text-white md:text-[24px]">Guest details</h2>
                       </div>
                       <StickerTag label="Your Identity, Jefe!" bg="#f9cb37" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" text="#111111" rotate="rotate-[6deg]" />
                       {!isAuthenticated ? (
                         <button
-                          className="rounded-full border border-white/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white/82"
+                          className="rounded-none border border-[#3D3D3D] bg-[#121212] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-white hover:bg-[#202029]"
                           onClick={() => openAuthModal("signin")}
                           type="button"
                         >
@@ -1640,29 +1642,29 @@ export function BookingCheckoutPage() {
                         <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-white/60">First name *</span>
                         <input
                           autoComplete="given-name"
-                          className={`w-full rounded-[14px] border bg-black/30 px-4 py-4 text-base text-white outline-none ${guestErrors.firstName ? "border-[#ff2e62]" : "border-white/10 focus:border-[#c62828]"}`}
+                          className={`w-full rounded-none border bg-[#121212] px-4 py-4 text-base text-white outline-none focus:border-[var(--np-yellow)] ${guestErrors.firstName ? "border-[#EE4D37]" : "border-[#3D3D3D]"}`}
                           onChange={(event) => updateGuestField("firstName", event.target.value)}
                           value={guestForm.firstName}
                         />
-                        {guestErrors.firstName ? <span className="mt-2 block text-xs text-[#ff2e62]">{guestErrors.firstName}</span> : null}
+                        {guestErrors.firstName ? <span className="mt-2 block text-xs text-[#EE4D37]">{guestErrors.firstName}</span> : null}
                       </label>
 
                       <label className="block">
                         <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-white/60">Last name *</span>
                         <input
                           autoComplete="family-name"
-                          className={`w-full rounded-[14px] border bg-black/30 px-4 py-4 text-base text-white outline-none ${guestErrors.lastName ? "border-[#ff2e62]" : "border-white/10 focus:border-[#c62828]"}`}
+                          className={`w-full rounded-none border bg-[#121212] px-4 py-4 text-base text-white outline-none focus:border-[var(--np-yellow)] ${guestErrors.lastName ? "border-[#EE4D37]" : "border-[#3D3D3D]"}`}
                           onChange={(event) => updateGuestField("lastName", event.target.value)}
                           value={guestForm.lastName}
                         />
-                        {guestErrors.lastName ? <span className="mt-2 block text-xs text-[#ff2e62]">{guestErrors.lastName}</span> : null}
+                        {guestErrors.lastName ? <span className="mt-2 block text-xs text-[#EE4D37]">{guestErrors.lastName}</span> : null}
                       </label>
 
                       <label className="block">
                         <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-white/60">Email *</span>
                         <input
                           autoComplete="email"
-                          className={`w-full rounded-[14px] border bg-black/30 px-4 py-4 text-base text-white outline-none ${guestErrors.email ? "border-[#ff2e62]" : "border-white/10 focus:border-[#c62828]"}`}
+                          className={`w-full rounded-none border bg-[#121212] px-4 py-4 text-base text-white outline-none focus:border-[var(--np-yellow)] ${guestErrors.email ? "border-[#EE4D37]" : "border-[#3D3D3D]"}`}
                           onChange={(event) => updateGuestField("email", normalizeEmail(event.target.value))}
                           type="email"
                           value={guestForm.email}
@@ -1676,7 +1678,7 @@ export function BookingCheckoutPage() {
                         <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-white/60">Phone number *</span>
                         <input
                           autoComplete="tel"
-                          className={`w-full rounded-[14px] border bg-black/30 px-4 py-4 text-base text-white outline-none ${guestErrors.phone ? "border-[#ff2e62]" : "border-white/10 focus:border-[#c62828]"}`}
+                          className={`w-full rounded-none border bg-[#121212] px-4 py-4 text-base text-white outline-none focus:border-[var(--np-yellow)] ${guestErrors.phone ? "border-[#EE4D37]" : "border-[#3D3D3D]"}`}
                           inputMode="tel"
                           onChange={(event) => updateGuestField("phone", normalizePhone(event.target.value))}
                           placeholder="Enter phone number"
@@ -1690,7 +1692,7 @@ export function BookingCheckoutPage() {
                     </div>
 
                     {guestForm.additionalGuests.length > 0 ? (
-                      <div className="mt-6 rounded-[14px] border border-white/10 bg-black/20 p-4">
+                      <div className="mt-6 rounded-none border border-[#3D3D3D] bg-[#121212] p-4">
                         <div className="flex items-center justify-between gap-3">
                           <div>
                             <p className="font-semibold text-white">Other guest details</p>
@@ -1698,20 +1700,20 @@ export function BookingCheckoutPage() {
                               Optional for {guestForm.additionalGuests.length} {guestForm.additionalGuests.length === 1 ? "guest" : "guests"}
                             </p>
                           </div>
-                          <div className="rounded-full border border-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.12em] text-white/55">
+                          <div className="rounded-none border border-[#3D3D3D] bg-[#161616] px-3 py-1 text-[11px] font-mono uppercase tracking-[0.12em] text-white/55">
                             Optional
                           </div>
                         </div>
 
                         <div className="mt-4 space-y-4">
                           {guestForm.additionalGuests.map((additionalGuest, index) => (
-                            <div key={`additional-guest-${index}`} className="rounded-[14px] border border-white/10 bg-white/[0.03] p-4">
+                            <div key={`additional-guest-${index}`} className="rounded-none border border-[#3D3D3D] bg-[#161616] p-4">
                               <p className="text-sm font-semibold uppercase tracking-[0.08em] text-white/72">Guest {index + 2}</p>
                               <div className="mt-3 grid gap-4 md:grid-cols-2">
                                 <label className="block">
                                   <span className="mb-2 block text-xs uppercase tracking-[0.12em] text-white/50">Full name</span>
                                   <input
-                                    className="w-full rounded-[12px] border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-[#00f0ff]"
+                                    className="w-full rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-3 text-sm text-white outline-none focus:border-[var(--np-yellow)]"
                                     onChange={(event) => updateAdditionalGuest(index, "name", event.target.value)}
                                     value={additionalGuest.name}
                                   />
@@ -1719,7 +1721,7 @@ export function BookingCheckoutPage() {
                                 <label className="block">
                                   <span className="mb-2 block text-xs uppercase tracking-[0.12em] text-white/50">Phone number</span>
                                   <input
-                                    className="w-full rounded-[12px] border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-[#00f0ff]"
+                                    className="w-full rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-3 text-sm text-white outline-none focus:border-[var(--np-yellow)]"
                                     inputMode="tel"
                                     onChange={(event) => updateAdditionalGuest(index, "phone", normalizePhone(event.target.value))}
                                     type="tel"
@@ -1733,41 +1735,41 @@ export function BookingCheckoutPage() {
                       </div>
                     ) : null}
 
-                    <div className={`mt-6 rounded-[14px] border p-4 ${guestErrors.acceptedTerms ? "border-[#e30613]" : "border-[rgba(198,40,40,0.2)]"}`}>
+                    <div className={`mt-6 rounded-none border p-4 ${guestErrors.acceptedTerms ? "border-[#EE4D37] bg-[#EE4D37]/5" : "border-[#3D3D3D] bg-[#121212]"}`}>
                       <label className="flex items-start gap-3">
                         <input
                           checked={guestForm.acceptedTerms}
-                          className="mt-1 h-4 w-4 accent-[#c62828]"
+                          className="mt-1 h-4 w-4 accent-[var(--np-yellow)] rounded-none"
                           onChange={(event) => updateGuestField("acceptedTerms", event.target.checked)}
                           type="checkbox"
                         />
                         <span className="text-sm leading-6 text-white/80">
                           Yes, I confirm <span className="font-bold text-white">all the guests are above 18 year old</span> and I acknowledge and accept the{" "}
-                          <Link className="text-[#00f0ff] hover:underline" href="/policies">
+                          <Link className="text-[var(--np-yellow)] hover:underline" href="/policies">
                             Terms of Booking Conditions, Cancellation Policy &amp; Property Policy.
                           </Link>
                         </span>
                       </label>
-                      {guestErrors.acceptedTerms ? <span className="mt-2 block text-xs text-[#ff2e62]">{guestErrors.acceptedTerms}</span> : null}
+                      {guestErrors.acceptedTerms ? <span className="mt-2 block text-xs text-[#EE4D37]">{guestErrors.acceptedTerms}</span> : null}
                     </div>
                   </div>
                 </div>
 
-                <div className="overflow-hidden rounded-[22px] border border-dashed border-[rgba(255,255,255,0.28)] bg-[#07070a] shadow-[0_20px_45px_rgba(0,0,0,0.24)]">
+                <div className="overflow-hidden rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[6px_6px_0px_#000000]">
                   <div className="p-6 md:p-8">
                     <div className="flex items-start justify-between gap-4">
-                      <h2 className="font-sectiontitle text-[22px] text-white md:text-[24px]">Coupon codes</h2>
+                      <h2 className="font-['Cirka',serif] text-[22px] tracking-tight text-white md:text-[24px]">Coupon codes</h2>
                       <StickerTag label="Unlock rewards" bg="#f9cb37" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" text="#111111" rotate="rotate-[6deg]" />
                     </div>
                     <div className="mt-5 flex gap-3">
                       <input
-                        className="flex-1 rounded-[14px] border border-white/10 bg-black/30 px-4 py-4 text-base text-white outline-none focus:border-white/25"
+                        className="flex-1 rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-4 text-base text-white outline-none focus:border-[var(--np-yellow)]"
                         onChange={(event) => handleCouponInputChange(event.target.value)}
                         placeholder="Have a coupon code?"
                         value={guestForm.coupon}
                       />
                       <button
-                        className="rounded-[12px] border border-white/15 bg-white/5 px-5 text-sm font-bold uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-none bg-[var(--np-yellow)] px-5 text-sm font-bold uppercase tracking-[0.08em] text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90 disabled:cursor-not-allowed disabled:opacity-50"
                         disabled={isApplyingCoupon}
                         onClick={() => void applyCoupon()}
                         type="button"
@@ -1783,7 +1785,7 @@ export function BookingCheckoutPage() {
                       {PROMO_CODES.map((coupon) => (
                         <button
                           key={coupon.code}
-                          className={`block w-full rounded-[14px] border p-4 text-left ${guestForm.coupon === coupon.code ? "border-white/25 bg-white/5" : "border-white/10 bg-black/20"}`}
+                          className={`block w-full rounded-none border p-4 text-left ${guestForm.coupon === coupon.code ? "border-[var(--np-yellow)] bg-[#1F1D14] shadow-[3px_3px_0px_var(--np-yellow)]" : "border-[#3D3D3D] bg-[#121212] hover:bg-[#1c1c1c]"}`}
                           onClick={() => handleCouponInputChange(coupon.code)}
                           type="button"
                         >
@@ -1798,10 +1800,10 @@ export function BookingCheckoutPage() {
                   </div>
                 </div>
 
-                <div className="overflow-hidden rounded-[22px] border border-dashed border-[rgba(255,255,255,0.28)] bg-[#07070a] shadow-[0_20px_45px_rgba(0,0,0,0.24)]">
+                <div className="overflow-hidden rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[6px_6px_0px_#000000]">
                   <div className="p-6 md:p-8">
                     <div className="flex items-start justify-between gap-4">
-                      <h2 className="font-sectiontitle text-[22px] text-white md:text-[24px]">Booking policies</h2>
+                      <h2 className="font-['Cirka',serif] text-[22px] tracking-tight text-white md:text-[24px]">Booking policies</h2>
                       <StickerTag label="Read the rules" bg="#dc2626" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" text="#ffffff" rotate="rotate-[6deg]" />
                     </div>
                     <div className="mt-4">
@@ -1825,32 +1827,32 @@ export function BookingCheckoutPage() {
 
             {activeTab === "addons" ? (
               <>
-                <div className="overflow-hidden rounded-[22px] border border-dashed border-[rgba(255,255,255,0.28)] bg-[#07070a] shadow-[0_20px_45px_rgba(0,0,0,0.24)]">
+                <div className="overflow-hidden rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[6px_6px_0px_#000000]">
                   <div className="p-6 md:p-8">
                     <div className="flex items-start justify-between gap-4">
-                      <h2 className="font-sectiontitle text-[22px] text-white md:text-[24px]">Add essentials</h2>
+                      <h2 className="font-['Cirka',serif] text-[22px] tracking-tight text-white md:text-[24px]">Add essentials</h2>
                       <StickerTag label="Level up" bg="#ec4899" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" text="#ffffff" rotate="rotate-[10deg]" />
                     </div>
 
                     {catalogLoading ? (
                       <div aria-busy="true" aria-live="polite" className="mt-5 space-y-3" role="status">
                         {Array.from({ length: 3 }).map((_, index) => (
-                          <div key={`catalog-loading-${index}`} className="flex items-center justify-between rounded-[14px] border border-white/10 bg-black/20 px-4 py-4">
+                          <div key={`catalog-loading-${index}`} className="flex items-center justify-between rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-4">
                             <div className="flex min-w-0 items-center gap-4">
-                              <Skeleton className="h-12 w-12 rounded-[14px] bg-white/10" />
+                              <Skeleton className="h-12 w-12 rounded-none border border-[#3D3D3D] bg-white/10" />
                               <div className="min-w-0 space-y-2">
                                 <Skeleton className="h-4 w-44 bg-white/10" />
                                 <Skeleton className="h-3 w-28 bg-white/10" />
                               </div>
                             </div>
-                            <Skeleton className="h-9 w-20 rounded-[10px] bg-white/10" />
+                            <Skeleton className="h-9 w-20 rounded-none border border-[#3D3D3D] bg-white/10" />
                           </div>
                         ))}
                       </div>
                     ) : null}
 
                     {!catalogLoading && commodityItems.length === 0 ? (
-                      <div className="mt-5 rounded-[14px] border border-dashed border-white/12 bg-black/20 px-4 py-5 text-sm text-white/70">
+                      <div className="mt-5 rounded-none border border-dashed border-[#3D3D3D] bg-[#121212] px-4 py-5 text-sm text-white/70">
                         No essentials are available right now.
                       </div>
                     ) : null}
@@ -1865,7 +1867,7 @@ export function BookingCheckoutPage() {
                         return (
                           <div key={item.id} className={`flex items-center justify-between gap-4 py-4 ${disabled ? "opacity-55" : ""}`}>
                             <div className="flex min-w-0 items-center gap-4">
-                              <div className={`flex h-14 w-14 items-center justify-center rounded-[18px] ${frameClassName}`}>
+                              <div className={`flex h-14 w-14 items-center justify-center rounded-none border border-[#3D3D3D] ${frameClassName}`}>
                                 <Icon className="h-7 w-7" strokeWidth={2.1} />
                               </div>
                               <div className="min-w-0">
@@ -1879,18 +1881,18 @@ export function BookingCheckoutPage() {
                             </div>
 
                             {quantity > 0 ? (
-                              <div className="flex items-center gap-3 rounded-[10px] border border-white/10 bg-black/40 px-2 py-1">
-                                <button className="flex h-8 w-8 items-center justify-center rounded-[8px] text-white hover:bg-white/5" onClick={() => decrementAddon(item)} type="button">
+                              <div className="flex items-center gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] px-2 py-1">
+                                <button className="flex h-8 w-8 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#161616] text-white hover:bg-[#202029]" onClick={() => decrementAddon(item)} type="button">
                                   <Minus className="h-4 w-4" />
                                 </button>
                                 <span className="w-4 text-center text-base font-bold text-white">{quantity}</span>
-                                <button className="flex h-8 w-8 items-center justify-center rounded-[8px] text-white hover:bg-white/5" onClick={() => incrementAddon(item)} type="button">
+                                <button className="flex h-8 w-8 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#161616] text-white hover:bg-[#202029]" onClick={() => incrementAddon(item)} type="button">
                                   <Plus className="h-4 w-4" />
                                 </button>
                               </div>
                             ) : (
                               <button
-                                className="rounded-[10px] border border-white/15 bg-white/5 px-5 py-2 text-sm font-bold uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:bg-white/5 disabled:text-white/40"
+                                className="rounded-none bg-[var(--np-yellow)] px-5 py-2 text-sm font-bold uppercase tracking-[0.08em] text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90 disabled:cursor-not-allowed disabled:opacity-50"
                                 disabled={disabled}
                                 onClick={() => incrementAddon(item)}
                                 type="button"
@@ -1905,15 +1907,15 @@ export function BookingCheckoutPage() {
                   </div>
                 </div>
 
-                <div className="overflow-hidden rounded-[22px] border border-dashed border-[rgba(255,255,255,0.28)] bg-[#07070a] shadow-[0_20px_45px_rgba(0,0,0,0.24)]">
+                <div className="overflow-hidden rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[6px_6px_0px_#000000]">
                   <div className="p-6 md:p-8">
                     <div className="flex items-start justify-between gap-4">
-                      <h2 className="font-sectiontitle text-[22px] text-white md:text-[24px]">Add Services</h2>
+                      <h2 className="font-['Cirka',serif] text-[22px] tracking-tight text-white md:text-[24px]">Add Services</h2>
                       <StickerTag label="Convinience Rewritten" bg="#dc2626" className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]" text="#ffffff" rotate="rotate-[6deg]" />
                     </div>
 
                     {!catalogLoading && serviceItems.length === 0 ? (
-                      <div className="mt-5 rounded-[14px] border border-dashed border-white/12 bg-black/20 px-4 py-5 text-sm text-white/70">
+                      <div className="mt-5 rounded-none border border-dashed border-[#3D3D3D] bg-[#121212] px-4 py-5 text-sm text-white/70">
                         No stay upgrades are available right now.
                       </div>
                     ) : null}
@@ -1928,7 +1930,7 @@ export function BookingCheckoutPage() {
                         return (
                           <div key={item.id} className="flex items-center justify-between gap-4 py-4">
                             <div className="flex min-w-0 items-center gap-4">
-                              <div className={`flex h-14 w-14 items-center justify-center rounded-[18px] ${frameClassName}`}>
+                              <div className={`flex h-14 w-14 items-center justify-center rounded-none border border-[#3D3D3D] ${frameClassName}`}>
                                 <Icon className="h-7 w-7" strokeWidth={2.1} />
                               </div>
                               <div className="min-w-0">
@@ -1943,13 +1945,13 @@ export function BookingCheckoutPage() {
                             </div>
 
                             {quantity > 0 ? (
-                              <div className="flex items-center gap-3 rounded-[10px] border border-white/10 bg-black/40 px-2 py-1">
-                                <button className="flex h-8 w-8 items-center justify-center rounded-[8px] text-white hover:bg-white/5" onClick={() => decrementAddon(item)} type="button">
+                              <div className="flex items-center gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] px-2 py-1">
+                                <button className="flex h-8 w-8 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#161616] text-white hover:bg-[#202029]" onClick={() => decrementAddon(item)} type="button">
                                   <Minus className="h-4 w-4" />
                                 </button>
                                 <span className="w-4 text-center text-base font-bold text-white">{quantity}</span>
                                 <button
-                                  className="flex h-8 w-8 items-center justify-center rounded-[8px] text-white hover:bg-white/5 disabled:cursor-not-allowed disabled:text-white/25 disabled:hover:bg-transparent"
+                                  className="flex h-8 w-8 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#161616] text-white hover:bg-[#202029] disabled:cursor-not-allowed disabled:text-white/25 disabled:hover:bg-transparent"
                                   disabled={singleQuantity && quantity >= 1}
                                   onClick={() => incrementAddon(item)}
                                   type="button"
@@ -1959,7 +1961,7 @@ export function BookingCheckoutPage() {
                               </div>
                             ) : (
                               <button
-                                className="rounded-[10px] border border-white/15 bg-white/5 px-5 py-2 text-sm font-bold uppercase tracking-[0.08em] text-white"
+                                className="rounded-none bg-[var(--np-yellow)] px-5 py-2 text-sm font-bold uppercase tracking-[0.08em] text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
                                 onClick={() => incrementAddon(item)}
                                 type="button"
                               >
@@ -2014,19 +2016,19 @@ export function BookingCheckoutPage() {
       </div>
 
       <div className={`fixed inset-0 z-[60] transition ${showMobileSummary ? "pointer-events-auto bg-black/80" : "pointer-events-none bg-transparent"}`}>
-        <div className={`absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-[28px] border-t border-white/10 bg-[#07070a] transition-transform duration-300 ${showMobileSummary ? "translate-y-0" : "translate-y-full"}`}>
+        <div className={`absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-none border-t-2 border-[#3D3D3D] bg-[#161616] shadow-[0_-10px_30px_rgba(0,0,0,0.8)] transition-transform duration-300 ${showMobileSummary ? "translate-y-0" : "translate-y-full"}`}>
           <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
             <div>
               <p className="text-lg font-bold uppercase text-white">Booking details</p>
               <p className="text-xs uppercase tracking-[0.12em] text-white/45">Review the current price breakup</p>
             </div>
-            <button className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white" onClick={() => setShowMobileSummary(false)} type="button">
+            <button className="inline-flex h-9 w-9 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#121212] text-white hover:bg-[#202029]" onClick={() => setShowMobileSummary(false)} type="button">
               <X className="h-4 w-4" />
             </button>
           </div>
 
           <div className="space-y-4 overflow-y-auto px-5 py-5">
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-[14px] border border-white/10 bg-white/5 px-4 py-4">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-4">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-white/50">{isColiveBooking ? "Move-in" : "Check-in"}</p>
                 <p className="mt-1 text-base font-bold text-white">{formatDateLabel(draft.checkinDate)}</p>
@@ -2043,12 +2045,12 @@ export function BookingCheckoutPage() {
             </div>
 
             <div className="space-y-3">
-              <div className="rounded-[14px] border border-white/10 bg-white/5 px-4 py-4">
+              <div className="rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-4">
                 <p className="text-base font-bold text-white">{draft.colive?.propertyName || propertyHero.title}</p>
                 <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-white/45">{isColiveBooking ? "Koramangala, Bengaluru" : propertyHero.location}</p>
               </div>
               {draft.rooms.map((room) => (
-                <div key={room.roomTypeId} className="flex items-start justify-between gap-3 rounded-[14px] border border-white/10 bg-white/5 px-4 py-4">
+                <div key={room.roomTypeId} className="flex items-start justify-between gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-4">
                   <div>
                     <p className="font-semibold text-white">{room.title}</p>
                     <p className="text-xs text-white/55">
@@ -2060,7 +2062,7 @@ export function BookingCheckoutPage() {
               ))}
             </div>
 
-            <div className="space-y-2 rounded-[14px] border border-white/10 bg-white/5 px-4 py-4 text-sm text-white/82">
+            <div className="space-y-2 rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-4 text-sm text-white/82">
               <div className="flex items-center justify-between">
                 <p>Room charges</p>
                 <p className="font-bold text-white">{formatCurrency(roomSubtotal)}</p>
@@ -2082,12 +2084,12 @@ export function BookingCheckoutPage() {
                   <p className="text-xs uppercase tracking-[0.14em] text-white/45">{activeAddons.length === 0 ? "None" : `${activeAddons.length} selected`}</p>
                 </div>
                 {activeAddons.length === 0 ? (
-                  <p className="rounded-[12px] border border-dashed border-white/12 bg-black/20 px-3 py-3 text-xs text-white/55">
+                  <p className="rounded-none border border-dashed border-[#3D3D3D] bg-[#121212] px-3 py-3 text-xs text-white/55">
                     No extras added yet.
                   </p>
                 ) : (
                   activeAddons.map((addon) => (
-                    <div key={addon.productId} className="flex items-start justify-between gap-3 rounded-[12px] border border-white/10 bg-black/20 px-3 py-3">
+                    <div key={addon.productId} className="flex items-start justify-between gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] px-3 py-3">
                       <div>
                         <p className="font-semibold text-white">{addon.name}</p>
                         <p className="text-xs text-white/55">

@@ -2,142 +2,78 @@
 @import "tailwindcss";
 @import "react-day-picker/style.css";
 @import "../src/styles/theme.css";
+@import "../components/neopop/neopop.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
-@font-face {
-  font-family: "Bebas Neue";
-  src: url("/fonts/Bebas_Neue/BebasNeue-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Acme";
-  src: url("/fonts/Acme/Acme-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Nunito";
-  src: url("/fonts/Nunito/Nunito-VariableFont_wght.ttf") format("truetype");
-  font-weight: 200 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Nunito";
-  src: url("/fonts/Nunito/Nunito-Italic-VariableFont_wght.ttf") format("truetype");
-  font-weight: 200 900;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Varela Round";
-  src: url("/fonts/Varela_Round/VarelaRound-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Suez One";
-  src: url("/fonts/Suez_One/SuezOne-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Caveat";
-  src: url("/fonts/Caveat/Caveat-VariableFont_wght.ttf") format("truetype");
-  font-weight: 400 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Space Grotesk";
-  src: url("/fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf") format("truetype");
-  font-weight: 300 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Geologica";
-  src: url("/fonts/Geologica/Geologica-VariableFont_CRSV,SHRP,slnt,wght.ttf") format("truetype");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
-  --font-geologica: "Geologica", "Segoe UI", sans-serif;
-  --font-biorhyme: "Acme", "Trebuchet MS", sans-serif;
-  --font-sora: var(--font-geologica);
-  --font-encode: var(--font-geologica);
-  --font-suez: "Suez One", "Trebuchet MS", sans-serif;
-  --font-bebas: "Bebas Neue", "Trebuchet MS", sans-serif;
-  --vh-bg: #07070a;
-  --vh-bg-soft: #07070a;
-  --vh-surface: #1f1b1f;
-  --vh-surface-2: #12161d;
-  --vh-section-a: #07070a;
-  --vh-section-b: #07070a;
-  --vh-border: #3a4d63;
-  --vh-hot: #ff4c30;
-  --vh-pink: #c62828;
-  --vh-pink-soft: #8e1b1b;
-  --vh-cyan: #3a5f84;
-  --vh-ice: #f3eee6;
-  --vh-lime: #d7a64a;
-  --vh-amber: #d7a64a;
-  --vh-panel: rgba(255, 255, 255, 0.05);
-  --vh-panel-soft: rgba(255, 255, 255, 0.03);
-  --vh-panel-strong: rgba(15, 16, 26, 0.92);
-  --vh-chip: rgba(255, 255, 255, 0.06);
-  --vh-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.18);
-  --vh-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.28);
-  --background: #07070a;
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.54 0.2 28);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.45 0.08 250);
-  --secondary-foreground: oklch(0.97 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.82 0.12 75);
-  --accent-foreground: oklch(0.2 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --font-gilroy: "Gilroy", "Urbanist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-cirka: "Cirka", "Libre Bodoni", Georgia, serif;
+  --font-geologica: var(--font-gilroy);
+  --font-biorhyme: var(--font-cirka);
+  --font-sora: var(--font-gilroy);
+  --font-encode: var(--font-gilroy);
+  --font-suez: var(--font-cirka);
+  --font-bebas: var(--font-cirka);
+  --font-space-grotesk: var(--font-gilroy);
+  --font-body: var(--font-gilroy);
+  --font-display: var(--font-cirka);
+  --font-utility: var(--font-gilroy);
+
+  --vh-bg: #0d0d0d;
+  --vh-bg-soft: #0d0d0d;
+  --vh-surface: #121212;
+  --vh-surface-2: #161616;
+  --vh-section-a: #0d0d0d;
+  --vh-section-b: #121212;
+  --vh-border: #3d3d3d;
+  --vh-hot: #ffcb45;
+  --vh-pink: #ff426f;
+  --vh-pink-soft: #ee4d37;
+  --vh-cyan: #3f6fd9;
+  --vh-ice: #ffffff;
+  --vh-lime: #3bffad;
+  --vh-amber: #ffcb45;
+  --vh-panel: #161616;
+  --vh-panel-soft: #121212;
+  --vh-panel-strong: #0d0d0d;
+  --vh-chip: #1f1f1f;
+  --vh-shadow: 3px 3px 0px #3d3d3d;
+  --vh-shadow-lg: 6px 6px 0px #3d3d3d;
+  --background: #0d0d0d;
+  --foreground: #ffffff;
+  --card: #161616;
+  --card-foreground: #ffffff;
+  --popover: #121212;
+  --popover-foreground: #ffffff;
+  --primary: #ffcb45;
+  --primary-foreground: #000000;
+  --secondary: #161616;
+  --secondary-foreground: #ffffff;
+  --muted: #1f1f1f;
+  --muted-foreground: #d2d2d2;
+  --accent: #3bffad;
+  --accent-foreground: #000000;
+  --destructive: #ee4d37;
+  --border: #3d3d3d;
+  --input: #121212;
+  --ring: #3bffad;
+  --chart-1: #ffcb45;
+  --chart-2: #3bffad;
+  --chart-3: #3f6fd9;
+  --chart-4: #ff426f;
+  --chart-5: #ee4d37;
+  --radius: 0px;
+  --sidebar: #0d0d0d;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffcb45;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #161616;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #3d3d3d;
+  --sidebar-ring: #3bffad;
   --motion-duration-instant: 0ms;
   --motion-duration-feedback: 100ms;
   --motion-duration-fast: 150ms;
@@ -656,18 +592,15 @@ select optgroup {
   }
 
   .vh-card {
-    @apply rounded-[12px] border-2 border-[var(--vh-border)] bg-[var(--vh-surface)] shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.18)];
+    @apply rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[6px_6px_0px_#000000];
   }
 
   .vh-panel {
-    @apply rounded-[24px] border border-white/12;
-    background: var(--vh-panel);
-    box-shadow: var(--vh-shadow);
+    @apply rounded-none border border-[#3D3D3D] bg-[#161616] shadow-[6px_6px_0px_#000000];
   }
 
   .vh-panel-soft {
-    @apply rounded-[20px] border border-white/10;
-    background: var(--vh-panel-soft);
+    @apply rounded-none border border-[#3D3D3D] bg-[#121212];
   }
 
   .vh-bento-tile {
@@ -677,28 +610,24 @@ select optgroup {
   }
 
   .vh-chip {
-    @apply inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/72;
-    background: var(--vh-chip);
+    @apply inline-flex items-center gap-2 rounded-none border border-[#3D3D3D] bg-[#1F1F1F] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white;
   }
 
   .vh-icon-pill {
-    @apply inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/78;
-    background: var(--vh-chip);
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#1F1F1F] text-white;
   }
 
   .vh-outline-button {
-    @apply inline-flex items-center justify-center rounded-[4px] border-2 border-white/30 bg-white/10 px-4 py-2 text-sm font-bold uppercase text-white;
+    @apply inline-flex items-center justify-center rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-2 text-sm font-bold uppercase text-white hover:bg-[#202029];
   }
 
   .vh-primary-button {
-    @apply inline-flex items-center justify-center rounded-[4px] bg-[var(--vh-pink)] px-6 py-3 text-sm font-bold uppercase text-white shadow-[4px_4px_0px_0px_var(--vh-border)];
+    @apply inline-flex items-center justify-center rounded-none bg-[var(--np-yellow)] border border-[var(--np-yellow)] px-6 py-3 text-sm font-bold uppercase text-black shadow-[4px_4px_0px_#000000] hover:bg-[var(--np-yellow)]/90;
   }
 
   .vh-cta-button {
-    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[14px] bg-[var(--vh-pink)] px-6 py-3 text-center text-[18px] font-bold uppercase leading-7 text-white transition-all outline-none hover:bg-[#8e1b1b] focus-visible:ring-[3px] focus-visible:ring-white/30;
-    font-family: var(--font-geologica);
-    box-shadow: 4px 4px 0 0 rgba(128, 128, 128, 0.5);
-    letter-spacing: 0.9px;
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none bg-[var(--np-yellow)] border border-[var(--np-yellow)] px-6 py-3 text-center text-[18px] font-bold uppercase leading-7 text-black shadow-[4px_4px_0px_#000000] transition-all outline-none hover:bg-[var(--np-yellow)]/90 focus-visible:ring-[3px] focus-visible:ring-[var(--np-yellow)];
+    font-family: var(--font-gilroy);
   }
 
   .vh-motion-press {
@@ -799,7 +728,7 @@ select optgroup {
   }
 
   .vh-input {
-    @apply w-full rounded-[4px] border-2 border-[var(--vh-border)] bg-[#1b1d27] px-3 py-2 text-sm text-white outline-none focus:border-[var(--vh-pink)] focus:shadow-[0_0_0_3px_rgba(198,40,40,0.3)] transition-all;
+    @apply w-full rounded-none border border-[#3D3D3D] bg-[#121212] px-3 py-2 text-sm text-white outline-none focus:border-[var(--np-yellow)] transition-all;
   }
 
   .vh-rot-1 {

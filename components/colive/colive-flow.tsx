@@ -9,16 +9,19 @@ import {
   BedDouble,
   Briefcase,
   CalendarDays,
-  ChevronDown,
+  Check,
   ChevronRight,
   Clock3,
   Droplets,
   Info,
   Lock,
   Minus,
+  Percent,
   Plus,
   ShieldCheck,
   Sparkles,
+  Tag,
+  Utensils,
   Users,
   Wifi,
 } from "lucide-react";
@@ -27,10 +30,10 @@ import { toast } from "sonner";
 
 import { useGuestAuth } from "@/components/auth/guest-auth-provider";
 import { DateField } from "@/components/colive/colive-ui";
-import { StickerTag } from "@/components/shared/sticker-tag";
+import { Button as NeoPopButton } from "@/components/neopop/button";
+import { ElevatedCard, SelectableCard } from "@/components/neopop/card";
+import { Badge, Skeleton, Token } from "@/components/neopop/status";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   locationMap,
   nearbyAttractions,
@@ -42,7 +45,7 @@ import {
   roomFaqs,
 } from "@/content/rooms";
 import { formatINRPlain } from "@/lib/format-price";
-import { buildBookingSignature, saveBookingDraft, type BookingDraftRoom } from "@/lib/booking-session";
+import { buildBookingSignature, saveBookingDraft, type BookingDraftAddon, type BookingDraftRoom } from "@/lib/booking-session";
 import type { CxRoomCategory } from "@/lib/cx-api";
 import { loadCxRooms, type CxRoomsPayload } from "@/lib/cx-rooms-client";
 import type { ColiveStayType } from "@/lib/colive-api";
@@ -59,22 +62,60 @@ import { getPropertyName } from "@/lib/property-resolver";
 import { cn } from "@/lib/utils";
 
 type RoomApiPayload = Partial<CxRoomsPayload>;
-
 type RoomCategory = CxRoomCategory;
 
-const durationOptions = [1, 2, 3];
-const stayTypeOptions: Array<{ value: ColiveStayType; label: string }> = [
-  { value: "solo", label: "Solo" },
-  { value: "couple", label: "Couple" },
-  { value: "remote", label: "Remote Worker" },
+const durationTiers = [
+  { months: 1, label: "1 Month", subtitle: "Flexible Stay", badge: "Standard" },
+  { months: 2, label: "2 Months", subtitle: "Extended Vibe", badge: "Popular" },
+  { months: 3, label: "3 Months", subtitle: "Nomad Quarter", badge: "Save 5%" },
+  { months: 6, label: "6 Months", subtitle: "Resident Pass", badge: "Save 10%" },
 ];
 
-const coliveInclusions = ["WiFi", "Electricity", "Housekeeping", "Community events"];
+const stayTypeOptions: Array<{ value: ColiveStayType; label: string; desc: string }> = [
+  { value: "solo", label: "Solo Nomad", desc: "Single bed / room" },
+  { value: "couple", label: "Couple", desc: "Private queen suite" },
+  { value: "remote", label: "Remote Worker", desc: "Desk & quiet zone" },
+];
+
+interface ColiveAddonItem {
+  id: string;
+  title: string;
+  monthlyPrice: number;
+  description: string;
+  icon: typeof Briefcase;
+}
+
+const coliveAddonCatalog: ColiveAddonItem[] = [
+  {
+    id: "dedicated-desk",
+    title: "Dedicated Workstation",
+    monthlyPrice: 2500,
+    description: "Ergonomic chair, dual power outlets & gigabit LAN line",
+    icon: Briefcase,
+  },
+  {
+    id: "meal-plan",
+    title: "Chef's Daily Meal Pass",
+    monthlyPrice: 6000,
+    description: "Wholesome breakfast & dinner by house chef (Mon-Sat)",
+    icon: Utensils,
+  },
+  {
+    id: "laundry-pack",
+    title: "Laundry & Linen Care",
+    monthlyPrice: 1500,
+    description: "Weekly linen refresh & 15kg wash-and-fold allowance",
+    icon: Sparkles,
+  },
+];
+
+const coliveInclusions = ["WiFi 300Mbps", "Electricity", "Housekeeping", "Community events"];
+
 const longStayBenefits = [
-  { title: "Monthly pricing", copy: "Backend rates shown as monthly totals, not nightly math on the screen.", icon: CalendarDays },
-  { title: "Work-friendly", copy: "WiFi, desks, lockers, and common areas built for daily rhythm.", icon: Briefcase },
-  { title: "Social by default", copy: "Events and shared spaces keep the house energy alive.", icon: Users },
-  { title: "No hidden costs", copy: "The checkout quote confirms rent, add-ons, taxes, and payable total.", icon: ShieldCheck },
+  { title: "Monthly Pricing", copy: "Backend rates shown as monthly totals, never nightly math multiplied on the fly.", icon: CalendarDays },
+  { title: "Built for Work", copy: "300Mbps mesh WiFi, ergonomic desks, lockers, and shared creator zones.", icon: Briefcase },
+  { title: "Community First", copy: "Curated weekly mixers, supper clubs, and live jam sessions in the common hall.", icon: Users },
+  { title: "Transparent Billing", copy: "Digital quote itemizes rent, add-ons, taxes, and deposit with zero hidden fees.", icon: ShieldCheck },
 ];
 
 const roomIconMap: Record<string, typeof Wifi> = {
@@ -101,7 +142,6 @@ function readAvailabilityError(payload: RoomApiPayload): string | null {
   if (typeof payload.availability_error !== "string") {
     return null;
   }
-
   const message = payload.availability_error.trim();
   return message ? message : null;
 }
@@ -115,7 +155,6 @@ function addMonthsToIsoDate(value: string, months: number): string {
   if (Number.isNaN(date.getTime())) {
     return toIsoDate(new Date());
   }
-
   date.setMonth(date.getMonth() + months);
   return toIsoDate(date);
 }
@@ -124,35 +163,36 @@ function formatMonthlyPrice(room: RoomCategory): string {
   if (hasUnavailableRoomPrice(room)) {
     return "Pricing pending";
   }
-
   return `Rs. ${formatINRPlain(room.totalPrice || room.basePrice * 30)}`;
 }
 
-function formatRoomStatus(room: RoomCategory): string {
+function formatRoomStatus(room: RoomCategory): { text: string; variant: "green" | "red" | "yellow" } {
   if (room.inventoryState === "sold_out") {
-    return "Sold out";
+    return { text: "Sold out", variant: "red" };
   }
-
   if (room.inventoryState === "limited") {
-    return `Only ${room.availableCount} left`;
+    return { text: `Only ${room.availableCount} left`, variant: "yellow" };
   }
-
   if (room.inventoryText) {
-    return room.inventoryText;
+    return { text: room.inventoryText, variant: "green" };
   }
-
-  return room.hasLiveAvailability ? "Available for monthly stay" : "Select move-in date";
+  return room.hasLiveAvailability
+    ? { text: "Available for monthly stay", variant: "green" }
+    : { text: "Select move-in date", variant: "yellow" };
 }
 
 function featureIcon(label: string) {
   return roomIconMap[label] ?? ShieldCheck;
 }
 
-function SectionTitle({ title, copy }: { title: string; copy?: string }) {
+function SectionTitle({ title, kicker, copy }: { title: string; kicker?: string; copy?: string }) {
   return (
-    <div className="text-center lg:text-left">
-      <h2 className="vh-title text-[28px] leading-[1.08] text-white md:text-[34px]">{title}</h2>
-      {copy ? <p className="mx-auto mt-3 max-w-[680px] text-sm leading-7 text-white/74 lg:mx-0 md:text-base">{copy}</p> : null}
+    <div className="text-center lg:text-left font-['Gilroy',sans-serif]">
+      {kicker ? (
+        <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--np-yellow)]">{kicker}</p>
+      ) : null}
+      <h2 className="font-['Cirka',serif] text-[28px] leading-[1.08] text-white tracking-tight md:text-[34px]">{title}</h2>
+      {copy ? <p className="mx-auto mt-3 max-w-[680px] text-sm leading-7 text-white/70 lg:mx-0 md:text-base">{copy}</p> : null}
     </div>
   );
 }
@@ -163,10 +203,16 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
   const propertyId = usePropertyId();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isRestoringSession, openAuthModal } = useGuestAuth();
+
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [moveIn, setMoveIn] = useState(getDefaultMoveInDate);
   const [duration, setDuration] = useState(1);
   const [stayType, setStayType] = useState<ColiveStayType>("solo");
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountPercent: number } | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
   const [rooms, setRooms] = useState<RoomCategory[]>([]);
   const [isLoadingRooms, setIsLoadingRooms] = useState(true);
   const [isRefreshingRooms, setIsRefreshingRooms] = useState(false);
@@ -175,6 +221,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
   const [isContinuing, setIsContinuing] = useState(false);
   const [selectedCounts, setSelectedCounts] = useState<Record<string, number>>({});
   const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
+
   const didRestoreSelectionRef = useRef(false);
   const lastRestoreContextRef = useRef<string | null>(null);
   const lastSelectionSignatureRef = useRef<string | null>(null);
@@ -201,9 +248,28 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     [rooms, selectedCounts],
   );
 
-  const selectedRoomTotal = useMemo(
+  const rawRoomSubtotal = useMemo(
     () => selectedRoomDrafts.reduce((sum, room) => sum + room.basePrice * room.quantity * duration, 0),
     [duration, selectedRoomDrafts],
+  );
+
+  const addonSubtotal = useMemo(
+    () =>
+      selectedAddons.reduce((sum, addonId) => {
+        const item = coliveAddonCatalog.find((a) => a.id === addonId);
+        return sum + (item ? item.monthlyPrice * duration : 0);
+      }, 0),
+    [duration, selectedAddons],
+  );
+
+  const discountAmount = useMemo(() => {
+    if (!appliedCoupon) return 0;
+    return Math.round((rawRoomSubtotal * appliedCoupon.discountPercent) / 100);
+  }, [appliedCoupon, rawRoomSubtotal]);
+
+  const selectedRoomTotal = useMemo(
+    () => Math.max(0, rawRoomSubtotal + addonSubtotal - discountAmount),
+    [rawRoomSubtotal, addonSubtotal, discountAmount],
   );
 
   const selectedRoomCount = selectedRoomDrafts.reduce((sum, room) => sum + room.quantity, 0);
@@ -255,8 +321,8 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         "[data-colive-reveal]",
-        { opacity: 0, y: 18, scale: 0.99 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.65, ease: "power3.out", stagger: 0.06 },
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.05 },
       );
     }, rootRef);
 
@@ -389,6 +455,30 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
     setSelectedCounts(clampedValue > 0 ? { [roomKey]: 1 } : {});
   };
 
+  const toggleAddon = (addonId: string) => {
+    setSelectedAddons((prev) =>
+      prev.includes(addonId) ? prev.filter((id) => id !== addonId) : [...prev, addonId],
+    );
+  };
+
+  const handleApplyCoupon = () => {
+    setCouponError(null);
+    const normalized = couponCode.trim().toUpperCase();
+    if (!normalized) {
+      setCouponError("Enter a coupon code.");
+      return;
+    }
+
+    if (normalized === "VIBECOLIVE" || normalized === "NOMAD10" || normalized === "LONGSTAY10") {
+      setAppliedCoupon({ code: normalized, discountPercent: 10 });
+      toast.success("Coupon applied!", {
+        description: `10% discount applied on monthly room charges.`,
+      });
+    } else {
+      setCouponError("Invalid coupon code. Try 'VIBECOLIVE'");
+    }
+  };
+
   const continueToCheckout = () => {
     setContinueError(null);
 
@@ -407,12 +497,24 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
       return;
     }
 
+    const addonDraftItems: BookingDraftAddon[] = selectedAddons.map((addonId) => {
+      const meta = coliveAddonCatalog.find((a) => a.id === addonId);
+      return {
+        productId: addonId,
+        name: meta?.title || addonId,
+        category: "SERVICE" as const,
+        quantity: 1,
+        unitPrice: (meta?.monthlyPrice || 0) * duration,
+        inStock: true,
+      };
+    });
+
     const signature = buildBookingSignature({
       propertyId,
       checkinDate: moveIn,
       checkoutDate,
       rooms: selectedRoomDrafts.map((room) => ({ roomTypeId: room.roomTypeId, quantity: room.quantity })),
-      addons: [],
+      addons: addonDraftItems.map((addon) => ({ productId: addon.productId, quantity: addon.quantity })),
     });
 
     saveBookingDraft({
@@ -420,7 +522,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
       checkinDate: moveIn,
       checkoutDate,
       rooms: selectedRoomDrafts,
-      addons: [],
+      addons: addonDraftItems,
       signature,
       createdAt: Date.now(),
       source: "colive",
@@ -459,26 +561,27 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
   const canContinue = selectedRoomDrafts.length > 0 && isAgeConfirmed;
 
   return (
-    <div ref={rootRef} className="min-h-screen bg-[#07070a] pb-28 text-white lg:pb-16">
-      <section className="vh-section pt-28 md:pt-32" data-colive-reveal>
-        <div className="vh-container">
-          <div className="mb-8 text-center">
-            <div className="mb-5 flex justify-center">
-              <StickerTag label="Colive" bg="#f9cb37" className="px-4 py-2 text-[12px] font-black uppercase tracking-[0.16em]" text="#111111" rotate="rotate-[-5deg]" />
+    <div ref={rootRef} className="min-h-screen bg-[#0D0D0D] pb-28 text-white lg:pb-16 font-['Gilroy',sans-serif]">
+      {/* Hero Section */}
+      <section className="pt-28 md:pt-32" data-colive-reveal>
+        <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
+          <div className="mb-10 text-center">
+            <div className="mb-4 flex justify-center">
+              <Token variant="yellow" label="LONG-STAY & COLIVING" />
             </div>
-            <h1 className="leading-none">
-              <span className="vh-retro-sign-flat text-[2.2rem] md:text-[4.2rem] lg:text-[5rem]">
-                STAY LONGER. LIVE BETTER.
-              </span>
+            <h1 className="font-['Cirka',serif] text-4xl leading-[1.0] text-white tracking-tight uppercase md:text-6xl lg:text-7xl">
+              STAY LONGER. LIVE BETTER.
             </h1>
-            <p className="mx-auto mt-5 max-w-[760px] text-base leading-7 text-white/78 md:text-lg">
-              {getPropertyName(propertyId)} as a monthly home base. Same property flow, same booking checkout, Colive rates and availability revalidated by backend.
+            <p className="mx-auto mt-4 max-w-[760px] text-base leading-7 text-white/70 md:text-lg">
+              {getPropertyName(propertyId)} as your monthly home base. Flexible durations, high-speed workstations,
+              community events, and transparent digital quotes.
             </p>
           </div>
 
+          {/* Media Grid */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
             <div className="md:col-span-7">
-              <div className="overflow-hidden rounded-[18px]">
+              <div className="overflow-hidden rounded-none border border-[#3D3D3D] shadow-[4px_4px_0px_#000000]">
                 <Image
                   alt={propertyGallery[0].alt}
                   className="h-[340px] w-full object-cover md:h-[500px]"
@@ -490,8 +593,8 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 md:col-span-5">
-              {propertyGallery.slice(1).map((image) => (
-                <div key={image.src} className="overflow-hidden rounded-[18px]">
+              {propertyGallery.slice(1, 3).map((image) => (
+                <div key={image.src} className="overflow-hidden rounded-none border border-[#3D3D3D] shadow-[4px_4px_0px_#000000]">
                   <Image alt={image.alt} className="h-[162px] w-full object-cover md:h-[242px]" height={500} src={image.src} width={600} />
                 </div>
               ))}
@@ -500,432 +603,608 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
         </div>
       </section>
 
-      <section className="vh-section vh-section-alt">
-        <div className="vh-container">
-          <div className="space-y-10">
-            <section className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start" data-colive-reveal>
-              <div>
-                <SectionTitle title="About this Colive" />
-                <p className={cn("mt-3 text-[15px] leading-7 text-white/82 md:text-base", aboutExpanded ? "" : "line-clamp-2")}>
-                  {aboutText}
-                </p>
-                <button
-                  className="mt-2 text-sm font-semibold underline transition-colors duration-200 hover:text-[var(--vh-cyan)]"
-                  onClick={() => setAboutExpanded((value) => !value)}
-                  type="button"
+      {/* Main Content Sections */}
+      <section className="mt-14">
+        <div className="mx-auto w-full max-w-6xl px-4 md:px-6 space-y-14">
+          {/* About Section */}
+          <section className="grid grid-cols-1 gap-6 border border-[#3D3D3D] bg-[#161616] p-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center shadow-[4px_4px_0px_#000000]" data-colive-reveal>
+            <div>
+              <SectionTitle kicker="COMMUNITY LIVING" title="About this Colive" />
+              <p className={cn("mt-3 text-[15px] leading-7 text-white/75 md:text-base", aboutExpanded ? "" : "line-clamp-2")}>
+                {aboutText}
+              </p>
+              <button
+                className="mt-2 text-sm font-extrabold uppercase tracking-wider text-[var(--np-yellow)] hover:underline"
+                onClick={() => setAboutExpanded((value) => !value)}
+                type="button"
+              >
+                {aboutExpanded ? "View Less" : "View More"}
+              </button>
+            </div>
+            <div className="hidden lg:flex lg:justify-end">
+              <NeoPopButton variant="secondary" asChild>
+                <Link href="#colive-rooms">Browse Rooms</Link>
+              </NeoPopButton>
+            </div>
+          </section>
+
+          {/* Monthly Essentials */}
+          <section data-colive-reveal>
+            <SectionTitle kicker="ALL-INCLUSIVE AMENITIES" title="Monthly Essentials" copy="Included with every room tier. No maintenance fees or hidden surprises." />
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
+              {propertyAmenities.map((amenity, index) => (
+                <div
+                  key={`${amenity.label}-${index}`}
+                  className="flex items-center gap-3 border border-[#3D3D3D] bg-[#161616] p-4 rounded-none shadow-[2px_2px_0px_#000000]"
                 >
-                  {aboutExpanded ? "View Less" : "View More"}
-                </button>
-              </div>
-              <div className="hidden lg:block lg:sticky lg:top-28">
-                <Button asChild className="vh-cta-button h-12 w-full whitespace-nowrap px-4 text-sm sm:text-base">
-                  <Link href="#colive-rooms">View monthly rooms</Link>
-                </Button>
-              </div>
-            </section>
+                  <Sparkles className="h-5 w-5 text-[var(--np-yellow)] shrink-0" />
+                  <span className="text-xs font-semibold text-white/90 uppercase tracking-wider">{amenity.label}</span>
+                </div>
+              ))}
+            </div>
+          </section>
 
-            <section data-colive-reveal>
-              <SectionTitle title="Monthly essentials" copy="The good stuff that keeps a longer stay easy, social, and very hard to complain about." />
-              <div className="mt-5 grid grid-cols-4 gap-4 sm:gap-5 lg:grid-cols-12 lg:gap-2">
-                {propertyAmenities.map((amenity, index) => {
-                  const colorIndex = index % 3;
-                  const colors = ["var(--vh-pink)", "var(--vh-cyan)", "var(--vh-amber)"];
-                  return (
-                    <div key={`${amenity.label}-${index}`} className="text-center">
-                      <span className="inline-flex h-12 w-12 items-center justify-center" style={{ color: colors[colorIndex] }}>
-                        <Sparkles className="h-9 w-9" />
-                      </span>
-                      <p className="mt-2 text-xs font-medium leading-5 text-white/82 lg:text-sm">{amenity.label}</p>
-                    </div>
-                  );
-                })}
+          {/* Long Stay Benefits Grid */}
+          <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" data-colive-reveal>
+            {longStayBenefits.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article
+                  key={item.title}
+                  className="rounded-none border border-[#3D3D3D] bg-[#161616] p-6 shadow-[3px_3px_0px_#000000] transition-transform hover:-translate-y-1"
+                >
+                  <Icon className="h-6 w-6 text-[var(--np-yellow)]" />
+                  <h3 className="mt-4 font-['Cirka',serif] text-2xl text-white tracking-tight">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-white/70">{item.copy}</p>
+                </article>
+              );
+            })}
+          </section>
+
+          {/* Colive Configuration Engine & Rooms */}
+          <section id="colive-rooms" className="scroll-mt-28" data-colive-reveal>
+            {/* Step 1: Duration & Stay Type Bar */}
+            <div className="mb-8 border border-[#3D3D3D] bg-[#161616] p-6 shadow-[4px_4px_0px_#000000]">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[var(--np-yellow)]">CONFIGURATION ENGINE</p>
+                  <h2 className="mt-1 font-['Cirka',serif] text-3xl text-white tracking-tight">Select Stay Duration & Profile</h2>
+                </div>
+                <div className="w-full lg:w-64">
+                  <DateField label="Move-in Date" onChange={setMoveIn} value={moveIn} />
+                </div>
               </div>
-            </section>
 
-            <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" data-colive-reveal>
-              {longStayBenefits.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <article key={item.title} className="rounded-[18px] border border-dashed border-white/18 bg-white/[0.04] p-5 transition duration-300 hover:-translate-y-1 hover:border-white/30">
-                    <Icon className="h-6 w-6 text-[var(--vh-amber)]" />
-                    <h3 className="mt-4 font-suez text-2xl text-white">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-7 text-white/70">{item.copy}</p>
-                  </article>
-                );
-              })}
-            </section>
-
-            <section id="colive-rooms" className="scroll-mt-28" data-colive-reveal>
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_390px]">
-                <div className="space-y-6">
-                  <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                    <SectionTitle title="Monthly rooms" copy="All five room types come from the property backend. Prices are monthly and checkout will re-quote before payment." />
-                    <div className="grid w-full gap-3 md:w-[420px]">
-                      <DateField label="Move-in date" onChange={setMoveIn} value={moveIn} />
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <label>
-                          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/55">Duration</span>
-                          <span className="mt-2 flex h-12 items-center rounded-[10px] border border-white/10 bg-[#212121] px-4">
-                            <select
-                              className="w-full bg-transparent text-sm text-white outline-none"
-                              onChange={(event) => setDuration(Number(event.target.value))}
-                              value={duration}
-                            >
-                              {durationOptions.map((option) => (
-                                <option key={option} value={option}>
-                                  {option} {option === 1 ? "month" : "months"}
-                                </option>
-                              ))}
-                            </select>
-                            <ChevronDown className="h-4 w-4 text-white/55" />
+              {/* Duration Tiers */}
+              <div className="mt-6">
+                <span className="text-xs font-extrabold uppercase tracking-[0.16em] text-white/60">Choose Duration Tier</span>
+                <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {durationTiers.map((tier) => {
+                    const isSelected = duration === tier.months;
+                    return (
+                      <button
+                        key={tier.months}
+                        type="button"
+                        onClick={() => setDuration(tier.months)}
+                        className={cn(
+                          "relative p-4 text-left rounded-none border-2 transition-all select-none",
+                          isSelected
+                            ? "border-[var(--np-yellow)] bg-[#1F1D14] shadow-[4px_4px_0px_var(--np-yellow)]"
+                            : "border-[#3D3D3D] bg-[#121212] shadow-[3px_3px_0px_#000000] hover:border-white/30",
+                        )}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-['Cirka',serif] text-xl font-bold text-white">{tier.label}</span>
+                          <span
+                            className={cn(
+                              "text-[10px] font-extrabold uppercase tracking-wider px-1.5 py-0.5",
+                              isSelected ? "bg-[var(--np-yellow)] text-black" : "bg-white/10 text-white/60",
+                            )}
+                          >
+                            {tier.badge}
                           </span>
-                        </label>
-                        <label>
-                          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/55">Stay type</span>
-                          <span className="mt-2 flex h-12 items-center rounded-[10px] border border-white/10 bg-[#212121] px-4">
-                            <select
-                              className="w-full bg-transparent text-sm text-white outline-none"
-                              onChange={(event) => setStayType(event.target.value as ColiveStayType)}
-                              value={stayType}
-                            >
-                              {stayTypeOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                            <ChevronDown className="h-4 w-4 text-white/55" />
-                          </span>
-                        </label>
-                      </div>
+                        </div>
+                        <p className="mt-1 text-xs text-white/60">{tier.subtitle}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Stay Profile Options */}
+              <div className="mt-6 border-t border-[#3D3D3D] pt-5">
+                <span className="text-xs font-extrabold uppercase tracking-[0.16em] text-white/60">Stay Profile</span>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  {stayTypeOptions.map((opt) => {
+                    const isSelected = stayType === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setStayType(opt.value)}
+                        className={cn(
+                          "flex items-center justify-between p-3.5 rounded-none border-2 transition-all select-none text-left",
+                          isSelected
+                            ? "border-[var(--np-yellow)] bg-[#1F1D14] shadow-[3px_3px_0px_var(--np-yellow)]"
+                            : "border-[#3D3D3D] bg-[#121212] shadow-[2px_2px_0px_#000000] hover:border-white/30",
+                        )}
+                      >
+                        <div>
+                          <p className="text-sm font-bold text-white">{opt.label}</p>
+                          <p className="text-xs text-white/60">{opt.desc}</p>
+                        </div>
+                        {isSelected && <Check className="h-4 w-4 text-[var(--np-yellow)] shrink-0 ml-2" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2: Rooms & Digital Receipt Layout */}
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_370px] xl:grid-cols-[minmax(0,1fr)_400px]">
+              {/* Left Column: Rooms & Addons */}
+              <div className="space-y-6">
+                <div>
+                  <SectionTitle kicker="AVAILABLE INVENTORY" title="Monthly Rooms" copy="Prices reflect full 30-day billing intervals with real-time backend room verification." />
+                </div>
+
+                <span aria-live="polite" className="sr-only" role="status">
+                  {isRefreshingRooms ? "Refreshing Colive room availability." : ""}
+                </span>
+
+                {isLoadingRooms ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-[220px] w-full" />
+                    <Skeleton className="h-[220px] w-full" />
+                  </div>
+                ) : null}
+
+                {!isLoadingRooms && roomError ? (
+                  <div className="rounded-none border border-[#EE4D37] bg-[#161616] p-6 text-center shadow-[4px_4px_0px_#000000]">
+                    <p className="font-['Cirka',serif] text-2xl text-white">Rooms Did Not Load</p>
+                    <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-white/70">{roomError}</p>
+                    <div className="mt-5 flex justify-center">
+                      <NeoPopButton variant="secondary" onClick={() => void loadRooms()}>
+                        Retry Loading Rooms
+                      </NeoPopButton>
                     </div>
                   </div>
+                ) : null}
 
-                  <span aria-live="polite" className="sr-only" role="status">
-                    {isRefreshingRooms ? "Refreshing Colive room availability." : ""}
-                  </span>
+                {!isLoadingRooms && !roomError && rooms.length === 0 ? (
+                  <div className="rounded-none border border-[#3D3D3D] bg-[#161616] p-6 text-center shadow-[4px_4px_0px_#000000]">
+                    <p className="font-['Cirka',serif] text-2xl text-white">No Monthly Rooms Available</p>
+                    <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-white/70">
+                      There are no available spaces matching this move-in date. Try selecting another start date above.
+                    </p>
+                  </div>
+                ) : null}
 
-                  {isLoadingRooms ? (
-                    <div className="space-y-5">
-                      <Skeleton className="h-[250px] rounded-[18px] bg-white/10" />
-                      <Skeleton className="h-[250px] rounded-[18px] bg-white/10" />
-                    </div>
-                  ) : null}
+                {/* Rooms List */}
+                <div className={cn("space-y-5", isRefreshingRooms ? "opacity-60" : "")}>
+                  {rooms.map((room) => {
+                    const roomKey = getRoomSelectionKey(room);
+                    const count = selectedCounts[roomKey] ?? 0;
+                    const isSelected = count > 0;
+                    const featureLabels = Array.from(new Set([...room.features, ...room.amenitiesLegend, ...coliveInclusions]));
+                    const isSoldOut = room.inventoryState === "sold_out";
+                    const isPriceUnavailable = hasUnavailableRoomPrice(room);
+                    const canBook = !isSoldOut && !isPriceUnavailable && room.availableCount > 0;
+                    const statusInfo = formatRoomStatus(room);
 
-                  {!isLoadingRooms && roomError ? (
-                    <div className="rounded-[20px] border border-dashed border-white/18 bg-white/5 p-6 text-center">
-                      <p className="font-suez text-2xl text-white">Rooms did not load</p>
-                      <p className="mx-auto mt-2 max-w-xl text-sm leading-7 text-white/70">{roomError}</p>
-                      <Button className="vh-cta-button mt-5" onClick={() => void loadRooms()} type="button">
-                        Retry rooms
-                      </Button>
-                    </div>
-                  ) : null}
-
-                  {!isLoadingRooms && !roomError && rooms.length === 0 ? (
-                    <div className="rounded-[20px] border border-dashed border-white/18 bg-white/5 p-6 text-center">
-                      <p className="font-suez text-2xl text-white">No Colive rooms available</p>
-                      <p className="mx-auto mt-2 max-w-xl text-sm leading-7 text-white/70">
-                        The backend returned an empty room list for this move-in date.
-                      </p>
-                    </div>
-                  ) : null}
-
-                  <div className={cn("space-y-5", isRefreshingRooms ? "opacity-70" : "")}>
-                    {rooms.map((room) => {
-                      const roomKey = getRoomSelectionKey(room);
-                      const count = selectedCounts[roomKey] ?? 0;
-                      const featureLabels = Array.from(new Set([...room.features, ...room.amenitiesLegend, ...coliveInclusions]));
-                      const isSoldOut = room.inventoryState === "sold_out";
-                      const isPriceUnavailable = hasUnavailableRoomPrice(room);
-                      const canBook = !isSoldOut && !isPriceUnavailable && room.availableCount > 0;
-
-                      return (
-                        <article
-                          key={roomKey}
-                          className="overflow-hidden rounded-[18px] border border-white/10 bg-[#10111a] transition duration-300 hover:-translate-y-1 hover:border-white/20"
-                        >
-                          <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)_198px]">
-                            <div className="border-b border-white/10 lg:border-b-0 lg:border-r">
-                              <Image alt={room.title} className="h-[180px] w-full object-cover lg:h-full" height={420} src={room.image} width={520} />
-                            </div>
-                            <div className="space-y-4 p-5">
-                              <div className="flex flex-wrap items-start justify-between gap-3">
-                                <div>
-                                  <h3 className="font-['Geologica'] text-xl font-semibold text-white">{room.title}</h3>
-                                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/45">{room.guestText}</p>
-                                </div>
-                                <StickerTag
-                                  label={room.roomType === "PRIVATE" ? "Private" : "Dorm"}
-                                  bg={room.roomType === "PRIVATE" ? "#00d1ff" : "#f9cb37"}
-                                  className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em]"
-                                  text={room.roomType === "PRIVATE" ? "#071014" : "#111111"}
-                                  rotate="rotate-[5deg]"
-                                />
-                              </div>
-                              <p className="text-sm leading-7 text-white/78">
-                                Monthly stay with room availability synced for {formatColiveDate(moveIn)} to {formatColiveDate(checkoutDate)}.
-                              </p>
-                              <div className="flex flex-wrap gap-2">
-                                {featureLabels.slice(0, 7).map((label) => {
-                                  const Icon = featureIcon(label);
-                                  return (
-                                    <span key={label} className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-white/72">
-                                      <Icon className="h-3.5 w-3.5 text-[var(--vh-amber)]" />
-                                      {label}
-                                    </span>
-                                  );
-                                })}
-                              </div>
-                              <p className="text-sm font-semibold text-[var(--vh-cyan)]">{formatRoomStatus(room)}</p>
-                            </div>
-                            <div className="flex flex-col justify-between border-t border-white/10 p-5 lg:border-l lg:border-t-0">
-                              <div>
-                                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/45">Monthly price</p>
-                                <p className="mt-2 text-3xl font-bold text-[#c62828]">{formatMonthlyPrice(room)}</p>
-                                {!isPriceUnavailable ? <p className="mt-1 text-xs text-white/45">Backend total for 30 nights</p> : null}
-                              </div>
-
-                              <div className="mt-5 flex items-center justify-end gap-2">
-                                {!canBook ? (
-                                  <Button className="w-full rounded-full" disabled type="button">
-                                    {isSoldOut ? "Sold out" : "Unavailable"}
-                                  </Button>
-                                ) : count === 0 ? (
-                                  <Button className="w-full rounded-full" onClick={() => updateCount(roomKey, 1)} type="button">
-                                    Add
-                                  </Button>
-                                ) : (
-                                  <div className="ml-auto flex items-center gap-2">
-                                    <button
-                                      aria-label="Remove room"
-                                      className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[var(--vh-surface-2)]"
-                                      onClick={() => updateCount(roomKey, count - 1)}
-                                      type="button"
-                                    >
-                                      <Minus className="h-4 w-4" />
-                                    </button>
-                                    <span className="w-5 text-center text-sm font-semibold text-white">{count}</span>
-                                    <button
-                                      aria-label="Add room"
-                                      className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[var(--vh-surface-2)] disabled:cursor-not-allowed disabled:opacity-45"
-                                      disabled={count >= room.availableCount}
-                                      onClick={() => updateCount(roomKey, count + 1)}
-                                      type="button"
-                                    >
-                                      <Plus className="h-4 w-4" />
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
+                    return (
+                      <article
+                        key={roomKey}
+                        className={cn(
+                          "overflow-hidden rounded-none border-2 bg-[#161616] transition-all shadow-[4px_4px_0px_#000000]",
+                          isSelected ? "border-[var(--np-yellow)]" : "border-[#3D3D3D] hover:border-white/30",
+                        )}
+                      >
+                        <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)_200px]">
+                          {/* Thumbnail */}
+                          <div className="relative border-b border-[#3D3D3D] lg:border-b-0 lg:border-r">
+                            <Image alt={room.title} className="h-[200px] w-full object-cover lg:h-full" height={420} src={room.image} width={520} />
+                            <div className="absolute top-2 left-2">
+                              <Token
+                                variant={room.roomType === "PRIVATE" ? "blue" : "yellow"}
+                                label={room.roomType === "PRIVATE" ? "PRIVATE SUITE" : "COMMUNITY DORM"}
+                              />
                             </div>
                           </div>
-                        </article>
+
+                          {/* Details */}
+                          <div className="space-y-3 p-5">
+                            <div>
+                              <h3 className="font-['Cirka',serif] text-2xl text-white tracking-tight">{room.title}</h3>
+                              <p className="mt-0.5 text-xs font-extrabold uppercase tracking-wider text-white/50">{room.guestText}</p>
+                            </div>
+
+                            <p className="text-xs leading-5 text-white/70">
+                              Monthly residency synced for {formatColiveDate(moveIn)} to {formatColiveDate(checkoutDate)}.
+                            </p>
+
+                            {/* Amenity Chips */}
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              {featureLabels.slice(0, 5).map((label) => {
+                                const Icon = featureIcon(label);
+                                return (
+                                  <span key={label} className="inline-flex items-center gap-1 border border-[#3D3D3D] bg-[#121212] px-2 py-0.5 text-[11px] text-white/80">
+                                    <Icon className="h-3 w-3 text-[var(--np-yellow)]" />
+                                    {label}
+                                  </span>
+                                );
+                              })}
+                            </div>
+
+                            <div className="pt-2">
+                              <Token variant={statusInfo.variant} label={statusInfo.text} />
+                            </div>
+                          </div>
+
+                          {/* Pricing & Selection */}
+                          <div className="flex flex-col justify-between border-t border-[#3D3D3D] p-5 lg:border-l lg:border-t-0 bg-[#121212]">
+                            <div>
+                              <span className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/50">Monthly Rent</span>
+                              <p className="mt-1 font-['Cirka',serif] text-3xl font-bold text-white">{formatMonthlyPrice(room)}</p>
+                              {!isPriceUnavailable && (
+                                <p className="text-[11px] text-white/50">x {duration} {duration === 1 ? "month" : "months"}</p>
+                              )}
+                            </div>
+
+                            <div className="mt-5">
+                              {!canBook ? (
+                                <div className="border border-[#3D3D3D] bg-[#181818] py-2 text-center text-xs font-bold uppercase tracking-wider text-white/40">
+                                  {isSoldOut ? "Sold Out" : "Unavailable"}
+                                </div>
+                              ) : count === 0 ? (
+                                <NeoPopButton variant="primary" fullWidth size="default" onClick={() => updateCount(roomKey, 1)}>
+                                  Select Room
+                                </NeoPopButton>
+                              ) : (
+                                <div className="flex items-center justify-between border border-[var(--np-yellow)] bg-[#1A1A1A] p-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => updateCount(roomKey, count - 1)}
+                                    className="flex h-8 w-8 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-white hover:bg-[#252525]"
+                                    aria-label="Remove room"
+                                  >
+                                    <Minus className="h-3.5 w-3.5" />
+                                  </button>
+                                  <span className="font-['Cirka',serif] text-lg font-bold text-white px-2">{count} Selected</span>
+                                  <button
+                                    type="button"
+                                    disabled={count >= room.availableCount}
+                                    onClick={() => updateCount(roomKey, count + 1)}
+                                    className="flex h-8 w-8 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-white hover:bg-[#252525] disabled:opacity-40"
+                                    aria-label="Add more"
+                                  >
+                                    <Plus className="h-3.5 w-3.5" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+
+                {/* Coliving Addons Selector */}
+                <div className="mt-8 border border-[#3D3D3D] bg-[#161616] p-6 shadow-[4px_4px_0px_#000000]">
+                  <SectionTitle
+                    kicker="CUSTOMIZE YOUR RESIDENCY"
+                    title="Coliving Addons & Upgrades"
+                    copy="Optional enhancements to supercharge your productive monthly stay."
+                  />
+                  <div className="mt-4 space-y-3">
+                    {coliveAddonCatalog.map((addon) => {
+                      const isToggled = selectedAddons.includes(addon.id);
+                      const Icon = addon.icon;
+                      return (
+                        <button
+                          key={addon.id}
+                          type="button"
+                          onClick={() => toggleAddon(addon.id)}
+                          className={cn(
+                            "w-full flex items-center justify-between p-4 rounded-none border-2 text-left transition-all select-none",
+                            isToggled
+                              ? "border-[var(--np-green)] bg-[#121F17] shadow-[3px_3px_0px_var(--np-green)]"
+                              : "border-[#3D3D3D] bg-[#121212] hover:border-white/30",
+                          )}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={cn("p-2 border", isToggled ? "border-[var(--np-green)] text-[var(--np-green)]" : "border-[#3D3D3D] text-white/60")}>
+                              <Icon className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-white">{addon.title}</p>
+                              <p className="text-xs text-white/60 leading-5">{addon.description}</p>
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0 ml-4">
+                            <span className="font-['Cirka',serif] text-base font-bold text-white">+₹{formatINRPlain(addon.monthlyPrice)}</span>
+                            <span className="block text-[10px] uppercase text-white/50">/ month</span>
+                          </div>
+                        </button>
                       );
                     })}
                   </div>
                 </div>
+              </div>
 
-                <aside className="hidden self-start lg:sticky lg:top-28 lg:block">
-                  <div className="rounded-[26px] border border-dashed border-white/24 bg-[var(--vh-panel-strong)] p-5 shadow-[var(--vh-shadow-lg)]">
-                    <h2 className="vh-title text-3xl text-white">Monthly summary</h2>
-                    <div className="mt-5 rounded-[18px] border border-white/10 bg-white/5 px-4 py-4 text-white">
-                      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                        <div>
-                          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/48">Move in</p>
-                          <p className="mt-1 text-sm font-semibold">{formatColiveDate(moveIn)}</p>
-                        </div>
-                        <div className="rounded-full bg-[var(--vh-amber)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-900">
-                          {duration} mo
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/48">Until</p>
-                          <p className="mt-1 text-sm font-semibold">{formatColiveDate(checkoutDate)}</p>
-                        </div>
-                      </div>
+              {/* Right Column: Digital Receipt Summary Card */}
+              <aside className="hidden self-start lg:sticky lg:top-28 lg:block">
+                <div className="rounded-none border-2 border-[#3D3D3D] bg-[#161616] p-6 shadow-[6px_6px_0px_#000000]">
+                  {/* Receipt Header */}
+                  <div className="flex items-start justify-between border-b border-dashed border-[#3D3D3D] pb-4">
+                    <div>
+                      <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[var(--np-yellow)]">DIGITAL RECEIPT</p>
+                      <h2 className="mt-1 font-['Cirka',serif] text-2xl text-white tracking-tight">Coliving Quote</h2>
                     </div>
+                    <span className="border border-[#3D3D3D] bg-[#121212] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white">
+                      {duration} mo stay
+                    </span>
+                  </div>
 
-                    <div className="mt-5 space-y-3 border-t border-white/10 pt-5 text-sm text-white/82">
-                      {selectedRoomDrafts.length === 0 ? (
-                        <p className="rounded-[16px] border border-dashed border-white/12 bg-white/5 px-3 py-3 text-center text-sm font-semibold text-white/76">
-                          Add a monthly room to see booking totals.
-                        </p>
-                      ) : (
-                        selectedRoomDrafts.map((room) => (
-                          <div key={room.roomTypeId} className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="font-semibold text-white">{room.title}</p>
-                              <p className="text-xs text-white/55">
-                                Rs. {formatINRPlain(room.basePrice)} x {room.quantity} x {duration} mo
-                              </p>
-                            </div>
-                            <p className="font-semibold text-white">Rs. {formatINRPlain(room.basePrice * room.quantity * duration)}</p>
-                          </div>
-                        ))
-                      )}
+                  {/* Dates Box */}
+                  <div className="mt-4 border border-[#3D3D3D] bg-[#121212] p-3 text-xs">
+                    <div className="flex justify-between items-center text-white/70">
+                      <span>MOVE-IN</span>
+                      <span className="font-bold text-white">{formatColiveDate(moveIn)}</span>
                     </div>
+                    <div className="mt-2 flex justify-between items-center text-white/70">
+                      <span>UNTIL</span>
+                      <span className="font-bold text-white">{formatColiveDate(checkoutDate)}</span>
+                    </div>
+                    <div className="mt-2 flex justify-between items-center text-white/70">
+                      <span>PROFILE</span>
+                      <span className="font-bold uppercase text-[var(--np-yellow)]">{stayType}</span>
+                    </div>
+                  </div>
 
-                    <div className="mt-5 border-t border-white/10 pt-4 text-sm text-white/82">
-                      <div className="flex items-center justify-between">
-                        <p>Total room charges</p>
-                        <p className="font-semibold text-white">Rs. {formatINRPlain(selectedRoomTotal)}</p>
-                      </div>
-                      <p className="mt-3 rounded-[14px] border border-dashed border-white/14 bg-black/20 px-3 py-3 text-xs leading-5 text-white/60">
-                        Checkout will call Colive quote before payment, so backend remains the final source of truth.
+                  {/* Itemized charges */}
+                  <div className="mt-5 space-y-3 border-t border-dashed border-[#3D3D3D] pt-4 text-xs">
+                    {selectedRoomDrafts.length === 0 ? (
+                      <p className="border border-[#3D3D3D] bg-[#121212] p-4 text-center text-white/60">
+                        Select a room tier above to generate your itemized monthly receipt.
                       </p>
-                    </div>
+                    ) : (
+                      selectedRoomDrafts.map((room) => (
+                        <div key={room.roomTypeId} className="flex justify-between items-start text-white/80">
+                          <div>
+                            <p className="font-semibold text-white">{room.title}</p>
+                            <p className="text-[11px] text-white/50">
+                              ₹{formatINRPlain(room.basePrice)} x {room.quantity} x {duration} mo
+                            </p>
+                          </div>
+                          <p className="font-mono font-semibold text-white">₹{formatINRPlain(room.basePrice * room.quantity * duration)}</p>
+                        </div>
+                      ))
+                    )}
 
-                    <div className="my-4 flex items-start">
+                    {/* Addons line item */}
+                    {selectedAddons.map((addonId) => {
+                      const item = coliveAddonCatalog.find((a) => a.id === addonId);
+                      if (!item) return null;
+                      return (
+                        <div key={addonId} className="flex justify-between items-center text-white/80">
+                          <div>
+                            <p className="font-semibold text-white">{item.title}</p>
+                            <p className="text-[11px] text-white/50">₹{formatINRPlain(item.monthlyPrice)} x {duration} mo</p>
+                          </div>
+                          <p className="font-mono font-semibold text-white">₹{formatINRPlain(item.monthlyPrice * duration)}</p>
+                        </div>
+                      );
+                    })}
+
+                    {/* Discount line item */}
+                    {appliedCoupon && discountAmount > 0 ? (
+                      <div className="flex justify-between items-center text-[var(--np-green)]">
+                        <div>
+                          <p className="font-semibold">Discount ({appliedCoupon.code})</p>
+                          <p className="text-[11px] opacity-80">{appliedCoupon.discountPercent}% off room charges</p>
+                        </div>
+                        <p className="font-mono font-semibold">-₹{formatINRPlain(discountAmount)}</p>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  {/* Coupon Code Section */}
+                  <div className="mt-5 border-t border-dashed border-[#3D3D3D] pt-4">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-white/60">Promo Code</span>
+                    <div className="mt-2 flex gap-2">
                       <input
-                        checked={isAgeConfirmed}
-                        className="mt-1 h-10 w-10 cursor-pointer rounded border-gray-300 bg-gray-100 p-2 text-blue-600 align-top focus:ring-blue-500"
-                        id="colive-age-confirm-desktop"
-                        onChange={(event) => setIsAgeConfirmed(event.target.checked)}
-                        type="checkbox"
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        placeholder="e.g. VIBECOLIVE"
+                        className="h-9 w-full rounded-none border border-[#3D3D3D] bg-[#121212] px-3 text-xs uppercase font-mono text-white outline-none focus:border-[var(--np-yellow)]"
                       />
-                      <span className="cursor-pointer select-none px-2 text-sm font-poppins text-white">
-                        Yes, I confirm <span className="font-bold">all the guests are above 18 years old</span> and accept the{" "}
-                        <Link className="text-blue-400" href="/policies/">
-                          booking terms and policies.
-                        </Link>
+                      <NeoPopButton variant="secondary" size="sm" onClick={handleApplyCoupon}>
+                        Apply
+                      </NeoPopButton>
+                    </div>
+                    {couponError && <p className="mt-1.5 text-[11px] text-[#EE4D37]">{couponError}</p>}
+                    {appliedCoupon && (
+                      <p className="mt-1.5 text-[11px] text-[var(--np-green)]">
+                        Code {appliedCoupon.code} active (-{appliedCoupon.discountPercent}%)
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Total & Deposit */}
+                  <div className="mt-5 border-t-2 border-dashed border-[#3D3D3D] pt-4">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-xs uppercase tracking-wider text-white/70">Estimated Total</span>
+                      <span className="font-['Cirka',serif] text-3xl font-bold text-[var(--np-yellow)]">
+                        ₹{formatINRPlain(selectedRoomTotal)}
                       </span>
                     </div>
+                    <div className="mt-2 border border-[#3D3D3D] bg-[#121212] p-2.5 text-[11px] leading-5 text-white/60">
+                      <Info className="inline h-3.5 w-3.5 mr-1 text-[var(--np-yellow)]" />
+                      Refundable 1-month security deposit confirmed at backend checkout review.
+                    </div>
+                  </div>
 
-                    {continueError ? <p className="mt-4 text-sm text-[#ff8b8b]">{continueError}</p> : null}
-                    <Button
-                      className="vh-cta-button mt-5 w-full disabled:cursor-not-allowed disabled:opacity-55"
-                      disabled={!canContinue}
-                      loading={isContinuing}
-                      loadingText="Review Booking"
-                      onClick={continueToCheckout}
-                      type="button"
-                    >
-                      Review Booking
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                  {/* Age Confirmation Checkbox */}
+                  <div className="my-5 flex items-start gap-3">
+                    <input
+                      id="colive-age-confirm-desktop"
+                      type="checkbox"
+                      checked={isAgeConfirmed}
+                      onChange={(e) => setIsAgeConfirmed(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 rounded-none border border-[#3D3D3D] bg-[#121212] text-black accent-[var(--np-yellow)] cursor-pointer"
+                    />
+                    <label htmlFor="colive-age-confirm-desktop" className="text-xs text-white/80 cursor-pointer select-none leading-5">
+                      I confirm all guests are <strong className="text-white">18+ years of age</strong> and accept the{" "}
+                      <Link href="/policies" className="text-[var(--np-yellow)] underline">
+                        terms & coliving rules
+                      </Link>.
+                    </label>
                   </div>
-                </aside>
-              </div>
-            </section>
 
-            <section data-colive-reveal>
-              <SectionTitle title="Guidelines" />
-              <div className="mt-6 max-w-4xl">
-                <div className="mb-3 flex flex-wrap justify-between gap-x-4 gap-y-2 rounded-[16px] bg-white/6 p-3 text-white/84">
-                  <div className="flex min-w-[180px] items-center gap-3">
-                    <CalendarDays className="h-5 w-5 text-[var(--vh-cyan)]" />
-                    <span>
-                      Move in:
-                      <strong className="ml-1 text-white">{propertyGuidelines.checkIn}</strong>
-                    </span>
-                  </div>
-                  <div className="flex min-w-[180px] items-center gap-3">
-                    <Clock3 className="h-5 w-5 text-[var(--vh-cyan)]" />
-                    <span>
-                      Monthly review:
-                      <strong className="ml-1 text-white">Backend quote before payment</strong>
-                    </span>
-                  </div>
+                  {continueError ? <p className="mb-4 text-xs font-semibold text-[#EE4D37]">{continueError}</p> : null}
+
+                  {/* Review CTA */}
+                  <NeoPopButton
+                    variant="primary"
+                    fullWidth
+                    size="lg"
+                    disabled={!canContinue}
+                    loading={isContinuing}
+                    onClick={continueToCheckout}
+                  >
+                    Review Booking
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </NeoPopButton>
                 </div>
+              </aside>
+            </div>
+          </section>
 
-                <Accordion className="space-y-2" defaultValue={["general-guidelines"]} type="multiple">
-                  <AccordionItem className="overflow-hidden rounded-lg border border-white/10 bg-white/5 px-4" value="general-guidelines">
-                    <AccordionTrigger className="text-base">General guidelines</AccordionTrigger>
-                    <AccordionContent className="space-y-2 border-t border-white/10 pt-2 text-sm leading-6">
-                      {propertyGuidelines.summary.map((item) => (
-                        <p key={item}>- {item}</p>
+          {/* Guidelines Accordion */}
+          <section data-colive-reveal>
+            <SectionTitle kicker="HOUSE RULES" title="Coliving Guidelines" />
+            <div className="mt-6 max-w-4xl space-y-3">
+              <div className="flex flex-wrap gap-4 border border-[#3D3D3D] bg-[#161616] p-4 text-xs text-white/80">
+                <div className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 text-[var(--np-yellow)]" />
+                  <span>Check-in Window: <strong className="text-white">{propertyGuidelines.checkIn}</strong></span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock3 className="h-4 w-4 text-[var(--np-yellow)]" />
+                  <span>Quiet Hours: <strong className="text-white">11:00 PM – 8:00 AM</strong></span>
+                </div>
+              </div>
+
+              <Accordion className="space-y-2" defaultValue={["general-guidelines"]} type="multiple">
+                <AccordionItem className="rounded-none border border-[#3D3D3D] bg-[#161616] px-4" value="general-guidelines">
+                  <AccordionTrigger className="text-sm font-bold uppercase tracking-wider text-white">General Guidelines</AccordionTrigger>
+                  <AccordionContent className="border-t border-[#3D3D3D] pt-3 text-xs leading-6 text-white/70">
+                    {propertyGuidelines.summary.map((item) => (
+                      <p key={item}>• {item}</p>
+                    ))}
+                  </AccordionContent>
+                </AccordionItem>
+
+                {propertyGuidelines.sections.map((section, index) => (
+                  <AccordionItem key={section.title} className="rounded-none border border-[#3D3D3D] bg-[#161616] px-4" value={`guideline-${index}`}>
+                    <AccordionTrigger className="text-sm font-bold uppercase tracking-wider text-white">{section.title}</AccordionTrigger>
+                    <AccordionContent className="border-t border-[#3D3D3D] pt-3 text-xs leading-6 text-white/70">
+                      {section.content.map((item) => (
+                        <p key={item}>• {item}</p>
                       ))}
                     </AccordionContent>
                   </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          </section>
 
-                  {propertyGuidelines.sections.map((section, index) => (
-                    <AccordionItem key={section.title} className="overflow-hidden rounded-lg border border-white/10 bg-white/5 px-4" value={`guideline-${index}`}>
-                      <AccordionTrigger className="text-base">{section.title}</AccordionTrigger>
-                      <AccordionContent className="space-y-2 border-t border-white/10 pt-2 text-sm leading-6">
-                        {section.content.map((item) => (
-                          <p key={item}>- {item}</p>
-                        ))}
-                      </AccordionContent>
+          {/* FAQs & Neighborhood */}
+          <section data-colive-reveal>
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+              {/* FAQs */}
+              <div>
+                <SectionTitle kicker="FREQUENT QUESTIONS" title="Coliving FAQs" />
+                <Accordion className="mt-6 space-y-3" defaultValue={["faq-0"]} type="multiple">
+                  {roomFaqs.map((faq, index) => (
+                    <AccordionItem key={faq.question} className="rounded-none border border-[#3D3D3D] bg-[#161616] px-4" value={`faq-${index}`}>
+                      <AccordionTrigger className="text-sm font-semibold text-white">{faq.question}</AccordionTrigger>
+                      <AccordionContent className="border-t border-[#3D3D3D] pt-3 text-xs leading-6 text-white/70">{faq.answer}</AccordionContent>
                     </AccordionItem>
                   ))}
                 </Accordion>
               </div>
-            </section>
 
-            <section data-colive-reveal>
-              <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+              {/* Neighborhood & Map */}
+              <div className="space-y-6">
                 <div>
-                  <SectionTitle title="Frequently Asked Questions" />
-                  <Accordion className="mt-6 space-y-4" defaultValue={["faq-0"]} type="multiple">
-                    {roomFaqs.map((faq, index) => (
-                      <AccordionItem key={faq.question} className="overflow-hidden rounded-lg border border-white/10 bg-white/5 px-4" value={`faq-${index}`}>
-                        <AccordionTrigger className="text-base">{faq.question}</AccordionTrigger>
-                        <AccordionContent className="border-t border-white/10 pt-4 text-sm leading-7">{faq.answer}</AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
+                  <SectionTitle kicker="SURROUNDINGS" title="Location & Access" />
+                  <div className="mt-6 overflow-hidden rounded-none border border-[#3D3D3D] shadow-[4px_4px_0px_#000000]">
+                    <iframe className="h-[280px] w-full" loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={locationMap.embedUrl} title={locationMap.title} />
+                  </div>
+                  <Link className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--np-yellow)] hover:underline" href={propertyHero.mapsHref} target="_blank">
+                    Open in Google Maps
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
 
-                <div className="space-y-6">
-                  <section>
-                    <SectionTitle title="Location" />
-                    <div className="mt-6 overflow-hidden rounded-[18px]">
-                      <iframe className="h-[300px] w-full" loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={locationMap.embedUrl} title={locationMap.title} />
-                    </div>
-                    <Link className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--vh-cyan)] hover:text-white" href={propertyHero.mapsHref} target="_blank">
-                      Open in Maps
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  </section>
-
-                  <section>
-                    <SectionTitle title="Nearby" />
-                    <div className="mt-6 space-y-3">
-                      {nearbyAttractions.map((place) => (
-                        <div key={place.name} className="flex items-center justify-between gap-4 border-b border-white/10 pb-3 last:border-b-0 last:pb-0">
-                          <div>
-                            <p className="font-semibold text-white">{place.name}</p>
-                            <p className="text-xs uppercase tracking-[0.14em] text-white/48">{place.type}</p>
-                          </div>
-                          <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/72">
-                            {place.travel}
-                          </span>
+                <div className="border border-[#3D3D3D] bg-[#161616] p-4 shadow-[3px_3px_0px_#000000]">
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-[var(--np-yellow)]">Nearby Spots</p>
+                  <div className="mt-3 space-y-2.5">
+                    {nearbyAttractions.map((place) => (
+                      <div key={place.name} className="flex items-center justify-between border-b border-[#3D3D3D] pb-2 last:border-b-0 last:pb-0 text-xs">
+                        <div>
+                          <span className="font-semibold text-white">{place.name}</span>
+                          <span className="block text-[10px] uppercase text-white/50">{place.type}</span>
                         </div>
-                      ))}
-                    </div>
-                  </section>
+                        <span className="border border-[#3D3D3D] bg-[#121212] px-2 py-0.5 text-[10px] font-bold uppercase text-white/80">
+                          {place.travel}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
         </div>
       </section>
 
-      <div className="fixed bottom-4 left-4 right-4 z-40 lg:hidden">
-        <div className="overflow-hidden rounded-[22px] border border-white/12 bg-[var(--vh-panel-strong)] shadow-[var(--vh-shadow-lg)] backdrop-blur-xl">
-          <div className="flex items-center justify-between gap-3 px-4 py-4">
-            <div>
-              <p className="text-xl font-bold text-white">Rs. {formatINRPlain(selectedRoomTotal)}</p>
-              {continueError ? <p className="mt-1 max-w-[180px] text-xs text-[#ff8b8b]">{continueError}</p> : null}
-              <button className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.08em] text-white/72" type="button">
-                {selectedRoomCount} room{selectedRoomCount === 1 ? "" : "s"} / {duration} mo
-                <Info className="h-3.5 w-3.5" />
-              </button>
-            </div>
-            <Button
-              className="vh-cta-button px-5 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-55"
-              disabled={!canContinue}
-              loading={isContinuing}
-              loadingText="Review"
-              onClick={continueToCheckout}
-              type="button"
-            >
-              Review
-            </Button>
+      {/* Mobile Sticky Booking Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-[#3D3D3D] bg-[#121212]/95 p-4 backdrop-blur-xl shadow-[0px_-4px_16px_rgba(0,0,0,0.8)]">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-white/50">Est. Total</span>
+            <p className="font-['Cirka',serif] text-xl font-bold text-[var(--np-yellow)]">₹{formatINRPlain(selectedRoomTotal)}</p>
+            <span className="text-[11px] text-white/70">
+              {selectedRoomCount} room{selectedRoomCount === 1 ? "" : "s"} • {duration} mo
+            </span>
           </div>
-          <label className="flex items-start gap-2 border-t border-white/10 px-4 py-3 text-xs leading-5 text-white/72">
-            <input checked={isAgeConfirmed} className="mt-1" onChange={(event) => setIsAgeConfirmed(event.target.checked)} type="checkbox" />
-            <span>All guests are above 18 and accept booking terms.</span>
+          <NeoPopButton
+            variant="primary"
+            size="default"
+            disabled={!canContinue}
+            loading={isContinuing}
+            onClick={continueToCheckout}
+          >
+            Review
+            <ArrowRight className="ml-1.5 h-4 w-4" />
+          </NeoPopButton>
+        </div>
+        <div className="mt-2 flex items-center gap-2 pt-2 border-t border-[#3D3D3D]">
+          <input
+            type="checkbox"
+            id="colive-age-mobile"
+            checked={isAgeConfirmed}
+            onChange={(e) => setIsAgeConfirmed(e.target.checked)}
+            className="h-3.5 w-3.5 rounded-none border-[#3D3D3D] accent-[var(--np-yellow)] cursor-pointer"
+          />
+          <label htmlFor="colive-age-mobile" className="text-[10px] text-white/70 select-none">
+            All guests are 18+ and accept terms.
           </label>
         </div>
       </div>

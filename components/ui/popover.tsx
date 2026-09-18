@@ -24,7 +24,7 @@ function PopoverContent({
       <PopoverPrimitive.Content
         align={align}
         className={cn(
-          "z-[120] origin-(--radix-popover-content-transform-origin) rounded-xl border shadow-xl outline-hidden",
+          "z-[120] origin-(--radix-popover-content-transform-origin) rounded-none border border-[#3D3D3D] bg-[#121212] shadow-[6px_6px_0px_#000000] outline-hidden",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

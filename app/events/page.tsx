@@ -10,6 +10,7 @@ import { eventPageContent, pastEventImages, weeklyLineup } from "@/content/event
 import { getPublicEventsResult } from "@/lib/cx-api";
 import { usePropertyId } from "@/hooks/use-property-id";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button as NeoPopButton } from "@/components/neopop";
 
 export default function EventsPage() {
   const propertyId = usePropertyId();
@@ -50,69 +51,71 @@ export default function EventsPage() {
 
   const eventGridClass =
     liveEvents.length <= 1
-      ? "grid grid-cols-1 gap-8 md:max-w-[460px] md:mx-auto"
+      ? "grid grid-cols-1 gap-6 md:max-w-[460px] md:mx-auto"
       : liveEvents.length === 2
-      ? "grid grid-cols-1 gap-8 md:grid-cols-2"
-      : "grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3";
+      ? "grid grid-cols-1 gap-6 md:grid-cols-2"
+      : "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3";
 
   return (
     <>
-      <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden">
+      <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden border-b border-[#3D3D3D] bg-[#0D0D0D] pt-24">
         <div className="absolute inset-0">
           <ImageWithFallback
             alt="Experiences hero"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover opacity-45"
             src="https://images.unsplash.com/photo-1758179764880-7513421d202a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1400"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[rgba(15,23,42,0.65)] to-[var(--vh-surface-2)]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-[#0D0D0D]" />
         </div>
-        <FadeIn className="relative z-10 vh-container py-16 text-center">
-          <p className="inline-block rounded-[4px] bg-gradient-to-r from-[var(--vh-pink)] to-[var(--vh-pink-soft)] px-4 py-2 text-sm font-bold uppercase tracking-[1.4px] text-white">
+        <FadeIn className="relative z-10 mx-auto max-w-5xl px-4 py-20 text-center">
+          <span className="inline-block bg-[var(--np-yellow)] text-black px-3 py-1 text-xs font-black uppercase tracking-[0.16em] font-['Gilroy',sans-serif] mb-6 shadow-[2px_2px_0px_#000000]">
             Every Night is an Adventure
-          </p>
-          <h1 className="mt-8 leading-none">
-            <span className="vh-retro-sign-flat text-5xl md:text-7xl lg:text-8xl" style={{ display: "block" }}>Never a</span>
-            <span className="vh-retro-sign-flat text-5xl md:text-7xl lg:text-8xl" style={{ display: "block", marginTop: "0.15em" }}>
-              Dull <span className="vh-flicker-sign">E</span>v<span className="vh-flicker-sign" style={{ animationDelay: "0.35s" }}>e</span>ning.
+          </span>
+          <h1 className="leading-tight">
+            <span className="font-['Cirka',serif] font-bold text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-white tracking-tight block">
+              Never a Dull
+            </span>
+            <span className="font-['Cirka',serif] font-bold text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-[var(--np-yellow)] tracking-tight block mt-2">
+              Evening.
             </span>
           </h1>
-          <p className="mx-auto mt-6 max-w-[700px] text-lg italic text-white/85">
-            From pub crawls to game nights, meet travelers from around the world and create memories that last.
+          <p className="mx-auto mt-6 max-w-[700px] text-sm sm:text-base md:text-lg text-white/70 font-['Gilroy',sans-serif] leading-relaxed">
+            From pub crawls to game nights, meet travelers from around the world and create memories that outlast the checkout date.
           </p>
         </FadeIn>
       </section>
 
-      <section className="vh-section">
-        <div className="vh-container">
+      <section className="bg-[#0D0D0D] py-16 md:py-20 border-b border-[#3D3D3D]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading align="center" subtitle={eventPageContent.upcomingSubtitle} title="This Week" />
           {isPending ? (
-            <div aria-busy="true" className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div aria-busy="true" className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-10">
               <span className="sr-only">Current experiences are being prepared.</span>
               {[0, 1, 2].map((item) => (
-                <div className="overflow-hidden rounded-[18px] border border-white/10 bg-white/[0.03]" key={item}>
-                  <Skeleton className="h-[220px] w-full bg-white/8" />
+                <div className="border border-[#3D3D3D] bg-[#161616] shadow-[3px_3px_0px_#000000] rounded-none" key={item}>
+                  <Skeleton className="h-[220px] w-full rounded-none bg-[#222222]" />
                   <div className="space-y-3 p-5">
-                    <Skeleton className="h-7 w-2/3 bg-white/8" />
-                    <Skeleton className="h-4 w-full bg-white/8" />
-                    <Skeleton className="h-4 w-4/5 bg-white/8" />
+                    <Skeleton className="h-6 w-2/3 rounded-none bg-[#222222]" />
+                    <Skeleton className="h-4 w-full rounded-none bg-[#222222]" />
+                    <Skeleton className="h-4 w-4/5 rounded-none bg-[#222222]" />
                   </div>
                 </div>
               ))}
             </div>
           ) : eventsResult.error ? (
-            <FadeIn className="rounded-[18px] border border-dashed border-white/20 bg-white/5 px-6 py-8 text-center text-white">
-              <p className="font-['Geologica'] text-xl font-semibold">Events did not load</p>
-              <p className="mx-auto mt-2 max-w-[560px] text-sm leading-7 text-white/72">{eventsResult.error}</p>
+            <FadeIn className="border border-dashed border-[#3D3D3D] bg-[#161616] p-8 text-center text-white mt-10 max-w-2xl mx-auto shadow-[4px_4px_0px_#000000]">
+              <p className="font-['Cirka',serif] text-2xl font-bold">Events did not load</p>
+              <p className="mx-auto mt-2 max-w-[560px] text-xs font-['Gilroy',sans-serif] text-white/60">{eventsResult.error}</p>
             </FadeIn>
           ) : liveEvents.length === 0 ? (
-            <FadeIn className="rounded-[18px] border border-dashed border-white/20 bg-white/5 px-6 py-8 text-center text-white">
-              <p className="font-['Geologica'] text-xl font-semibold">No upcoming events</p>
-              <p className="mx-auto mt-2 max-w-[560px] text-sm leading-7 text-white/72">
-                No events are scheduled right now.
+            <FadeIn className="border border-dashed border-[#3D3D3D] bg-[#161616] p-8 text-center text-white mt-10 max-w-2xl mx-auto shadow-[4px_4px_0px_#000000]">
+              <p className="font-['Cirka',serif] text-2xl font-bold">No upcoming events</p>
+              <p className="mx-auto mt-2 max-w-[560px] text-xs font-['Gilroy',sans-serif] text-white/60">
+                No events are scheduled right now. Check back soon for the next lineup!
               </p>
             </FadeIn>
           ) : (
-            <Stagger className={eventGridClass}>
+            <Stagger className={`${eventGridClass} mt-10`}>
               {liveEvents.map((event) => (
                 <StaggerItem key={`${event.title}-${event.date}-${event.time}`}>
                   <EventCard {...event} />
@@ -123,52 +126,55 @@ export default function EventsPage() {
         </div>
       </section>
 
-      <section className="vh-section vh-section-alt">
-        <div className="vh-container">
+      <section className="bg-[#0A0A0A] py-16 md:py-20 border-b border-[#3D3D3D]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading align="center" subtitle={eventPageContent.weeklySubtitle} title="Standard Weekly Experiences" />
-          <MagicBento
-            clickEffect
-            disableAnimations={false}
-            enableBorderGlow
-            enableMagnetism={false}
-            enableSpotlight
-            enableStars
-            enableTilt={false}
-            glowColor="132, 0, 255"
-            items={weeklyLineup}
-            particleCount={12}
-            spotlightRadius={400}
-            textAutoHide
-          />
+          <div className="mt-10">
+            <MagicBento
+              clickEffect
+              disableAnimations={false}
+              enableBorderGlow
+              enableMagnetism={false}
+              enableSpotlight
+              enableStars
+              enableTilt={false}
+              glowColor="255, 203, 69"
+              items={weeklyLineup}
+              particleCount={12}
+              spotlightRadius={400}
+              textAutoHide
+            />
+          </div>
         </div>
       </section>
 
-      <section className="vh-section">
-        <div className="vh-container">
+      <section className="bg-[#0D0D0D] py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading align="center" subtitle={eventPageContent.pastSubtitle} title="The Memories" />
-          <Stagger className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <Stagger className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 mt-10">
             {pastEventImages.map((image, index) => (
               <StaggerItem key={image}>
-                <div
-                  className="overflow-hidden rounded-[8px] border-4 border-white shadow-[8px_8px_0px_0px_rgba(198,40,40,0.5)]"
-                  style={{ transform: `rotate(${(index % 3) - 1}deg)` }}
-                >
+                <div className="overflow-hidden border border-[#3D3D3D] shadow-[3px_3px_0px_#000000] bg-[#161616] group">
                   <ImageWithFallback
                     alt={`Past experience ${index + 1}`}
-                    className="aspect-square w-full object-cover hover:scale-110"
+                    className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     src={image}
                   />
                 </div>
               </StaggerItem>
             ))}
           </Stagger>
-          <FadeIn className="mt-10 text-center">
-            <a
-              className="vh-cta-button"
-              href="https://instagram.com/thedailysocial01"
-            >
-              Follow on Instagram
-            </a>
+          <FadeIn className="mt-12 text-center">
+            <NeoPopButton asChild size="lg" variant="primary">
+              <a
+                href="https://instagram.com/thedailysocial01"
+                rel="noreferrer"
+                target="_blank"
+                className="font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em]"
+              >
+                Follow on Instagram
+              </a>
+            </NeoPopButton>
           </FadeIn>
         </div>
       </section>

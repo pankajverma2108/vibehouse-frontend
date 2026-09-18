@@ -16,10 +16,20 @@ export function SectionHeading({
   const alignment = align === "center" ? "text-center" : "text-left";
 
   return (
-    <FadeIn className={`mb-5 ${alignment}`}>
-      <h2 className="vh-title">{title}</h2>
-      {subtitle ? <p className="vh-subtitle mt-1.5">{subtitle}</p> : null}
-      {tagline ? <p className="mx-auto mt-3 max-w-[720px] text-[15px] font-medium leading-7 text-white/84 md:text-base">{tagline}</p> : null}
+    <FadeIn className={`mb-8 ${alignment}`}>
+      {subtitle ? (
+        <p className="font-['Gilroy',sans-serif] text-xs font-black uppercase tracking-[0.18em] text-[var(--np-yellow)] mb-2">
+          {subtitle}
+        </p>
+      ) : null}
+      <h2 className="font-['Cirka',serif] text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-[-0.02em] text-white leading-tight">
+        {title}
+      </h2>
+      {tagline ? (
+        <p className="mx-auto mt-3 max-w-[720px] font-['Gilroy',sans-serif] text-xs sm:text-sm font-semibold uppercase tracking-[0.08em] leading-relaxed text-white/65">
+          {tagline}
+        </p>
+      ) : null}
     </FadeIn>
   );
 }

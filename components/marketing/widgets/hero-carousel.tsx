@@ -63,20 +63,20 @@ export function HeroCarousel({ images, titleParts }: HeroCarouselProps) {
                   src={image}
                 />
               </picture>
-              <div className="absolute inset-0 bg-gradient-to-b from-[rgba(35,15,20,0.65)] to-[rgba(35,15,20,0.92)]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-[#0D0D0D]" />
             </div>
           ))}
         </div>
       </div>
 
-      <div className="absolute bottom-2 left-1/2 z-20 flex -translate-x-1/2 gap-2 md:bottom-4">
+      <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2 md:bottom-6">
         {images.map((image, index) => (
           <button
             key={image}
             aria-label={`Go to slide ${index + 1}`}
             className={cn(
-              "h-2 rounded-full",
-              index === selectedIndex ? "w-8 bg-[var(--vh-pink)]" : "w-2 bg-white/50",
+              "h-1.5 transition-all duration-300",
+              index === selectedIndex ? "w-10 bg-[var(--np-yellow)]" : "w-3 bg-white/30 hover:bg-white/60",
             )}
             onClick={() => emblaApi?.scrollTo(index)}
             type="button"
@@ -85,19 +85,30 @@ export function HeroCarousel({ images, titleParts }: HeroCarouselProps) {
       </div>
 
       <div className="relative z-10 flex h-full flex-col items-center justify-start px-4 pb-28 pt-32 md:justify-center md:pb-24 md:pt-36">
-        <div className="mb-12 mt-16 max-w-[1000px] px-4 md:mt-0">
-          <h1 className="vh-title font-['Suez_One'] text-center text-[52px] uppercase leading-[0.92] md:text-[88px] lg:text-[108px]">
-            <span className="bg-gradient-to-r from-white via-slate-100 to-white bg-clip-text text-transparent">
+        <div className="mb-10 mt-16 max-w-[1100px] px-4 md:mt-0 text-center">
+          <div className="inline-flex items-center gap-2 border border-white/20 bg-black/60 px-3 py-1 mb-6 backdrop-blur-md">
+            <span className="h-1.5 w-1.5 bg-[var(--np-green)] animate-pulse" />
+            <span className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-white/90 font-['Gilroy',sans-serif]">
+              LIVE INVENTORY · DIRECT BOOKING
+            </span>
+          </div>
+
+          <h1 className="text-center uppercase leading-[0.92] text-[46px] sm:text-[72px] md:text-[96px] lg:text-[116px] font-['Cirka',serif] font-black tracking-[-0.02em] select-none text-white">
+            <span>
               {titleParts[0]}
             </span>{" "}
-            <span className="animate-pulse bg-gradient-to-r from-[var(--vh-pink)] via-[var(--vh-pink-soft)] to-[var(--vh-pink)] bg-clip-text text-transparent">
+            <span className="text-[var(--np-yellow)] drop-shadow-[0_4px_24px_rgba(255,203,69,0.25)]">
               {titleParts[1]}
             </span>
             <br />
-            <span className="bg-gradient-to-r from-white via-slate-100 to-white bg-clip-text text-transparent">
+            <span>
               {titleParts[2]}
             </span>
           </h1>
+
+          <p className="mt-4 text-center font-['Gilroy',sans-serif] text-xs sm:text-sm font-extrabold uppercase tracking-[0.18em] text-white/70 max-w-[640px] mx-auto">
+            VIBRANT SOCIAL HOSTEL, NOMAD SUITES & COMMUNITY IN KORAMANGALA
+          </p>
         </div>
       </div>
     </>
