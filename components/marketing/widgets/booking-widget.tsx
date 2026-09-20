@@ -4,19 +4,13 @@ import Link from "next/link";
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import type { ComponentPropsWithoutRef } from "react";
 import type { DateRange } from "react-day-picker";
-import { ArrowRight, CalendarDays, ChevronDown } from "lucide-react";
+import { ArrowRight, CalendarDays, ChevronDown, CheckCircle2 } from "lucide-react";
 
 import type { BookingWidgetProps } from "@/content/types";
 import { cn } from "@/lib/utils";
-import { Button as NeoPopButton } from "@/components/neopop";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
-const variantClasses: Record<NonNullable<BookingWidgetProps["variant"]>, string> = {
-  hero: "",
-  cta: "border border-[#3D3D3D] bg-[#121212] p-4 text-white shadow-[4px_4px_0px_#000000]",
-  inline: "border border-[#3D3D3D] bg-[#121212] p-4 text-white shadow-[4px_4px_0px_#000000]",
-};
+import { MagneticButton } from "../interactive/magnetic-button";
 
 function getLocalDate(days: number) {
   const date = new Date();
@@ -82,38 +76,99 @@ const DateSummaryButton = forwardRef<HTMLButtonElement, DateSummaryButtonProps>(
   },
   ref,
 ) {
+  const nights = (() => {
+    if (!dateRange?.from || !dateRange?.to) return 1;
+    const diffTime = Math.abs(dateRange.to.getTime() - dateRange.from.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(1, diffDays);
+  })();
+
+  if (variant === "hero") {
+    return (
+      <button
+        ref={ref}
+        {...props}
+        aria-expanded={open}
+        type="button"
+        className={cn(
+          "flex w-full md:flex-1 items-center justify-between gap-2.5 sm:gap-3 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl md:rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 transition-all text-left cursor-pointer group",
+          className
+        )}
+      >
+        {/* Left: Check-In Column */}
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#E01E5A]/15 text-[#E01E5A] border border-[#E01E5A]/30 group-hover:scale-105 transition-transform">
+            <CalendarDays className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-[10px] font-mono font-semibold uppercase tracking-wider text-white/50">Check-In</p>
+            <p className="text-xs sm:text-sm font-mono font-bold text-white tracking-tight whitespace-nowrap">{formatShortDate(dateRange?.from)}</p>
+          </div>
+        </div>
+
+        {/* Center: Stay Duration Pill */}
+        <div className="flex items-center gap-1.5 shrink-0 px-2.5 sm:px-3 py-1 rounded-full bg-white/[0.05] border border-white/10">
+          <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-white/75 whitespace-nowrap">
+            {nights} {nights === 1 ? "Night" : "Nights"}
+          </span>
+        </div>
+
+        {/* Right: Check-Out Column + Snug Chevron */}
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <div>
+            <p className="text-[10px] font-mono font-semibold uppercase tracking-wider text-white/50">Check-Out</p>
+            <p className="text-xs sm:text-sm font-mono font-bold text-white tracking-tight whitespace-nowrap">{formatShortDate(dateRange?.to)}</p>
+          </div>
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.05] border border-white/10 group-hover:border-white/25 transition-colors shrink-0">
+            <ChevronDown
+              className={cn(
+                "h-3.5 w-3.5 text-white/50 group-hover:text-white transition-transform",
+                open && "rotate-180 text-[#E01E5A]"
+              )}
+            />
+          </div>
+        </div>
+      </button>
+    );
+  }
+
   return (
     <button
       ref={ref}
       {...props}
       aria-expanded={open}
+      type="button"
       className={cn(
-        "flex w-full items-center gap-3 border border-[#3D3D3D] bg-[#161616] text-left text-white hover:border-white/40 transition-colors shadow-[2px_2px_0px_#000000] cursor-pointer",
-        variant === "hero" ? "px-4 py-3.5 md:px-5" : "px-3.5 py-3",
-        className,
+        "flex w-full items-center justify-between gap-3 px-4 py-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 transition-all text-left text-white cursor-pointer group",
+        className
       )}
     >
-      <div className="grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] items-center gap-3 md:gap-4">
-        <span className="inline-flex items-center justify-center text-[var(--np-yellow)]">
+      <div className="flex items-center gap-3">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#E01E5A]/15 text-[#E01E5A] border border-[#E01E5A]/30">
           <CalendarDays className="h-4 w-4" />
-        </span>
-        <div className="min-w-0">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-white/50 font-['Gilroy',sans-serif]">Check-In</p>
-          <p className="mt-0.5 text-sm font-extrabold text-white font-['Gilroy',sans-serif]">{formatShortDate(dateRange?.from)}</p>
         </div>
-        <div className="min-w-0 border-l border-[#3D3D3D] pl-3 md:pl-4">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-white/50 font-['Gilroy',sans-serif]">Check-Out</p>
-          <p className="mt-0.5 text-sm font-extrabold text-white font-['Gilroy',sans-serif]">{formatShortDate(dateRange?.to)}</p>
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div>
+            <p className="text-[10px] font-mono font-medium uppercase tracking-wider text-white/50">Check-In</p>
+            <p className="text-xs font-mono font-bold text-white">{formatShortDate(dateRange?.from)}</p>
+          </div>
+          <span className="text-[10px] font-mono text-white/50 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+            {nights}N
+          </span>
+          <div>
+            <p className="text-[10px] font-mono font-medium uppercase tracking-wider text-white/50">Check-Out</p>
+            <p className="text-xs font-mono font-bold text-white">{formatShortDate(dateRange?.to)}</p>
+          </div>
         </div>
       </div>
-      <span className="inline-flex h-7 w-7 items-center justify-center border border-[#3D3D3D] bg-black/60 text-white/70">
+      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.05] border border-white/10 group-hover:border-white/25 transition-colors shrink-0">
         <ChevronDown
           className={cn(
-            "h-4 w-4 shrink-0 transition-transform",
-            open && "rotate-180",
+            "h-3.5 w-3.5 text-white/50 group-hover:text-white transition-transform",
+            open && "rotate-180 text-[#E01E5A]"
           )}
         />
-      </span>
+      </div>
     </button>
   );
 });
@@ -122,7 +177,7 @@ export function BookingWidget({
   destinationHref = "/property",
   initialCheckIn = "",
   initialCheckOut = "",
-  submitLabel = "Check Dates",
+  submitLabel = "Check Availability",
   variant = "inline",
 }: BookingWidgetProps) {
   const initialFrom = initialCheckIn ? new Date(`${initialCheckIn}T12:00:00`) : getLocalDate(0);
@@ -146,6 +201,16 @@ export function BookingWidget({
       mediaQuery.removeEventListener("change", handleChange);
     };
   }, []);
+
+  // Auto-dismiss popover when scrolling away
+  useEffect(() => {
+    if (!open) return;
+    const handleScroll = () => {
+      setOpen(false);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [open]);
 
   const checkIn = toInputDateString(dateRange?.from);
   const checkOut = toInputDateString(dateRange?.to);
@@ -180,20 +245,21 @@ export function BookingWidget({
   if (variant === "hero") {
     return (
       <div className="w-full">
-        <div className="border border-[#3D3D3D] bg-[#0D0D0D]/95 p-4 shadow-[6px_6px_0px_#000000] backdrop-blur-xl">
+        {/* Floating Capsule Bar */}
+        <div className="bg-[#121216]/95 p-2 sm:p-2.5 rounded-2xl md:rounded-full border border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.8)] flex flex-col md:flex-row items-center gap-2.5 sm:gap-3 backdrop-blur-2xl">
           <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
-              <DateSummaryButton dateRange={dateRange} open={open} variant={variant} />
+              <DateSummaryButton dateRange={dateRange} open={open} variant="hero" />
             </PopoverTrigger>
             <PopoverContent
               align="center"
               className={cn(
-                "z-[200] w-auto border border-[#3D3D3D] bg-[#121212] p-4 shadow-[8px_8px_0px_#000000] rounded-none",
+                "z-[200] w-auto border border-white/10 bg-[#16161C]/98 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.9)] rounded-2xl backdrop-blur-2xl",
                 isDesktopCalendar ? "max-w-[min(100vw-2rem,860px)]" : "max-w-[min(100vw-2rem,360px)]",
               )}
             >
               <Calendar
-                className="vh-calendar-dark vh-calendar-balanced rounded-none"
+                className="vh-calendar-dark vh-calendar-balanced rounded-xl"
                 defaultMonth={dateRange?.from}
                 mode="range"
                 numberOfMonths={isDesktopCalendar ? 2 : 1}
@@ -206,8 +272,8 @@ export function BookingWidget({
 
                   setDateRange(resolvedRange);
 
-                  if (resolvedRange.from && resolvedRange.to) {
-                    setOpen(false);
+                  if (resolvedRange.from && resolvedRange.to && resolvedRange.to > resolvedRange.from) {
+                    setTimeout(() => setOpen(false), 220);
                   }
                 }}
                 selected={dateRange}
@@ -216,31 +282,29 @@ export function BookingWidget({
             </PopoverContent>
           </Popover>
 
-          <div className="mt-4">
-            <NeoPopButton
-              asChild
-              disabled={validationMessage.length > 0}
-              fullWidth
-              size="default"
-              variant="primary"
-              endIcon={<ArrowRight className="h-4 w-4" />}
+          {/* Primary CTA */}
+          <Link
+            href={destinationWithDates}
+            className={cn(
+              "w-full md:w-auto shrink-0",
+              validationMessage.length > 0 && "pointer-events-none opacity-60"
+            )}
+          >
+            <MagneticButton
+              className="w-full md:w-auto bg-[#E01E5A] hover:bg-[#F02D6B] text-white rounded-xl md:rounded-full px-7 py-3.5 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-[0_4px_20px_rgba(224,30,90,0.4)] active:scale-[0.98]"
             >
-              <Link href={destinationWithDates}>
-                {submitLabel}
-              </Link>
-            </NeoPopButton>
-          </div>
-
-          <p className="mt-3 text-center text-xs font-bold uppercase tracking-[0.1em] text-white/55 font-['Gilroy',sans-serif]">
-            Lock the dates now. Sort the rest when you get here.
-          </p>
+              <span>{submitLabel}</span>
+              <ArrowRight className="h-4 w-4" />
+            </MagneticButton>
+          </Link>
         </div>
       </div>
     );
   }
 
+  // CTA or Inline Variant
   return (
-    <div className={variantClasses[variant]}>
+    <div className="bg-[#121216] p-5 rounded-2xl border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.6)]">
       <Popover onOpenChange={setOpen} open={open}>
         <PopoverTrigger asChild>
           <DateSummaryButton dateRange={dateRange} open={open} variant={variant} />
@@ -248,12 +312,12 @@ export function BookingWidget({
         <PopoverContent
           align="center"
           className={cn(
-            "z-[200] w-auto border border-[#3D3D3D] bg-[#121212] p-4 shadow-[8px_8px_0px_#000000] rounded-none",
+            "z-[200] w-auto border border-white/10 bg-[#16161C]/98 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.9)] rounded-2xl backdrop-blur-2xl",
             isDesktopCalendar ? "max-w-[min(100vw-2rem,860px)]" : "max-w-[min(100vw-2rem,420px)]",
           )}
         >
           <Calendar
-            className="vh-calendar-dark vh-calendar-balanced rounded-none"
+            className="vh-calendar-dark vh-calendar-balanced rounded-xl"
             defaultMonth={dateRange?.from}
             mode="range"
             numberOfMonths={isDesktopCalendar ? 2 : 1}
@@ -276,16 +340,21 @@ export function BookingWidget({
         </PopoverContent>
       </Popover>
 
-      <div className="mt-3">
-        <NeoPopButton
-          asChild
-          disabled={validationMessage.length > 0}
-          fullWidth
-          size="default"
-          variant="primary"
+      <div className="mt-4">
+        <Link
+          href={destinationWithDates}
+          className={cn(
+            "w-full block",
+            validationMessage.length > 0 && "pointer-events-none opacity-60"
+          )}
         >
-          <Link href={destinationWithDates}>{submitLabel}</Link>
-        </NeoPopButton>
+          <MagneticButton
+            className="w-full bg-[#E01E5A] hover:bg-[#F02D6B] text-white rounded-xl py-3.5 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(224,30,90,0.4)] active:scale-[0.98]"
+          >
+            <span>{submitLabel}</span>
+            <ArrowRight className="h-4 w-4" />
+          </MagneticButton>
+        </Link>
       </div>
     </div>
   );

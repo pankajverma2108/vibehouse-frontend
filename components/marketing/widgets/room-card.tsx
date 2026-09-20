@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
 import type { RoomCardProps } from "@/content/types";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
-import { Button as NeoPopButton } from "@/components/neopop";
 import { cn } from "@/lib/utils";
+import { MagneticButton } from "../interactive/magnetic-button";
 
 export function RoomCard({
   amenitiesLegend,
@@ -36,20 +36,24 @@ export function RoomCard({
     setActiveImageIndex((current) => (current + 1) % gallery.length);
   };
 
+  const isDorm = title.toLowerCase().includes("bunk") || title.toLowerCase().includes("dorm") || title.toLowerCase().includes("pod");
+
   return (
-    <div className="flex flex-col border border-[#3D3D3D] bg-[#161616] shadow-[4px_4px_0px_#000000] hover:border-white/40 transition-colors h-full">
-      <div className="relative h-[240px] w-full overflow-hidden border-b border-[#3D3D3D] bg-black">
+    <div className="group flex flex-col bg-[#121216] rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.7)] h-full">
+      {/* Room Photography */}
+      <div className="relative h-[250px] w-full overflow-hidden bg-[#0A0A0E]">
         <ImageWithFallback
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           src={activeImage}
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#121216] via-transparent to-black/30" />
 
         {gallery.length > 1 ? (
           <>
             <button
               aria-label="Previous image"
-              className="absolute left-3 top-1/2 -translate-y-1/2 border border-white/30 bg-black/70 p-1.5 text-white/90 hover:border-white transition-colors cursor-pointer"
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/90 hover:bg-black/90 transition-all cursor-pointer opacity-0 group-hover:opacity-100"
               onClick={goPrevious}
               type="button"
             >
@@ -57,7 +61,7 @@ export function RoomCard({
             </button>
             <button
               aria-label="Next image"
-              className="absolute right-3 top-1/2 -translate-y-1/2 border border-white/30 bg-black/70 p-1.5 text-white/90 hover:border-white transition-colors cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/90 hover:bg-black/90 transition-all cursor-pointer opacity-0 group-hover:opacity-100"
               onClick={goNext}
               type="button"
             >
@@ -67,20 +71,25 @@ export function RoomCard({
         ) : null}
 
         {badge && badge.label.toLowerCase() !== "details on arrival" ? (
-          <div className="absolute left-3 top-3 border border-black bg-[var(--np-yellow)] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.14em] text-black">
+          <div
+            className={cn(
+              "absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-mono font-medium uppercase tracking-wider text-white shadow-md",
+              isDorm ? "bg-[#36C5F0]/90 text-black font-semibold" : "bg-[#E01E5A] text-white"
+            )}
+          >
             {badge.label}
           </div>
         ) : null}
 
         {gallery.length > 1 ? (
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 border border-white/20 bg-black/70 px-2 py-1">
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md px-2.5 py-1 border border-white/15">
             {gallery.map((item, index) => (
               <button
                 key={`${item}-${index}`}
                 aria-label={`Show image ${index + 1}`}
                 className={cn(
-                  "h-1.5 transition-all",
-                  index === activeImageIndex ? "w-4 bg-[var(--np-yellow)]" : "w-1.5 bg-white/40"
+                  "h-1 rounded-full transition-all duration-300",
+                  index === activeImageIndex ? "w-4 bg-[#E01E5A]" : "w-1 bg-white/40"
                 )}
                 onClick={(e) => {
                   e.preventDefault();
@@ -94,35 +103,41 @@ export function RoomCard({
         ) : null}
       </div>
 
-      <div className="p-5 flex flex-col flex-1">
-        <h3 className="font-['Gilroy',sans-serif] text-xl font-extrabold uppercase tracking-[0.06em] text-white">
-          {title}
-        </h3>
+      {/* Room Details & Pricing */}
+      <div className="p-6 flex flex-col flex-1 justify-between">
+        <div>
+          <h3 className="font-display text-xl font-bold uppercase tracking-tight text-white group-hover:text-white transition-colors">
+            {title}
+          </h3>
 
-        <ul className="mt-3.5 flex flex-wrap gap-1.5 text-xs">
-          {detailLabels.slice(0, 8).map((feature, index) => (
-            <li
-              key={`${feature}-${index}`}
-              className="inline-flex items-center border border-[#3D3D3D] bg-[#121212] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.06em] text-white/75 font-['Gilroy',sans-serif]"
-            >
-              {feature}
-            </li>
-          ))}
-        </ul>
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {detailLabels.slice(0, 6).map((feature, index) => (
+              <span
+                key={`${feature}-${index}`}
+                className="inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-mono font-medium uppercase tracking-wider text-white/70 bg-white/[0.04] border border-white/8"
+              >
+                {feature}
+              </span>
+            ))}
+          </div>
+        </div>
 
-        <div className="mt-6 pt-4 border-t border-[#3D3D3D] flex items-end justify-between gap-4">
+        <div className="mt-6 pt-5 border-t border-white/10 flex items-center justify-between gap-4">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/50 font-['Gilroy',sans-serif]">
+            <p className="text-[10px] font-mono font-medium uppercase tracking-wider text-white/50">
               {price.includes("/night") ? "Per Night" : "Starting From"}
             </p>
-            <p className="text-xl font-extrabold text-[var(--np-yellow)] font-['Gilroy',sans-serif] mt-0.5">
+            <p className="text-xl font-mono font-bold text-white mt-0.5 tracking-tight">
               {price}
             </p>
           </div>
 
-          <NeoPopButton asChild size="sm" variant="primary">
-            <Link href={href}>View Room</Link>
-          </NeoPopButton>
+          <Link href={href}>
+            <MagneticButton className="rounded-full bg-white/[0.08] hover:bg-[#E01E5A] text-white hover:text-white border border-white/15 hover:border-[#E01E5A] px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5">
+              <span>View Space</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </MagneticButton>
+          </Link>
         </div>
       </div>
     </div>

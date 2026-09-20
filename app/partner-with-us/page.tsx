@@ -4,7 +4,7 @@ import { PartnerWithUsPage } from "@/components/standalone/partner-with-us-page"
 
 export const metadata: Metadata = {
   title: "Partner With Us",
-  description: "Partner with The Daily Social to maximize property yield.",
+  description: "Partner with Vibehouse to maximize property yield.",
 };
 
 export default function Page() {

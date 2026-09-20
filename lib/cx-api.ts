@@ -363,7 +363,7 @@ function normalizeEvent(event: RawEvent): EventCardProps {
   const time = formatTime12Hour(event.time);
   if (!event.time) recordTelemetry({ type: "missing_field", source: "event", field: "time" });
 
-  const location = ensureString(event.location, "The Daily Social");
+  const location = ensureString(event.location, "Vibehouse");
   if (!event.location) recordTelemetry({ type: "missing_field", source: "event", field: "location" });
 
   const price = ensureString(event.price_text, "Details on arrival");

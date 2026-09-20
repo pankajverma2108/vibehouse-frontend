@@ -19,8 +19,8 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const variantFaceStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-[var(--np-yellow)] text-[var(--np-black-500)] border border-[var(--np-yellow)] font-bold',
-  secondary: 'bg-[var(--np-black-300)] text-[var(--np-white-500)] border border-[var(--np-black-200)] font-semibold',
+  primary: 'bg-[var(--vh-pink)] text-white border border-[var(--vh-pink)] hover:bg-[var(--vh-pink-soft)] font-bold transition-colors',
+  secondary: 'bg-[var(--np-black-300)] text-[var(--np-white-500)] border border-[var(--np-black-200)] hover:border-white/40 font-semibold transition-colors',
   destructive: 'bg-[var(--np-red)] text-white border border-[var(--np-red)] font-bold',
   success: 'bg-[var(--np-green)] text-[var(--np-black-500)] border border-[var(--np-green)] font-bold',
   ghost: 'bg-transparent text-[var(--np-white-500)] hover:bg-[var(--np-black-400)] font-medium',
@@ -28,12 +28,12 @@ const variantFaceStyles: Record<ButtonVariant, string> = {
 };
 
 const variantEdgeColors: Record<ButtonVariant, string> = {
-  primary: '#000000',
-  secondary: '#3d3d3d',
+  primary: '#991438',
+  secondary: '#2a2a38',
   destructive: '#7a1d12',
   success: '#0d4a30',
   ghost: 'transparent',
-  outline: '#3d3d3d',
+  outline: '#2a2a38',
 };
 
 const sizeStyles: Record<ButtonSize, { container: string; face: string; iconSize: string }> = {

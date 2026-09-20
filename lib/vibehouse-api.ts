@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE_URL = "https://api.thedailysocial.co.in";
+const DEFAULT_API_BASE_URL = "http://localhost:8000";
 
 export class ApiRequestError extends Error {
   status: number;

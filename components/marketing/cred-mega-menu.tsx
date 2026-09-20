@@ -34,7 +34,7 @@ export const credNavCategories: NavCategory[] = [
     label: "WHAT'S NEW",
     featured: {
       badge: "NEW LAUNCH",
-      title: "THE DAILY SOCIAL · KORAMANGALA",
+      title: "VIBEHOUSE · KORAMANGALA",
       subtitle: "Flagship social hostel, private suites & community rooftop cafe",
       image: "/images/property/hero-1-1600.webp",
       href: "/property",
@@ -220,38 +220,13 @@ export const credNavCategories: NavCategory[] = [
   },
 ];
 
+import { VibehouseLogo } from "./vibehouse-logo";
+
 /**
- * CRED Brand Logo Component (Stacked Emblem & Wordmark)
+ * Vibehouse Brand Logo (Original Initial Logo)
  */
 export function CredBrandLogo({ className }: { className?: string }) {
-  return (
-    <Link href="/" className={cn("group flex flex-col items-start gap-1 select-none", className)}>
-      <svg
-        className="h-8 w-8 text-white transition-transform group-hover:scale-105"
-        viewBox="0 0 40 46"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M20 2L4 9.5V26.5C4 35.5 11 41.5 20 44C29 41.5 36 35.5 36 26.5V9.5L20 2Z"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M20 12L12 16V25C12 29.5 15.5 32.8 20 34C24.5 32.8 28 29.5 28 25V16L20 12Z"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-      <span className="text-[13px] font-black tracking-[0.2em] uppercase text-white font-['Gilroy',sans-serif]">
-        THE DAILY SOCIAL
-      </span>
-    </Link>
-  );
+  return <VibehouseLogo className={className} />;
 }
 
 /**
@@ -289,7 +264,7 @@ export function CredExpandTrigger({
           </span>
         ) : (
           <span className="text-[9.5px] font-extrabold uppercase tracking-[0.14em] text-white/60 font-['Gilroy',sans-serif] transition-all">
-            THE DAILY SOCIAL · KORAMANGALA
+            VIBEHOUSE · KORAMANGALA
           </span>
         )}
       </div>
@@ -298,9 +273,9 @@ export function CredExpandTrigger({
 
       {/* 3-line hamburger */}
       <div className="flex flex-col justify-between w-4 h-3 text-white">
-        <span className="h-[2px] w-full bg-white transition-all group-hover:bg-[var(--np-yellow)]" />
-        <span className="h-[2px] w-full bg-white transition-all group-hover:bg-[var(--np-yellow)]" />
-        <span className="h-[2px] w-full bg-white transition-all group-hover:bg-[var(--np-yellow)]" />
+        <span className="h-[2px] w-full bg-white transition-all group-hover:bg-[var(--vh-pink)]" />
+        <span className="h-[2px] w-full bg-white transition-all group-hover:bg-[var(--vh-pink)]" />
+        <span className="h-[2px] w-full bg-white transition-all group-hover:bg-[var(--vh-pink)]" />
       </div>
     </button>
   );
@@ -464,7 +439,7 @@ export function CredMegaMenuOverlay({
                               className="object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                             />
                           </div>
-                          <h4 className="mt-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white font-['Gilroy',sans-serif] group-hover:text-[var(--np-yellow)] transition-colors">
+                          <h4 className="mt-3 text-[12px] font-extrabold uppercase tracking-[0.14em] text-white font-['Gilroy',sans-serif] group-hover:text-[var(--vh-pink)] transition-colors">
                             {card.title}
                           </h4>
                           <p className="mt-1 text-[11px] text-white/50 lowercase leading-relaxed line-clamp-2">

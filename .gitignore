@@ -30,3 +30,6 @@ context.md
 *.tsbuildinfo
 .github/workflows/
 .mcp.json
+scratch/
+portfolio-export/
+

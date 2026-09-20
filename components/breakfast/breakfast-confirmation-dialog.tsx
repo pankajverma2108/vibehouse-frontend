@@ -57,7 +57,7 @@ function BreakfastDialogFrame({
             <Dialog.Content asChild forceMount onEscapeKeyDown={(event) => { if (closeDisabled) event.preventDefault(); }} onPointerDownOutside={(event) => { if (closeDisabled) event.preventDefault(); }}>
               <motion.section
                 animate={{ opacity: 1 }}
-                className="fixed left-1/2 top-1/2 z-[241] flex max-h-[min(88dvh,760px)] w-[calc(100vw-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-none border border-[#3D3D3D] bg-[#161616] text-white shadow-[6px_6px_0px_#000000] focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--np-yellow)]"
+                className="fixed left-1/2 top-1/2 z-[241] flex max-h-[min(88dvh,760px)] w-[calc(100vw-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-none border border-white/10 bg-[#171822] text-white shadow-[6px_6px_0px_#991438] focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF2E62]"
                 exit={{ opacity: 0 }}
                 initial={{ opacity: 0 }}
                 transition={transition}
@@ -165,7 +165,7 @@ export function BreakfastConfirmationDialog({
       footer={mode === "review" ? (
         <div className="flex flex-col gap-3 sm:flex-row-reverse">
           <Button
-            className="h-12 rounded-none bg-[var(--np-yellow)] px-5 font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
+            className="h-12 rounded-none bg-[#FF2E62] px-5 font-bold text-white border border-[#FF2E62] shadow-[3px_3px_0px_#991438] hover:bg-[#FF2E62]/90"
             loading={pending}
             loadingText="Placing order..."
             onClick={onConfirm}
@@ -208,7 +208,7 @@ export function BreakfastSkipDialog({
       footer={(
         <div className="flex flex-col gap-3 sm:flex-row-reverse">
           <Button
-            className="h-12 rounded-none bg-[var(--np-yellow)] px-5 font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
+            className="h-12 rounded-none bg-[#FF2E62] px-5 font-bold text-white border border-[#FF2E62] shadow-[3px_3px_0px_#991438] hover:bg-[#FF2E62]/90"
             loading={pending}
             loadingText="Updating choice..."
             onClick={onConfirm}
@@ -239,3 +239,4 @@ export function BreakfastSkipDialog({
     </BreakfastDialogFrame>
   );
 }
+

@@ -257,25 +257,13 @@ export default function RoomsPage() {
               <div className="bg-[#1e293b] border-2 border-[#334155] rounded-[8px] p-6 space-y-6">
                 <div>
                   <p className="font-['Space_Grotesk'] font-bold text-[12px] text-[rgba(255,255,255,0.6)] uppercase tracking-[1px] mb-2">
-                    WhatsApp / Phone
-                  </p>
-                  <a
-                    href="tel:+918884973328"
-                    className="font-['Space_Grotesk'] text-[18px] text-[#00d1ff] hover:text-[#c62828] transition-colors"
-                  >
-                    +91 88849 73328
-                  </a>
-                </div>
-
-                <div>
-                  <p className="font-['Space_Grotesk'] font-bold text-[12px] text-[rgba(255,255,255,0.6)] uppercase tracking-[1px] mb-2">
                     Email
                   </p>
                   <a
-                    href="mailto:thedailysocial01@gmail.com"
+                    href="mailto:hello@vibehouse.co"
                     className="font-['Space_Grotesk'] text-[18px] text-[#00d1ff] hover:text-[#c62828] transition-colors"
                   >
-                    thedailysocial01@gmail.com
+                    hello@vibehouse.co
                   </a>
                 </div>
 

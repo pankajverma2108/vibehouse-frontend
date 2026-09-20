@@ -84,7 +84,7 @@ const scenarios: Record<BreakfastTestToken, BreakfastTestScenario> = {
   "test-ExistingOrder": { token: "test-ExistingOrder", label: "Existing submitted order", description: "Two saved plates with independent slots and an Edit action.", response: response([existingRoom]) },
   "test-FrozenOrder": { token: "test-FrozenOrder", label: "Frozen read-only order", description: "A saved order while breakfast ordering is closed.", response: { ...response([existingRoom]), window: { ...response([existingRoom]).window, state: "frozen", opens_at_ist: "2026-07-12 11:00 IST" } } },
   "test-AllSlotsFull": { token: "test-AllSlotsFull", label: "All delivery slots full", description: "Every delivery time is full.", response: { ...response([room("305", 2)]), slots: slots.map((slot) => ({ ...slot, booked: slot.capacity, remaining: 0 })) } },
-  "test-TDSTwoRooms": { token: "test-TDSTwoRooms", label: "TDS · two rooms", description: "The same workflow with The Daily Social branding and a room selector.", response: response([room("101 A", 2), room("102 B", 1)], "TDS") },
+  "test-TDSTwoRooms": { token: "test-TDSTwoRooms", label: "TDS · two rooms", description: "The same workflow with Vibehouse branding and a room selector.", response: response([room("101 A", 2), room("102 B", 1)], "TDS") },
 };
 
 export function isBreakfastTestToken(value: string): value is BreakfastTestToken {

@@ -1,9 +1,9 @@
 const ZOSTEL_PATTERN = /\bzostel\b/gi;
 const LOCALHOST_PATTERN = /^https?:\/\/(localhost|127(?:\.\d+){3})(:\d+)?$/i;
-const DEFAULT_SITE_ORIGIN = "https://www.thedailysocial.co.in";
+const DEFAULT_SITE_ORIGIN = "http://localhost:3000";
 
-export const BRAND_NAME = "The Daily Social";
-export const BRAND_SHORT_NAME = "TDS";
+export const BRAND_NAME = "Vibehouse";
+export const BRAND_SHORT_NAME = "VH";
 
 function looksLikeSystemId(value: string): boolean {
   // Reservation/property identifiers should not be shown as end-user location names.
@@ -66,8 +66,7 @@ export function getPreferredSiteOrigin(): string {
     }
   }
 
-  const envOrigins = process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_ORIGIN;
-  
+  const envOrigins = [process.env.NEXT_PUBLIC_SITE_URL, DEFAULT_SITE_ORIGIN].filter(Boolean) as string[];
 
   for (const candidate of envOrigins) {
     const origin = toOrigin(candidate);

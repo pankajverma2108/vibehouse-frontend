@@ -383,7 +383,7 @@ function SectionTitle({
   className?: string;
 }) {
   return (
-    <h2 className={`text-2xl md:text-3xl font-bold tracking-tight text-white font-['Cirka',serif] ${className}`}>
+    <h2 className={`text-2xl md:text-3xl font-bold tracking-tight text-white font-display ${className}`}>
       {title}
     </h2>
   );
@@ -419,11 +419,11 @@ function DateRangePicker({
       <PopoverTrigger asChild>
         <button
           aria-expanded={open}
-          className="flex w-full items-center justify-between gap-3 border border-[#3D3D3D] bg-[#161616] px-5 py-3 text-white shadow-[3px_3px_0px_#000000] hover:border-[var(--np-yellow)] transition-all md:w-auto font-['Gilroy',sans-serif]"
+          className="flex w-full items-center justify-between gap-3 border border-white/15 bg-[#171822] px-5 py-3 text-white shadow-[3px_3px_0px_#000000] hover:border-[var(--vh-pink)] transition-all md:w-auto font-['Gilroy',sans-serif]"
           type="button"
         >
           <div className="inline-flex min-w-0 items-center gap-3">
-            <span className="inline-flex items-center justify-center text-[var(--np-yellow)]">
+            <span className="inline-flex items-center justify-center text-[var(--vh-pink)]">
               <CalendarDays className="h-5 w-5" />
             </span>
             <span className="text-sm md:text-base font-bold tracking-[0.04em]">
@@ -509,16 +509,16 @@ function DesktopBookingSummary({
 
   return (
     <aside className="hidden self-start lg:sticky lg:top-28 lg:block">
-      <div className="border border-[#3D3D3D] bg-[#161616] p-6 shadow-[4px_4px_0px_#000000] lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto font-['Gilroy',sans-serif]">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white font-['Cirka',serif]">{bookingSummary.title}</h2>
+      <div className="border border-white/15 bg-[#171822] p-6 shadow-[4px_4px_0px_#000000] lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto font-['Gilroy',sans-serif]">
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white font-display">{bookingSummary.title}</h2>
 
-        <div className="mt-5 border border-[#3D3D3D] bg-[#121212] px-4 py-4 text-white">
+        <div className="mt-5 border border-white/10 bg-[#12131A] px-4 py-4 text-white">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">Check In</p>
               <p className="mt-1 text-sm font-extrabold">{formatDisplayDate(checkIn)}</p>
             </div>
-            <div className="bg-[var(--np-yellow)] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-black shadow-[2px_2px_0px_#000000]">
+            <div className="bg-[var(--vh-pink)] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white shadow-[2px_2px_0px_#000000]">
               {nights} {nights === 1 ? "Night" : "Nights"}
             </div>
             <div className="text-right">
@@ -528,7 +528,7 @@ function DesktopBookingSummary({
           </div>
         </div>
 
-        <div className="mt-5 space-y-3 border-t border-[#3D3D3D] pt-5 text-sm text-white/80">
+        <div className="mt-5 space-y-3 border-t border-white/10 pt-5 text-sm text-white/80">
           {hasSelection ? (
             selectedRooms.map((room) => (
               <div key={getRoomSelectionKey(room)} className="flex items-start justify-between gap-3">
@@ -544,13 +544,13 @@ function DesktopBookingSummary({
               </div>
             ))
           ) : (
-            <p className="border border-dashed border-[#3D3D3D] bg-[#121212] px-3 py-4 text-center text-xs font-bold uppercase tracking-[0.08em] text-white/50">
+            <p className="border border-dashed border-white/15 bg-[#12131A] px-3 py-4 text-center text-xs font-bold uppercase tracking-[0.08em] text-white/50">
               Add room(s) to see booking totals.
             </p>
           )}
 
           {essentials.filter((item) => item.quantity > 0).map((item) => (
-            <div key={item.id} className="flex items-start justify-between gap-3 border-t border-[#3D3D3D] pt-3">
+            <div key={item.id} className="flex items-start justify-between gap-3 border-t border-white/10 pt-3">
               <div>
                 <p className="font-extrabold text-white text-xs uppercase tracking-[0.04em]">{item.title}</p>
                 <p className="text-[11px] text-white/50 mt-0.5">
@@ -562,7 +562,7 @@ function DesktopBookingSummary({
           ))}
         </div>
 
-        <div className="mt-5 border-t border-[#3D3D3D] pt-4 text-xs text-white/70 space-y-2">
+        <div className="mt-5 border-t border-white/10 pt-4 text-xs text-white/70 space-y-2">
           <div className="flex items-center justify-between">
             <p className="uppercase tracking-[0.08em]">Total room charges</p>
             <p className="font-bold text-white text-sm">Rs. {formatINRPlain(roomTotal)}</p>
@@ -581,30 +581,30 @@ function DesktopBookingSummary({
               >
                 <Info className="h-3 w-3" />
               </button>
-              <span className="pointer-events-none absolute left-0 top-[calc(100%+6px)] z-20 hidden min-w-[180px] border border-[#3D3D3D] bg-[#121212] px-2.5 py-2 text-[11px] leading-4 text-white/85 shadow-[4px_4px_0px_#000000] group-hover:block">
+              <span className="pointer-events-none absolute left-0 top-[calc(100%+6px)] z-20 hidden min-w-[180px] border border-white/15 bg-[#12131A] px-2.5 py-2 text-[11px] leading-4 text-white/85 shadow-[4px_4px_0px_#000000] group-hover:block">
                 <span className="block">Room tax - {formatINRPlain(roomTaxExact)}</span>
                 <span className="mt-1 block">Add-on tax - {formatINRPlain(addonTaxExact)}</span>
               </span>
             </p>
             <p className="font-bold text-white text-sm">Rs. {formatINRPlain(taxes)}</p>
           </div>
-          <div className="pt-2 border-t border-[#3D3D3D] flex items-center justify-between">
+          <div className="pt-2 border-t border-white/10 flex items-center justify-between">
             <p className="font-bold text-white uppercase tracking-[0.1em] text-sm">Total price</p>
-            <p className="font-black text-xl text-[var(--np-yellow)]">Rs. {formatINRPlain(grandTotal)}</p>
+            <p className="font-black text-xl text-[var(--vh-pink)]">Rs. {formatINRPlain(grandTotal)}</p>
           </div>
         </div>
 
-        <div className="my-4 flex items-start gap-3 border-t border-[#3D3D3D] pt-4">
+        <div className="my-4 flex items-start gap-3 border-t border-white/10 pt-4">
           <input
             checked={isAgeConfirmed}
-            className="mt-0.5 h-5 w-5 cursor-pointer rounded-none border border-[#3D3D3D] bg-[#121212] accent-[var(--np-yellow)] focus:ring-0"
+            className="mt-0.5 h-5 w-5 cursor-pointer rounded-none border border-white/20 bg-[#12131A] accent-[var(--vh-pink)] focus:ring-0"
             id="checked-checkbox-desktop"
             onChange={(event) => onAgeConfirmChange(event.target.checked)}
             type="checkbox"
           />
           <label htmlFor="checked-checkbox-desktop" className="cursor-pointer select-none text-xs leading-relaxed text-white/80">
             Yes, I confirm <span className="font-bold text-white">all guests are 18+ years old</span> and acknowledge the{" "}
-            <Link className="text-[var(--np-yellow)] hover:underline" href="/policies/">
+            <Link className="text-[var(--vh-pink)] hover:underline" href="/policies/">
               Terms, Cancellation &amp; Property Policies.
             </Link>
           </label>
@@ -719,7 +719,7 @@ function MobileStickySummary({
                 </div>
               ))}
 
-              <div className="border-t border-[#3D3D3D] pt-2 text-[11px] space-y-1 text-white/60">
+              <div className="border-t border-white/10 pt-2 text-[11px] space-y-1 text-white/60">
                 <div className="flex items-center justify-between">
                   <p className="uppercase tracking-[0.06em]">Add-ons</p>
                   <p className="font-bold text-white">Rs. {formatINRPlain(essentialsTotal)}</p>
@@ -728,23 +728,23 @@ function MobileStickySummary({
                   <p className="uppercase tracking-[0.06em]">Total taxes</p>
                   <p className="font-bold text-white">Rs. {formatINRPlain(taxes)}</p>
                 </div>
-                <div className="mt-2 flex items-center justify-between font-black text-sm text-[var(--np-yellow)] border-t border-[#3D3D3D] pt-2">
+                <div className="mt-2 flex items-center justify-between font-black text-sm text-[var(--vh-pink)] border-t border-white/10 pt-2">
                   <p className="uppercase tracking-[0.08em] text-white">Total price</p>
                   <p>Rs. {formatINRPlain(grandTotal)}</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5 pt-3 border-t border-[#3D3D3D]">
+              <div className="flex items-start gap-2.5 pt-3 border-t border-white/10">
                 <input
                   checked={isAgeConfirmed}
-                  className="mt-0.5 h-4 w-4 cursor-pointer rounded-none border border-[#3D3D3D] bg-[#121212] accent-[var(--np-yellow)] focus:ring-0"
+                  className="mt-0.5 h-4 w-4 cursor-pointer rounded-none border border-white/20 bg-[#12131A] accent-[var(--vh-pink)] focus:ring-0"
                   id="checked-checkbox-mobile"
                   onChange={(event) => onAgeConfirmChange(event.target.checked)}
                   type="checkbox"
                 />
                 <label htmlFor="checked-checkbox-mobile" className="cursor-pointer select-none text-[11px] leading-relaxed text-white/80">
                   Yes, I confirm <span className="font-bold text-white">all guests are 18+</span> and accept{" "}
-                  <Link className="text-[var(--np-yellow)] hover:underline" href="/policies/">
+                  <Link className="text-[var(--vh-pink)] hover:underline" href="/policies/">
                     booking terms &amp; policies.
                   </Link>
                 </label>
@@ -760,7 +760,7 @@ function MobileStickySummary({
             </p>
             {continueError ? <p className="mt-1 max-w-[200px] text-[10px] font-bold text-[#EE4D37] uppercase">{continueError}</p> : null}
             <button
-              className="mt-1 inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-[0.1em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]"
+              className="mt-1 inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-[0.1em] text-[var(--vh-pink)] font-['Gilroy',sans-serif]"
               disabled={!hasSelection}
               onClick={() => setOpen((value) => !value)}
               type="button"
@@ -793,9 +793,9 @@ function BuildYourStaySection() {
           return (
             <div
               key={item.id}
-              className="relative border border-[#3D3D3D] bg-[#161616] p-5 text-left shadow-[3px_3px_0px_#000000] hover:border-[var(--np-yellow)] transition-all"
+              className="relative border border-white/10 bg-[#171822] p-5 text-left shadow-[3px_3px_0px_#000000] hover:border-[var(--vh-pink)] transition-all"
             >
-              <span className="inline-block bg-[var(--np-yellow)] text-black text-[10px] font-black uppercase tracking-[0.12em] px-2.5 py-0.5 font-['Gilroy',sans-serif] mb-3">
+              <span className="inline-block bg-[var(--vh-pink)] text-white text-[10px] font-black uppercase tracking-[0.12em] px-2.5 py-0.5 font-['Gilroy',sans-serif] mb-3">
                 {item.kicker}
               </span>
 
@@ -918,7 +918,7 @@ function RoomDetailsPopup({
               {gallery.map((image, index) => (
                 <button
                   key={image}
-                  className={`overflow-hidden border ${index === imageIndex ? "border-[var(--np-yellow)] shadow-[2px_2px_0px_#000000]" : "border-[#3D3D3D]"}`}
+                  className={`overflow-hidden border ${index === imageIndex ? "border-[var(--vh-pink)] shadow-[2px_2px_0px_#000000]" : "border-white/10"}`}
                   onClick={() => onImageChange(index)}
                   type="button"
                 >
@@ -931,14 +931,14 @@ function RoomDetailsPopup({
           <div className="p-5 md:p-6 lg:max-h-[92vh] lg:overflow-y-auto">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="inline-block bg-[var(--np-yellow)] text-black text-[10px] font-black uppercase tracking-[0.14em] px-2.5 py-0.5 font-['Gilroy',sans-serif]">
+                <span className="inline-block bg-[var(--vh-pink)] text-white text-[10px] font-black uppercase tracking-[0.14em] px-2.5 py-0.5 font-['Gilroy',sans-serif]">
                   Room Details
                 </span>
-                <h3 className="mt-3 text-3xl font-bold text-white font-['Cirka',serif] tracking-tight">{room.title}</h3>
+                <h3 className="mt-3 text-3xl font-bold text-white font-display tracking-tight">{room.title}</h3>
               </div>
               <button
                 aria-label="Close"
-                className="border border-[#3D3D3D] bg-[#161616] p-2 text-white/70 hover:border-white hover:text-white shadow-[2px_2px_0px_#000000]"
+                className="border border-white/15 bg-[#171822] p-2 text-white/70 hover:border-white hover:text-white shadow-[2px_2px_0px_#000000]"
                 onClick={onClose}
                 type="button"
               >
@@ -950,9 +950,9 @@ function RoomDetailsPopup({
               Clean, practical, and comfortable for city stays, with features that make the room work well for both rest and day-to-day use.
             </p>
 
-            <div className="mt-6 border border-[#3D3D3D] bg-[#161616] p-5 shadow-[3px_3px_0px_#000000]">
+            <div className="mt-6 border border-white/10 bg-[#171822] p-5 shadow-[3px_3px_0px_#000000]">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50 font-['Gilroy',sans-serif]">Availability</p>
-              <p className="mt-1 text-base font-extrabold text-[var(--np-yellow)] font-['Gilroy',sans-serif]">{room.inventoryText}</p>
+              <p className="mt-1 text-base font-extrabold text-[var(--vh-pink)] font-['Gilroy',sans-serif]">{room.inventoryText}</p>
               <div className="mt-4 flex items-center justify-between">
                 <div>
                   <div className="flex items-baseline gap-1 font-['Gilroy',sans-serif]">
@@ -968,7 +968,7 @@ function RoomDetailsPopup({
                 {!canBook ? (
                   <div className="flex flex-col items-end gap-1">
                     {isPriceUnavailable ? (
-                      <span className="border border-[#FFCB45]/40 bg-[#FFCB45]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]">
+                      <span className="border border-[var(--vh-pink)]/40 bg-[var(--vh-pink)]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[var(--vh-pink)] font-['Gilroy',sans-serif]">
                         Price unavailable
                       </span>
                     ) : isAvailabilityPending ? (
@@ -994,7 +994,7 @@ function RoomDetailsPopup({
                   <div className="flex items-center gap-2">
                     <button
                       aria-label="Decrement Count"
-                      className="flex h-9 w-9 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-white shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] transition-all font-bold"
+                      className="flex h-9 w-9 items-center justify-center border border-white/15 bg-[#12131A] text-white shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] transition-all font-bold"
                       onClick={onDecrement}
                       type="button"
                     >
@@ -1003,7 +1003,7 @@ function RoomDetailsPopup({
                     <span className="w-8 text-center text-base font-black text-white font-['Gilroy',sans-serif]">{count}</span>
                     <button
                       aria-label="Increment Count"
-                      className="flex h-9 w-9 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-white shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] transition-all font-bold disabled:opacity-40"
+                      className="flex h-9 w-9 items-center justify-center border border-white/15 bg-[#12131A] text-white shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] transition-all font-bold disabled:opacity-40"
                       disabled={count >= room.availableCount}
                       onClick={onIncrement}
                       type="button"
@@ -1022,8 +1022,8 @@ function RoomDetailsPopup({
                   const Icon = iconForLabel(label);
 
                   return (
-                    <div key={`${label}-${index}`} className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.06em] text-white/80 font-['Gilroy',sans-serif] border border-[#3D3D3D] bg-[#161616] p-2.5 shadow-[2px_2px_0px_#000000]">
-                      <span className="flex h-7 w-7 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-[var(--np-yellow)]">
+                    <div key={`${label}-${index}`} className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.06em] text-white/80 font-['Gilroy',sans-serif] border border-white/10 bg-[#171822] p-2.5 shadow-[2px_2px_0px_#000000]">
+                      <span className="flex h-7 w-7 items-center justify-center border border-white/10 bg-[#12131A] text-[var(--vh-pink)]">
                         <Icon className="h-3.5 w-3.5" />
                       </span>
                       <span>{label}</span>
@@ -1573,15 +1573,15 @@ export function Property({
 
   return (
     <>
-      <section className="bg-[#0D0D0D] pt-28 md:pt-36 pb-12 border-b border-[#3D3D3D]">
+      <section className="bg-[#0A0A0E] pt-28 md:pt-36 pb-12 border-b border-white/10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="mb-10 text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--np-yellow)] mb-3 font-['Gilroy',sans-serif]">
-              THE FLAGSHIP HOSTEL
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--vh-pink)] mb-3 font-['Gilroy',sans-serif] flex items-center justify-center gap-1.5">
+              <span>◉</span> THE FLAGSHIP HOSTEL
             </p>
             <h1 className="leading-tight">
-              <span className="font-['Cirka',serif] font-bold text-4xl md:text-6xl lg:text-7xl text-white tracking-tight">
-                THE DAILY SOCIAL
+              <span className="font-display font-bold text-4xl md:text-6xl lg:text-7xl text-white tracking-tight">
+                VIBEHOUSE
               </span>
             </h1>
             <p className="mx-auto mt-4 max-w-[760px] text-sm md:text-base leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
@@ -1591,7 +1591,7 @@ export function Property({
 
           <div className="grid grid-cols-1 gap-3 md:grid-cols-12">
             <div className="md:col-span-7">
-              <div className="overflow-hidden border border-[#3D3D3D] shadow-[4px_4px_0px_#000000]">
+              <div className="overflow-hidden border border-white/15 shadow-[4px_4px_0px_#000000]">
                 <ImageWithFallback
                   alt={propertyGallery[0].alt}
                   className="h-[340px] w-full object-cover md:h-[480px]"
@@ -1601,7 +1601,7 @@ export function Property({
             </div>
             <div className="grid grid-cols-2 gap-3 md:col-span-5">
               {propertyGallery.slice(1).map((image) => (
-                <div key={image.src} className="overflow-hidden border border-[#3D3D3D] shadow-[3px_3px_0px_#000000]">
+                <div key={image.src} className="overflow-hidden border border-white/15 shadow-[3px_3px_0px_#000000]">
                   <ImageWithFallback alt={image.alt} className="h-[164px] w-full object-cover md:h-[234px]" src={image.src} />
                 </div>
               ))}
@@ -1610,18 +1610,18 @@ export function Property({
         </div>
       </section>
 
-      <section className="bg-[#0D0D0D] py-12 md:py-16">
+      <section className="bg-[#0A0A0E] py-12 md:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-12 pb-4 md:space-y-16 lg:pb-0">
             <section id="about" className="scroll-mt-28">
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start border border-[#3D3D3D] bg-[#161616] p-6 md:p-8 shadow-[4px_4px_0px_#000000]">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start border border-white/15 bg-[#171822] p-6 md:p-8 shadow-[4px_4px_0px_#000000]">
                 <div>
                   <SectionTitle title="About" />
                   <p className={`mt-3 text-sm leading-relaxed text-white/75 font-['Gilroy',sans-serif] ${aboutExpanded ? "" : "line-clamp-2"}`}>
                     {propertyAboutText}
                   </p>
                   <button
-                    className="mt-3 text-xs font-bold uppercase tracking-[0.1em] text-[var(--np-yellow)] hover:underline font-['Gilroy',sans-serif]"
+                    className="mt-3 text-xs font-bold uppercase tracking-[0.1em] text-[var(--vh-pink)] hover:underline font-['Gilroy',sans-serif]"
                     onClick={() => setAboutExpanded((value) => !value)}
                     type="button"
                   >
@@ -1648,8 +1648,8 @@ export function Property({
                   const Icon = amenityIcons[amenity.icon as keyof typeof amenityIcons] ?? ShieldCheck;
 
                   return (
-                    <div key={`${amenity.label}-${index}`} className="border border-[#3D3D3D] bg-[#161616] p-4 text-center shadow-[2px_2px_0px_#000000] hover:border-[var(--np-yellow)] transition-all">
-                      <span className="inline-flex h-10 w-10 items-center justify-center text-[var(--np-yellow)]">
+                    <div key={`${amenity.label}-${index}`} className="border border-white/10 bg-[#171822] p-4 text-center shadow-[2px_2px_0px_#000000] hover:border-[var(--vh-pink)] transition-all">
+                      <span className="inline-flex h-10 w-10 items-center justify-center text-[var(--vh-pink)]">
                         <Icon className="h-6 w-6" />
                       </span>
                       <p className="mt-2 text-xs font-bold uppercase tracking-[0.08em] text-white/90 font-['Gilroy',sans-serif]">{amenity.label}</p>
@@ -1702,7 +1702,7 @@ export function Property({
                       width={224}
                     />
                     <p className="mt-4 text-base font-semibold text-white">No room types are currently available for this property.</p>
-                    <p className="mt-2 text-sm text-white/75">Please retry or contact support at thedailysocial01@gmail.com.</p>
+                    <p className="mt-2 text-sm text-white/75">Please retry or contact support at hello@vibehouse.co.</p>
                   </div>
                 ) : (
                   roomCategoryList.map((room) => {
@@ -1719,10 +1719,10 @@ export function Property({
                     return (
                       <article
                         key={roomKey}
-                        className="border border-[#3D3D3D] bg-[#161616] shadow-[4px_4px_0px_#000000] transition-all hover:border-[var(--np-yellow)]"
+                        className="border border-white/15 bg-[#171822] shadow-[4px_4px_0px_#000000] transition-all hover:border-[var(--vh-pink)]"
                       >
                         <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)_200px]">
-                          <div className="border-b border-[#3D3D3D] lg:border-b-0 lg:border-r">
+                          <div className="border-b border-white/10 lg:border-b-0 lg:border-r">
                             <button className="group block w-full text-left" onClick={() => openRoomPopup(roomKey)} type="button">
                               <ImageWithFallback
                                 alt={room.title}
@@ -1730,11 +1730,11 @@ export function Property({
                                 src={roomGallery[0] ?? room.image}
                               />
                             </button>
-                            <div className="grid grid-cols-3 gap-1 p-1.5 bg-[#121212] border-t border-[#3D3D3D]">
+                            <div className="grid grid-cols-3 gap-1 p-1.5 bg-[#12131A] border-t border-white/10">
                               {roomGallery.slice(0, 3).map((galleryImage, index) => (
                                 <button
                                   key={`${roomKey}-thumb-${index}`}
-                                  className="overflow-hidden border border-[#3D3D3D] hover:border-[var(--np-yellow)]"
+                                  className="overflow-hidden border border-white/10 hover:border-[var(--vh-pink)]"
                                   onClick={() => {
                                     openRoomPopup(roomKey);
                                     setActiveRoomImageIndex(index);
@@ -1750,7 +1750,7 @@ export function Property({
                           <div className="space-y-3 p-5 font-['Gilroy',sans-serif]">
                             <div className="flex flex-wrap items-center justify-between gap-3">
                               <button className="text-left" onClick={() => openRoomPopup(roomKey)} type="button">
-                                <h3 className="text-xl font-extrabold uppercase tracking-[0.06em] text-white hover:text-[var(--np-yellow)] transition-colors">
+                                <h3 className="text-xl font-extrabold uppercase tracking-[0.06em] text-white hover:text-[var(--vh-pink)] transition-colors">
                                   {room.title}
                                 </h3>
                               </button>
@@ -1764,7 +1764,7 @@ export function Property({
                               {featureLabels.map((label, index) => (
                                 <span
                                   key={`${label}-${index}`}
-                                  className="inline-flex items-center border border-[#3D3D3D] bg-[#121212] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-white/80"
+                                  className="inline-flex items-center border border-white/10 bg-[#12131A] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-white/80"
                                   title={label}
                                 >
                                   {label}
@@ -1778,7 +1778,7 @@ export function Property({
                                   Sold out for selected dates
                                 </span>
                               ) : isPriceUnavailable ? (
-                                <span className="inline-flex items-center gap-1.5 border border-[#FFCB45]/40 bg-[#FFCB45]/15 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-[var(--np-yellow)]">
+                                <span className="inline-flex items-center gap-1.5 border border-[var(--vh-pink)]/40 bg-[var(--vh-pink)]/15 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.1em] text-[var(--vh-pink)]">
                                   Price unavailable. Retry shortly.
                                 </span>
                               ) : isAvailabilityPending ? (
@@ -1876,16 +1876,16 @@ export function Property({
             <section id="guidelines">
               <SectionTitle title="Guidelines" />
               <div className="mt-6 max-w-4xl">
-                <div className="mb-4 flex flex-wrap justify-between gap-x-4 gap-y-2 border border-[#3D3D3D] bg-[#161616] p-4 text-white font-['Gilroy',sans-serif] shadow-[2px_2px_0px_#000000]">
+                <div className="mb-4 flex flex-wrap justify-between gap-x-4 gap-y-2 border border-white/15 bg-[#171822] p-4 text-white font-['Gilroy',sans-serif] shadow-[2px_2px_0px_#000000]">
                   <div className="flex min-w-[180px] items-center gap-3">
-                    <CalendarDays className="h-5 w-5 text-[var(--np-yellow)]" />
+                    <CalendarDays className="h-5 w-5 text-[var(--vh-pink)]" />
                     <span className="text-xs uppercase tracking-[0.06em]">
                       Check in:
                       <strong className="ml-1 text-white font-black">{propertyGuidelines.checkIn}</strong>
                     </span>
                   </div>
                   <div className="flex min-w-[180px] items-center gap-3">
-                    <Clock3 className="h-5 w-5 text-[var(--np-yellow)]" />
+                    <Clock3 className="h-5 w-5 text-[var(--vh-pink)]" />
                     <span className="text-xs uppercase tracking-[0.06em]">
                       Check out:
                       <strong className="ml-1 text-white font-black">{propertyGuidelines.checkOut}</strong>
@@ -1894,9 +1894,9 @@ export function Property({
                 </div>
 
                 <Accordion className="space-y-2" defaultValue={["general-guidelines"]} type="multiple">
-                  <AccordionItem className="border border-[#3D3D3D] bg-[#161616] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]" value="general-guidelines">
+                  <AccordionItem className="border border-white/10 bg-[#171822] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]" value="general-guidelines">
                     <AccordionTrigger className="text-sm font-extrabold uppercase tracking-[0.06em] text-white">General guidelines</AccordionTrigger>
-                    <AccordionContent className="space-y-2 border-t border-[#3D3D3D] pt-3 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
+                    <AccordionContent className="space-y-2 border-t border-white/10 pt-3 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
                       {propertyGuidelines.summary.map((item) => (
                         <p key={item}>● {item}</p>
                       ))}
@@ -1906,11 +1906,11 @@ export function Property({
                   {propertyGuidelines.sections.map((section, index) => (
                     <AccordionItem
                       key={section.title}
-                      className="border border-[#3D3D3D] bg-[#161616] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]"
+                      className="border border-white/10 bg-[#171822] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]"
                       value={`guideline-${index}`}
                     >
                       <AccordionTrigger className="text-sm font-extrabold uppercase tracking-[0.06em] text-white">{section.title}</AccordionTrigger>
-                      <AccordionContent className="space-y-2 border-t border-[#3D3D3D] pt-3 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
+                      <AccordionContent className="space-y-2 border-t border-white/10 pt-3 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
                         {section.content.map((item) => (
                           <p key={item}>● {item}</p>
                         ))}
@@ -1929,11 +1929,11 @@ export function Property({
                     {roomFaqs.map((faq, index) => (
                       <AccordionItem
                         key={faq.question}
-                        className="border border-[#3D3D3D] bg-[#161616] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]"
+                        className="border border-white/10 bg-[#171822] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]"
                         value={`faq-${index}`}
                       >
                         <AccordionTrigger className="text-sm font-extrabold uppercase tracking-[0.06em] text-white">{faq.question}</AccordionTrigger>
-                        <AccordionContent className="border-t border-[#3D3D3D] pt-4 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">{faq.answer}</AccordionContent>
+                        <AccordionContent className="border-t border-white/10 pt-4 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">{faq.answer}</AccordionContent>
                       </AccordionItem>
                     ))}
                   </Accordion>
@@ -1942,7 +1942,7 @@ export function Property({
                 <div className="space-y-6">
                   <section>
                     <SectionTitle title="Location" />
-                    <div className="mt-6 overflow-hidden border border-[#3D3D3D] shadow-[4px_4px_0px_#000000]">
+                    <div className="mt-6 overflow-hidden border border-white/15 shadow-[4px_4px_0px_#000000]">
                       <iframe
                         className="h-[300px] w-full"
                         loading="lazy"
@@ -1952,7 +1952,7 @@ export function Property({
                       />
                     </div>
                     <Link
-                      className="mt-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-[var(--np-yellow)] hover:underline font-['Gilroy',sans-serif]"
+                      className="mt-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-[var(--vh-pink)] hover:underline font-['Gilroy',sans-serif]"
                       href={propertyHero.mapsHref}
                       target="_blank"
                     >
@@ -1963,14 +1963,14 @@ export function Property({
 
                   <section>
                     <SectionTitle title="Nearby" />
-                    <div className="mt-6 space-y-3 border border-[#3D3D3D] bg-[#161616] p-5 shadow-[3px_3px_0px_#000000]">
+                    <div className="mt-6 space-y-3 border border-white/15 bg-[#171822] p-5 shadow-[3px_3px_0px_#000000]">
                       {nearbyAttractions.map((place) => (
-                        <div key={place.name} className="flex items-center justify-between gap-4 border-b border-[#3D3D3D] pb-3 last:border-b-0 last:pb-0 font-['Gilroy',sans-serif]">
+                        <div key={place.name} className="flex items-center justify-between gap-4 border-b border-white/10 pb-3 last:border-b-0 last:pb-0 font-['Gilroy',sans-serif]">
                           <div>
                             <p className="font-extrabold uppercase tracking-[0.04em] text-white text-xs">{place.name}</p>
                             <p className="text-[10px] uppercase tracking-[0.14em] text-white/50">{place.type}</p>
                           </div>
-                          <span className="border border-[#3D3D3D] bg-[#121212] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-[var(--np-yellow)]">
+                          <span className="border border-white/10 bg-[#12131A] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-[var(--vh-pink)]">
                             {place.travel}
                           </span>
                         </div>

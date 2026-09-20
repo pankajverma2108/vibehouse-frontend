@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100;200;300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400;1,500&family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap");
 @import "tailwindcss";
 @import "react-day-picker/style.css";
 @import "../src/styles/theme.css";
@@ -9,71 +10,102 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-gilroy: "Gilroy", "Urbanist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-cirka: "Cirka", "Libre Bodoni", Georgia, serif;
-  --font-geologica: var(--font-gilroy);
-  --font-biorhyme: var(--font-cirka);
-  --font-sora: var(--font-gilroy);
-  --font-encode: var(--font-gilroy);
-  --font-suez: var(--font-cirka);
-  --font-bebas: var(--font-cirka);
-  --font-space-grotesk: var(--font-gilroy);
-  --font-body: var(--font-gilroy);
-  --font-display: var(--font-cirka);
-  --font-utility: var(--font-gilroy);
+  --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-inter-display: "Inter Tight", "Inter Display", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-dm-mono: "DM Mono", "Geist Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --vh-bg: #0d0d0d;
-  --vh-bg-soft: #0d0d0d;
-  --vh-surface: #121212;
-  --vh-surface-2: #161616;
-  --vh-section-a: #0d0d0d;
-  --vh-section-b: #121212;
-  --vh-border: #3d3d3d;
-  --vh-hot: #ffcb45;
-  --vh-pink: #ff426f;
-  --vh-pink-soft: #ee4d37;
-  --vh-cyan: #3f6fd9;
+  --font-body: var(--font-inter);
+  --font-display: var(--font-inter-display);
+  --font-mono: var(--font-dm-mono);
+  --font-gilroy: var(--font-inter);
+  --font-cirka: var(--font-inter-display);
+  --font-geologica: var(--font-inter);
+  --font-biorhyme: var(--font-inter-display);
+  --font-sora: var(--font-inter);
+  --font-encode: var(--font-inter);
+  --font-suez: var(--font-inter-display);
+  --font-bebas: var(--font-inter-display);
+  --font-space-grotesk: var(--font-inter);
+  --font-utility: var(--font-inter);
+
+  /* Foundation Neutrals (Pitch-Black Dark System) */
+  --vh-bg: #000000;
+  --vh-bg-soft: #050507;
+  --vh-surface: #0c0c0f;
+  --vh-surface-2: #121216;
+  --vh-section-a: #000000;
+  --vh-section-b: #070709;
+  --vh-border: rgba(255, 255, 255, 0.08);
+  --vh-border-subtle: rgba(255, 255, 255, 0.08);
+  --vh-border-muted: rgba(255, 255, 255, 0.12);
+  --vh-border-active: rgba(255, 255, 255, 0.22);
+  --vh-panel: #121216;
+  --vh-panel-soft: #0c0c0f;
+  --vh-panel-strong: #000000;
+  --vh-chip: #16161c;
+  --vh-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --vh-shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.75);
+
+  /* Nudge Folio Quad-Color Accents */
+  --accent-cyan: #36c5f0;
+  --accent-cyan-soft: rgba(54, 197, 240, 0.12);
+  --accent-cyan-border: rgba(54, 197, 240, 0.35);
+
+  --accent-amber: #ecb22e;
+  --accent-amber-soft: rgba(236, 178, 46, 0.12);
+  --accent-amber-border: rgba(236, 178, 46, 0.35);
+
+  --accent-mint: #2fbc81;
+  --accent-mint-soft: rgba(47, 188, 129, 0.12);
+  --accent-mint-border: rgba(47, 188, 129, 0.35);
+
+  --accent-crimson: #e01e5a;
+  --accent-crimson-soft: rgba(224, 30, 90, 0.14);
+  --accent-crimson-border: rgba(224, 30, 90, 0.4);
+
+  /* Legacy Color Aliases mapped to Nudge Palette */
+  --vh-hot: var(--accent-amber);
+  --vh-pink: var(--accent-crimson);
+  --vh-pink-soft: #f04b75;
+  --vh-cyan: var(--accent-cyan);
   --vh-ice: #ffffff;
-  --vh-lime: #3bffad;
-  --vh-amber: #ffcb45;
-  --vh-panel: #161616;
-  --vh-panel-soft: #121212;
-  --vh-panel-strong: #0d0d0d;
-  --vh-chip: #1f1f1f;
-  --vh-shadow: 3px 3px 0px #3d3d3d;
-  --vh-shadow-lg: 6px 6px 0px #3d3d3d;
-  --background: #0d0d0d;
+  --vh-lime: var(--accent-mint);
+  --vh-amber: var(--accent-amber);
+
+  /* Standard Theme Semantic Tokens */
+  --background: #000000;
   --foreground: #ffffff;
-  --card: #161616;
+  --card: #121216;
   --card-foreground: #ffffff;
-  --popover: #121212;
+  --popover: #16161c;
   --popover-foreground: #ffffff;
-  --primary: #ffcb45;
-  --primary-foreground: #000000;
-  --secondary: #161616;
+  --primary: var(--accent-crimson);
+  --primary-foreground: #ffffff;
+  --secondary: #121216;
   --secondary-foreground: #ffffff;
-  --muted: #1f1f1f;
-  --muted-foreground: #d2d2d2;
-  --accent: #3bffad;
+  --muted: #18181f;
+  --muted-foreground: #a0a0a5;
+  --accent: var(--accent-mint);
   --accent-foreground: #000000;
   --destructive: #ee4d37;
-  --border: #3d3d3d;
-  --input: #121212;
-  --ring: #3bffad;
-  --chart-1: #ffcb45;
-  --chart-2: #3bffad;
-  --chart-3: #3f6fd9;
-  --chart-4: #ff426f;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: #121216;
+  --ring: var(--accent-cyan);
+  --chart-1: var(--accent-crimson);
+  --chart-2: var(--accent-mint);
+  --chart-3: var(--accent-cyan);
+  --chart-4: var(--accent-amber);
   --chart-5: #ee4d37;
-  --radius: 0px;
-  --sidebar: #0d0d0d;
+  --radius: 12px;
+  --sidebar: #000000;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #ffcb45;
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #161616;
+  --sidebar-primary: var(--accent-crimson);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #121216;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #3d3d3d;
-  --sidebar-ring: #3bffad;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: var(--accent-cyan);
   --motion-duration-instant: 0ms;
   --motion-duration-feedback: 100ms;
   --motion-duration-fast: 150ms;
@@ -128,10 +160,10 @@ body {
   overflow-x: clip;
   overflow-y: visible;
   width: 100%;
-  background: #07070a;
-  color: white;
-  font-family: var(--font-geologica);
-  scrollbar-color: var(--vh-pink) #07070a;
+  background: #000000;
+  color: #f1f1f1;
+  font-family: var(--font-body);
+  scrollbar-color: var(--accent-crimson) #000000;
   scrollbar-width: thin;
 }
 
@@ -145,7 +177,7 @@ body {
   label,
   small,
   span {
-    font-family: var(--font-geologica);
+    font-family: var(--font-body);
   }
 
   h1,
@@ -154,7 +186,8 @@ body {
   h4,
   h5,
   h6 {
-    font-family: var(--font-suez);
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
   }
 }
 
@@ -163,17 +196,17 @@ body {
 }
 
 *::-webkit-scrollbar-track {
-  background: #07070a;
+  background: #000000;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #c62828 0%, #8e1b1b 100%);
+  background: linear-gradient(180deg, #e01e5a 0%, #991438 100%);
   border: 2px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #b82020 0%, #6f1616 100%);
+  background: linear-gradient(180deg, #f02d6b 0%, #ba1946 100%);
 }
 
 .vh-rating-marquee {
@@ -1107,6 +1140,57 @@ select optgroup {
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .glass-dock {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    background-color: rgba(10, 10, 14, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-panel {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background-color: rgba(18, 19, 26, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-pill {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-pill:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .glow-crimson {
+    box-shadow: 0 0 35px rgba(255, 46, 98, 0.3);
+  }
+
+  .glow-crimson-lg {
+    box-shadow: 0 0 70px rgba(255, 46, 98, 0.38);
+  }
+
+  .text-gradient-crimson {
+    background: linear-gradient(135deg, #FF2E62 0%, #FF668B 50%, #F3EEE6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-ice {
+    background: linear-gradient(180deg, #FFFFFF 0%, rgba(243, 238, 230, 0.75) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }
 

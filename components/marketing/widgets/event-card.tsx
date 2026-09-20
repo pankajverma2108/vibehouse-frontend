@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { CalendarDays, Clock3, MapPin, Users } from "lucide-react";
+import { CalendarDays, Clock3, MapPin, Users, ArrowUpRight } from "lucide-react";
 
 import type { EventCardProps } from "@/content/types";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
-import { Button as NeoPopButton } from "@/components/neopop";
+import { MagneticButton } from "../interactive/magnetic-button";
 
 export function EventCard({
   badge,
@@ -16,41 +16,44 @@ export function EventCard({
   time,
   title,
 }: EventCardProps) {
-  const whatsappText = `Hi, I'd like to RSVP for ${title} at The Daily Social. Date: ${date}, Time: ${time}, Location: ${location}.`;
-  const whatsappHref = `https://wa.me/918884973328?text=${encodeURIComponent(whatsappText)}`;
+  const rsvpSubject = `RSVP: ${title} at Vibehouse (${date})`;
+  const rsvpBody = `Hi Vibehouse team,\n\nI'd like to RSVP for ${title}.\nDate: ${date}\nTime: ${time}\nLocation: ${location}\n\nThanks!`;
+  const rsvpHref = `mailto:hello@vibehouse.co?subject=${encodeURIComponent(rsvpSubject)}&body=${encodeURIComponent(rsvpBody)}`;
 
   const details = [
-    { icon: CalendarDays, label: date, tone: "text-[var(--np-yellow)]" },
-    { icon: Clock3, label: time, tone: "text-[var(--np-blue)]" },
-    { icon: MapPin, label: location, tone: "text-[var(--np-green)]" },
-    { icon: Users, label: capacity, tone: "text-white/80" },
+    { icon: CalendarDays, label: date, tone: "text-[#E01E5A]" },
+    { icon: Clock3, label: time, tone: "text-[#36C5F0]" },
+    { icon: MapPin, label: location, tone: "text-[#2FBC81]" },
+    { icon: Users, label: capacity, tone: "text-[#ECB22E]" },
   ];
 
   return (
-    <div className="flex flex-col border border-[#3D3D3D] bg-[#161616] shadow-[4px_4px_0px_#000000] hover:border-white/40 transition-colors h-full">
-      <div className="relative h-[220px] w-full overflow-hidden border-b border-[#3D3D3D] bg-black">
+    <div className="group flex flex-col bg-[#121216] rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.7)] h-full">
+      {/* Event Photography */}
+      <div className="relative h-[230px] w-full overflow-hidden bg-[#0A0A0E]">
         <ImageWithFallback
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           src={image}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#121216] via-transparent to-black/40" />
 
         {badge ? (
-          <div className="absolute right-3 top-3 border border-black bg-[var(--np-yellow)] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.14em] text-black">
+          <div className="absolute right-3 top-3 rounded-full bg-[#E01E5A] px-3 py-1 text-[10px] font-mono font-medium uppercase tracking-wider text-white shadow-md">
             {badge.label}
           </div>
         ) : null}
 
         <div className="absolute bottom-3 left-4 right-4">
-          <h3 className="font-['Gilroy',sans-serif] text-xl font-extrabold uppercase tracking-[0.06em] text-white">
+          <h3 className="font-display text-xl font-bold uppercase tracking-tight text-white drop-shadow-md">
             {title}
           </h3>
         </div>
       </div>
 
-      <div className="p-5 flex flex-col flex-1 gap-4">
-        <p className="text-xs leading-relaxed text-white/65 font-['Gilroy',sans-serif] line-clamp-2">
+      {/* Event Metadata & RSVP */}
+      <div className="p-6 flex flex-col flex-1 justify-between gap-5">
+        <p className="text-xs leading-relaxed text-white/70 font-body line-clamp-2">
           {description ?? "Experience details will be available from API soon. Stay tuned for full lineup info."}
         </p>
 
@@ -60,25 +63,26 @@ export function EventCard({
             return (
               <div
                 key={item.label}
-                className="flex items-center gap-2 border border-[#3D3D3D] bg-[#121212] px-2.5 py-1.5 text-xs text-white/80 font-['Gilroy',sans-serif]"
+                className="flex items-center gap-2 rounded-xl bg-white/[0.04] border border-white/8 px-3 py-2 text-xs text-white/80"
               >
                 <Icon className={`h-3.5 w-3.5 shrink-0 ${item.tone}`} />
-                <span className="truncate font-semibold text-[11px] uppercase tracking-[0.04em]">{item.label}</span>
+                <span className="truncate font-mono font-medium text-[10.5px] uppercase tracking-wider">{item.label}</span>
               </div>
             );
           })}
         </div>
 
-        <div className="mt-auto pt-2 flex flex-col gap-3">
-          <div className="border border-[var(--np-yellow)]/40 bg-[var(--np-yellow)]/10 p-2 text-center text-xs font-black uppercase tracking-[0.12em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]">
+        <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-4">
+          <span className="inline-block rounded-full bg-[#E01E5A]/15 border border-[#E01E5A]/30 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wider text-[#E01E5A]">
             {price}
-          </div>
+          </span>
 
-          <NeoPopButton asChild fullWidth size="sm" variant="primary">
-            <Link href={whatsappHref} rel="noreferrer" target="_blank">
-              RSVP via WhatsApp
-            </Link>
-          </NeoPopButton>
+          <Link href={rsvpHref} rel="noreferrer" className="shrink-0">
+            <MagneticButton className="rounded-full bg-[#E01E5A] hover:bg-[#F02D6B] text-white px-5 py-2.5 text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-[0_4px_16px_rgba(224,30,90,0.35)] active:scale-[0.98]">
+              <span>RSVP</span>
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </MagneticButton>
+          </Link>
         </div>
       </div>
     </div>

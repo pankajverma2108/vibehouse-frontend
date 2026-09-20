@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { locationMap, nearbyAttractions, propertyAmenities, propertyGuidelines, roomFaqs } from "@/content/rooms";
 import { siteMeta } from "@/content/site";
 
-const supportPhoneDigits = siteMeta.contact.phoneDisplay.replace(/\D/g, "");
-const supportHref = `https://wa.me/${supportPhoneDigits}?text=${encodeURIComponent("Hey The Daily Social, I need help during my stay.")}`;
+const supportEmail = siteMeta.contact.email;
+const supportHref = `mailto:${supportEmail}?subject=${encodeURIComponent("Hey Vibehouse, I need help during my stay.")}`;
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -113,15 +113,12 @@ export function GuestGuide() {
             <p className="text-[11px] font-black uppercase text-[#f9cb37]">Emergency / Support</p>
             <h2 className="mt-2 font-sectiontitle text-[28px] leading-tight text-white">Need the team right now?</h2>
             <p className="mt-2 text-sm leading-6 text-[#cbd5e1]">
-              <a className="underline underline-offset-4 hover:text-white" href={siteMeta.contact.phoneHref}>{siteMeta.contact.phoneDisplay}</a>
-              {" - "}
               <a className="underline underline-offset-4 hover:text-white" href={siteMeta.contact.emailHref}>{siteMeta.contact.email}</a>
             </p>
           </div>
           <Button asChild className="vh-cta-button h-10 rounded-[4px] px-4 text-xs">
-            <a href={supportHref} rel="noreferrer" target="_blank">
-              <WhatsAppIcon className="mr-2 h-4 w-4" />
-              WhatsApp support
+            <a href={supportHref}>
+              Email Support
             </a>
           </Button>
         </div>

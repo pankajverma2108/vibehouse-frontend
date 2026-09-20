@@ -93,44 +93,44 @@ export function GuestAuthModal({
     onSwitchMode(nextMode);
   };
 
-  const headline = 
-    mode === "signin" ? "Welcome Back" : 
-    mode === "signup" ? "Join The Crew" : 
-    mode === "verify-otp" ? "Verify Email" : 
+  const headline =
+    mode === "signin" ? "Welcome Back" :
+    mode === "signup" ? "Join The Crew" :
+    mode === "verify-otp" ? "Verify Email" :
     mode === "verify-2fa" ? "Two-Factor Code" :
-    mode === "forgot-password" ? "Forgot Password?" : 
+    mode === "forgot-password" ? "Forgot Password?" :
     mode === "forgot-password-otp" ? "Reset Password" :
     "Set New Password";
 
-  const description = 
-    mode === "verify-otp" ? `We sent a 6-digit code to ${resolvedEmail || "your email"}` : 
+  const description =
+    mode === "verify-otp" ? `We sent a 6-digit code to ${resolvedEmail || "your email"}` :
     mode === "verify-2fa" ? `Enter the 6-digit login code sent to ${resolvedEmail || "your email"}` :
-    mode === "forgot-password" ? "Enter your email and we will send you a 6-digit OTP." : 
-    mode === "forgot-password-otp" ? `Enter the OTP sent to ${resolvedEmail || "your email"} and set your new password.` : 
+    mode === "forgot-password" ? "Enter your email and we will send you a 6-digit OTP." :
+    mode === "forgot-password-otp" ? `Enter the OTP sent to ${resolvedEmail || "your email"} and set your new password.` :
     mode === "set-new-password" ? "Create a new password for your account." :
     null;
 
-  const ctaLabel = 
-    mode === "signin" ? "Let's Go!" : 
-    mode === "signup" ? "Start My Journey!" : 
-    mode === "verify-otp" ? "Verify" : 
+  const ctaLabel =
+    mode === "signin" ? "Let's Go!" :
+    mode === "signup" ? "Start My Journey!" :
+    mode === "verify-otp" ? "Verify" :
     mode === "verify-2fa" ? "Verify & Sign In" :
-    mode === "forgot-password" ? "Send OTP" : 
+    mode === "forgot-password" ? "Send OTP" :
     mode === "forgot-password-otp" ? "Update Password" :
     "Update Password";
 
-  const switchLabel = 
-    mode === "signin" ? "New to the vibe?" : 
-    mode === "signup" ? "Already vibing?" : 
+  const switchLabel =
+    mode === "signin" ? "New to the vibe?" :
+    mode === "signup" ? "Already vibing?" :
     "";
 
-  const switchAction = 
-    mode === "signin" ? "Join the crew!" : 
+  const switchAction =
+    mode === "signin" ? "Join the crew!" :
     mode === "signup" ? "Sign in here!" :
     "Back to Login";
 
-  const switchTarget = 
-    mode === "signin" ? "signup" : 
+  const switchTarget =
+    mode === "signin" ? "signup" :
     "signin";
 
   const showOtpSection = mode === "verify-otp" || mode === "verify-2fa" || mode === "forgot-password-otp";
@@ -281,7 +281,7 @@ export function GuestAuthModal({
         type="button"
       />
 
-      <div className="relative z-10 w-full max-w-[560px] rounded-none border border-[#3D3D3D] bg-[#161616] p-4 shadow-[6px_6px_0px_#000000] md:p-6">
+      <div className="relative z-10 w-full max-w-[560px] rounded-none border border-white/10 bg-[#171822] p-4 shadow-[6px_6px_0px_#991438] md:p-6">
         <button
           aria-label="Close"
           className="absolute right-4 top-4 inline-flex h-5 w-5 items-center justify-center text-white/85 hover:text-white"
@@ -360,7 +360,7 @@ export function GuestAuthModal({
                     type="button"
                     onClick={onResendOtp}
                     disabled={countdown > 0 || pending}
-                    className="text-sm font-semibold text-[var(--np-yellow)] disabled:opacity-50"
+                    className="text-sm font-semibold text-[#FF2E62] disabled:opacity-50"
                   >
                     {countdown > 0 ? `Resend in 00:${countdown.toString().padStart(2, "0")}` : "Didn't receive it? Resend"}
                   </button>
@@ -404,15 +404,15 @@ export function GuestAuthModal({
               <label className="inline-flex items-center gap-2.5">
                 <input
                   checked={rememberMe}
-                  className="h-[18px] w-[18px] rounded-none border border-[#3D3D3D] bg-[#121212] accent-[var(--np-yellow)]"
+                  className="h-[18px] w-[18px] rounded-none border border-white/15 bg-[#12131A] accent-[#FF2E62]"
                   onChange={(event) => setRememberMe(event.target.checked)}
                   type="checkbox"
                 />
                 <span>Remember me</span>
               </label>
 
-              <button 
-                className="font-semibold text-[var(--np-yellow)]" 
+              <button
+                className="font-semibold text-[#FF2E62]"
                 type="button"
                 onClick={() => switchMode("forgot-password")}
               >
@@ -420,17 +420,17 @@ export function GuestAuthModal({
               </button>
             </div>
           ) : mode === "signup" ? (
-            <label className="block rounded-none border border-dashed border-[#3D3D3D] bg-[#121212] px-4 py-3 text-sm text-white/85">
+            <label className="block rounded-none border border-dashed border-white/10 bg-[#12131A] px-4 py-3 text-sm text-white/85">
               <span className="inline-flex items-start gap-2.5">
                 <input
                   checked={agreed}
-                  className="mt-[3px] h-[18px] w-[18px] rounded-none border border-[#3D3D3D] bg-[#121212] accent-[var(--np-yellow)]"
+                  className="mt-[3px] h-[18px] w-[18px] rounded-none border border-white/15 bg-[#12131A] accent-[#FF2E62]"
                   onChange={(event) => setAgreed(event.target.checked)}
                   type="checkbox"
                 />
                 <span>
-                  I agree to the <Link className="font-bold text-[var(--np-yellow)]" href="/policies/terms">Terms & Conditions</Link> and{" "}
-                  <Link className="font-bold text-[var(--np-yellow)]" href="/policies/privacy">Privacy Policy</Link>
+                  I agree to the <Link className="font-bold text-[#FF2E62]" href="/policies/terms">Terms &amp; Conditions</Link> and{" "}
+                  <Link className="font-bold text-[#FF2E62]" href="/policies/privacy">Privacy Policy</Link>
                 </span>
               </span>
             </label>
@@ -438,9 +438,7 @@ export function GuestAuthModal({
 
           <button
             aria-busy={pending || undefined}
-            className={`inline-flex h-12 w-full items-center justify-center rounded-none bg-[var(--np-yellow)] border border-[var(--np-yellow)] text-base font-bold uppercase tracking-[0.08em] text-black shadow-[4px_4px_0px_#000000] hover:bg-[var(--np-yellow)]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-              mode === "signin" ? "bg-[var(--vh-pink)] text-white" : "bg-[var(--vh-lime)] text-[#0F172A]"
-            }`}
+            className="inline-flex h-12 w-full items-center justify-center rounded-none bg-[#FF2E62] border border-[#FF2E62] text-base font-bold uppercase tracking-[0.08em] text-white shadow-[4px_4px_0px_#991438] hover:bg-[#FF426F] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={pending || (mode === "signup" && !isSignupValid)}
             type="submit"
           >
@@ -467,7 +465,7 @@ export function GuestAuthModal({
               </div>
 
               <button
-                className="inline-flex h-11 w-full items-center justify-center gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] text-sm font-bold text-white shadow-[3px_3px_0px_#000000] hover:bg-[#202029]"
+                className="inline-flex h-11 w-full items-center justify-center gap-3 rounded-none border border-white/10 bg-[#12131A] text-sm font-bold text-white shadow-[3px_3px_0px_#991438] hover:bg-[#1E1F2D]"
                 onClick={onGoogleAuth}
                 type="button"
               >
@@ -486,7 +484,7 @@ export function GuestAuthModal({
           <div className="text-center text-base text-white/80">
             <span>{switchLabel} </span>
             <button
-              className={`font-bold ${mode === "signin" ? "text-[var(--vh-pink)]" : "text-[var(--vh-lime)]"}`}
+              className="font-bold text-[#FF2E62]"
               onClick={() => switchMode(switchTarget)}
               type="button"
             >
@@ -523,7 +521,7 @@ function LabelledInput({
       <span className="mb-1.5 block text-xs font-bold uppercase tracking-[1.2px] text-[#F1F5F9]">{label}</span>
       <input
         autoComplete={autoComplete}
-        className="h-[42px] w-full rounded-none border border-[#3D3D3D] bg-[#121212] px-3 text-sm text-white outline-none placeholder:text-white/40 focus:border-[var(--np-yellow)]"
+        className="h-[42px] w-full rounded-none border border-white/10 bg-[#12131A] px-3 text-sm text-white outline-none placeholder:text-white/40 focus:border-[#FF2E62]"
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         type={type}
@@ -566,12 +564,12 @@ function OtpSlot({ index }: { index: number }) {
 
   return (
     <div
-      className={`relative flex h-12 w-11 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#121212] text-lg font-bold text-white transition sm:h-14 sm:w-12 ${
-        slot?.isActive ? "border-[var(--np-yellow)] shadow-[2px_2px_0px_var(--np-yellow)]" : "border-white/25"
+      className={`relative flex h-12 w-11 items-center justify-center rounded-none border border-[#3D3D3D] bg-[#12131A] text-lg font-bold text-white transition sm:h-14 sm:w-12 ${
+        slot?.isActive ? "border-[#FF2E62] shadow-[2px_2px_0px_#FF2E62]" : "border-white/25"
       }`}
     >
       {slot?.char ?? ""}
-      {slot?.hasFakeCaret ? <div className="absolute h-5 w-px animate-pulse bg-[var(--np-yellow)]" /> : null}
+      {slot?.hasFakeCaret ? <div className="absolute h-5 w-px animate-pulse bg-[#FF2E62]" /> : null}
     </div>
   );
 }

@@ -80,7 +80,7 @@ const policyFaqs = [
 export const metadata: Metadata = {
   title: "Policies",
   description:
-    "Read The Daily Social Policies: general guest policy, check-in and ID rules, cancellation and refund policy, privacy policy, terms and conditions, and policy FAQs for stays in India.",
+    "Read Vibehouse Policies: general guest policy, check-in and ID rules, cancellation and refund policy, privacy policy, terms and conditions, and policy FAQs for stays in India.",
   keywords: [
     "hostel policies",
     "guest policy",
@@ -96,11 +96,11 @@ export const metadata: Metadata = {
     canonical: "/policies",
   },
   openGraph: {
-    title: "Policies | The Daily Social",
+    title: "Policies | Vibehouse",
     description:
       "Unified policy hub for guest rules, cancellation and refunds, privacy, terms, and FAQs.",
-    url: "https://thedailysocial.co.in/policies",
-    siteName: "The Daily Social",
+    url: "/policies",
+    siteName: "Vibehouse",
     type: "website",
   },
 };
@@ -162,7 +162,7 @@ export default function PoliciesPage() {
               <section className="vh-panel rounded-2xl p-6 md:p-8" id="general-policy">
                 <SectionHeading align="left" title="General Policy" />
                 <p className="text-sm leading-7 text-white/82 md:text-base">
-                  The Daily Social is a social stay and community hospitality brand. The policies below
+                  Vibehouse is a social stay and community hospitality brand. The policies below
                   define fair use, guest eligibility, safety standards, and booking responsibilities for
                   all users of our website, booking channels, and on-property services.
                 </p>
@@ -547,15 +547,6 @@ export default function PoliciesPage() {
                           </a>
                         </td>
                         <td className="border-b border-white/10 px-4 py-3">Policy clarifications and grievance submissions</td>
-                      </tr>
-                      <tr>
-                        <td className="border-b border-white/10 px-4 py-3">Phone / WhatsApp</td>
-                        <td className="border-b border-white/10 px-4 py-3">
-                          <a className="underline decoration-white/25 underline-offset-4 hover:text-white" href={siteMeta.contact.phoneHref}>
-                            {siteMeta.contact.phoneDisplay}
-                          </a>
-                        </td>
-                        <td className="border-b border-white/10 px-4 py-3">Urgent booking and in-stay support</td>
                       </tr>
                       <tr>
                         <td className="px-4 py-3">Support timeline</td>

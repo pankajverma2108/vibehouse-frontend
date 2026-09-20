@@ -189,9 +189,11 @@ function SectionTitle({ title, kicker, copy }: { title: string; kicker?: string;
   return (
     <div className="text-center lg:text-left font-['Gilroy',sans-serif]">
       {kicker ? (
-        <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--np-yellow)]">{kicker}</p>
+        <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--vh-pink)] flex items-center justify-center lg:justify-start gap-1.5">
+          <span>◉</span> {kicker}
+        </p>
       ) : null}
-      <h2 className="font-['Cirka',serif] text-[28px] leading-[1.08] text-white tracking-tight md:text-[34px]">{title}</h2>
+      <h2 className="font-display text-[28px] leading-[1.08] text-white tracking-tight md:text-[34px]">{title}</h2>
       {copy ? <p className="mx-auto mt-3 max-w-[680px] text-sm leading-7 text-white/70 lg:mx-0 md:text-base">{copy}</p> : null}
     </div>
   );
@@ -569,7 +571,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
             <div className="mb-4 flex justify-center">
               <Token variant="yellow" label="LONG-STAY & COLIVING" />
             </div>
-            <h1 className="font-['Cirka',serif] text-4xl leading-[1.0] text-white tracking-tight uppercase md:text-6xl lg:text-7xl">
+            <h1 className="font-display text-4xl leading-[1.0] text-white tracking-tight uppercase md:text-6xl lg:text-7xl">
               STAY LONGER. LIVE BETTER.
             </h1>
             <p className="mx-auto mt-4 max-w-[760px] text-base leading-7 text-white/70 md:text-lg">
@@ -607,14 +609,14 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
       <section className="mt-14">
         <div className="mx-auto w-full max-w-6xl px-4 md:px-6 space-y-14">
           {/* About Section */}
-          <section className="grid grid-cols-1 gap-6 border border-[#3D3D3D] bg-[#161616] p-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center shadow-[4px_4px_0px_#000000]" data-colive-reveal>
+          <section className="grid grid-cols-1 gap-6 border border-white/10 bg-[#171822] p-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center shadow-[4px_4px_0px_#000000]" data-colive-reveal>
             <div>
               <SectionTitle kicker="COMMUNITY LIVING" title="About this Colive" />
               <p className={cn("mt-3 text-[15px] leading-7 text-white/75 md:text-base", aboutExpanded ? "" : "line-clamp-2")}>
                 {aboutText}
               </p>
               <button
-                className="mt-2 text-sm font-extrabold uppercase tracking-wider text-[var(--np-yellow)] hover:underline"
+                className="mt-2 text-sm font-extrabold uppercase tracking-wider text-[var(--vh-pink)] hover:underline"
                 onClick={() => setAboutExpanded((value) => !value)}
                 type="button"
               >
@@ -635,9 +637,9 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
               {propertyAmenities.map((amenity, index) => (
                 <div
                   key={`${amenity.label}-${index}`}
-                  className="flex items-center gap-3 border border-[#3D3D3D] bg-[#161616] p-4 rounded-none shadow-[2px_2px_0px_#000000]"
+                  className="flex items-center gap-3 border border-white/10 bg-[#171822] p-4 rounded-none shadow-[2px_2px_0px_#000000]"
                 >
-                  <Sparkles className="h-5 w-5 text-[var(--np-yellow)] shrink-0" />
+                  <Sparkles className="h-5 w-5 text-[var(--vh-pink)] shrink-0" />
                   <span className="text-xs font-semibold text-white/90 uppercase tracking-wider">{amenity.label}</span>
                 </div>
               ))}
@@ -651,10 +653,10 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
               return (
                 <article
                   key={item.title}
-                  className="rounded-none border border-[#3D3D3D] bg-[#161616] p-6 shadow-[3px_3px_0px_#000000] transition-transform hover:-translate-y-1"
+                  className="rounded-none border border-white/10 bg-[#171822] p-6 shadow-[3px_3px_0px_#000000] transition-transform hover:-translate-y-1"
                 >
-                  <Icon className="h-6 w-6 text-[var(--np-yellow)]" />
-                  <h3 className="mt-4 font-['Cirka',serif] text-2xl text-white tracking-tight">{item.title}</h3>
+                  <Icon className="h-6 w-6 text-[var(--vh-pink)]" />
+                  <h3 className="mt-4 font-display text-2xl text-white tracking-tight">{item.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-white/70">{item.copy}</p>
                 </article>
               );
@@ -664,11 +666,11 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
           {/* Colive Configuration Engine & Rooms */}
           <section id="colive-rooms" className="scroll-mt-28" data-colive-reveal>
             {/* Step 1: Duration & Stay Type Bar */}
-            <div className="mb-8 border border-[#3D3D3D] bg-[#161616] p-6 shadow-[4px_4px_0px_#000000]">
+            <div className="mb-8 border border-white/15 bg-[#171822] p-6 shadow-[4px_4px_0px_#000000]">
               <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[var(--np-yellow)]">CONFIGURATION ENGINE</p>
-                  <h2 className="mt-1 font-['Cirka',serif] text-3xl text-white tracking-tight">Select Stay Duration & Profile</h2>
+                  <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[var(--vh-pink)]">CONFIGURATION ENGINE</p>
+                  <h2 className="mt-1 font-display text-3xl text-white tracking-tight">Select Stay Duration & Profile</h2>
                 </div>
                 <div className="w-full lg:w-64">
                   <DateField label="Move-in Date" onChange={setMoveIn} value={moveIn} />
@@ -689,16 +691,16 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                         className={cn(
                           "relative p-4 text-left rounded-none border-2 transition-all select-none",
                           isSelected
-                            ? "border-[var(--np-yellow)] bg-[#1F1D14] shadow-[4px_4px_0px_var(--np-yellow)]"
-                            : "border-[#3D3D3D] bg-[#121212] shadow-[3px_3px_0px_#000000] hover:border-white/30",
+                            ? "border-[var(--vh-pink)] bg-[var(--vh-pink)]/10 shadow-[4px_4px_0px_var(--vh-pink)]"
+                            : "border-white/10 bg-[#12131A] shadow-[3px_3px_0px_#000000] hover:border-white/30",
                         )}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-['Cirka',serif] text-xl font-bold text-white">{tier.label}</span>
+                          <span className="font-display text-xl font-bold text-white">{tier.label}</span>
                           <span
                             className={cn(
                               "text-[10px] font-extrabold uppercase tracking-wider px-1.5 py-0.5",
-                              isSelected ? "bg-[var(--np-yellow)] text-black" : "bg-white/10 text-white/60",
+                              isSelected ? "bg-[var(--vh-pink)] text-white shadow-[2px_2px_0px_#000000]" : "bg-white/10 text-white/60",
                             )}
                           >
                             {tier.badge}
@@ -712,7 +714,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
               </div>
 
               {/* Stay Profile Options */}
-              <div className="mt-6 border-t border-[#3D3D3D] pt-5">
+              <div className="mt-6 border-t border-white/10 pt-5">
                 <span className="text-xs font-extrabold uppercase tracking-[0.16em] text-white/60">Stay Profile</span>
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
                   {stayTypeOptions.map((opt) => {
@@ -725,15 +727,15 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                         className={cn(
                           "flex items-center justify-between p-3.5 rounded-none border-2 transition-all select-none text-left",
                           isSelected
-                            ? "border-[var(--np-yellow)] bg-[#1F1D14] shadow-[3px_3px_0px_var(--np-yellow)]"
-                            : "border-[#3D3D3D] bg-[#121212] shadow-[2px_2px_0px_#000000] hover:border-white/30",
+                            ? "border-[var(--vh-pink)] bg-[var(--vh-pink)]/10 shadow-[3px_3px_0px_var(--vh-pink)]"
+                            : "border-white/10 bg-[#12131A] shadow-[2px_2px_0px_#000000] hover:border-white/30",
                         )}
                       >
                         <div>
                           <p className="text-sm font-bold text-white">{opt.label}</p>
                           <p className="text-xs text-white/60">{opt.desc}</p>
                         </div>
-                        {isSelected && <Check className="h-4 w-4 text-[var(--np-yellow)] shrink-0 ml-2" />}
+                        {isSelected && <Check className="h-4 w-4 text-[var(--vh-pink)] shrink-0 ml-2" />}
                       </button>
                     );
                   })}
@@ -762,11 +764,11 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
 
                 {!isLoadingRooms && roomError ? (
                   <div className="rounded-none border border-[#EE4D37] bg-[#161616] p-6 text-center shadow-[4px_4px_0px_#000000]">
-                    <p className="font-['Cirka',serif] text-2xl text-white">Rooms Did Not Load</p>
+                    <p className="font-display text-2xl text-white">Rooms Did Not Load</p>
                     <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-white/70">{roomError}</p>
                     <div className="mt-5 flex justify-center">
                       <NeoPopButton variant="secondary" onClick={() => void loadRooms()}>
-                        Retry Loading Rooms
+                        Retry Room Search
                       </NeoPopButton>
                     </div>
                   </div>
@@ -774,7 +776,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
 
                 {!isLoadingRooms && !roomError && rooms.length === 0 ? (
                   <div className="rounded-none border border-[#3D3D3D] bg-[#161616] p-6 text-center shadow-[4px_4px_0px_#000000]">
-                    <p className="font-['Cirka',serif] text-2xl text-white">No Monthly Rooms Available</p>
+                    <p className="font-display text-2xl text-white">No Monthly Rooms Available</p>
                     <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-white/70">
                       There are no available spaces matching this move-in date. Try selecting another start date above.
                     </p>
@@ -797,17 +799,17 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                       <article
                         key={roomKey}
                         className={cn(
-                          "overflow-hidden rounded-none border-2 bg-[#161616] transition-all shadow-[4px_4px_0px_#000000]",
-                          isSelected ? "border-[var(--np-yellow)]" : "border-[#3D3D3D] hover:border-white/30",
+                          "overflow-hidden rounded-none border-2 bg-[#171822] transition-all shadow-[4px_4px_0px_#000000]",
+                          isSelected ? "border-[var(--vh-pink)]" : "border-white/10 hover:border-white/30",
                         )}
                       >
                         <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)_200px]">
                           {/* Thumbnail */}
-                          <div className="relative border-b border-[#3D3D3D] lg:border-b-0 lg:border-r">
+                          <div className="relative border-b border-white/10 lg:border-b-0 lg:border-r">
                             <Image alt={room.title} className="h-[200px] w-full object-cover lg:h-full" height={420} src={room.image} width={520} />
                             <div className="absolute top-2 left-2">
                               <Token
-                                variant={room.roomType === "PRIVATE" ? "blue" : "yellow"}
+                                variant={room.roomType === "PRIVATE" ? "blue" : "crimson"}
                                 label={room.roomType === "PRIVATE" ? "PRIVATE SUITE" : "COMMUNITY DORM"}
                               />
                             </div>
@@ -816,7 +818,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                           {/* Details */}
                           <div className="space-y-3 p-5">
                             <div>
-                              <h3 className="font-['Cirka',serif] text-2xl text-white tracking-tight">{room.title}</h3>
+                              <h3 className="font-display text-2xl text-white tracking-tight">{room.title}</h3>
                               <p className="mt-0.5 text-xs font-extrabold uppercase tracking-wider text-white/50">{room.guestText}</p>
                             </div>
 
@@ -829,8 +831,8 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                               {featureLabels.slice(0, 5).map((label) => {
                                 const Icon = featureIcon(label);
                                 return (
-                                  <span key={label} className="inline-flex items-center gap-1 border border-[#3D3D3D] bg-[#121212] px-2 py-0.5 text-[11px] text-white/80">
-                                    <Icon className="h-3 w-3 text-[var(--np-yellow)]" />
+                                  <span key={label} className="inline-flex items-center gap-1 border border-white/10 bg-[#12131A] px-2 py-0.5 text-[11px] text-white/80">
+                                    <Icon className="h-3 w-3 text-[var(--vh-pink)]" />
                                     {label}
                                   </span>
                                 );
@@ -843,10 +845,10 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                           </div>
 
                           {/* Pricing & Selection */}
-                          <div className="flex flex-col justify-between border-t border-[#3D3D3D] p-5 lg:border-l lg:border-t-0 bg-[#121212]">
+                          <div className="flex flex-col justify-between border-t border-white/10 p-5 lg:border-l lg:border-t-0 bg-[#12131A]">
                             <div>
                               <span className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/50">Monthly Rent</span>
-                              <p className="mt-1 font-['Cirka',serif] text-3xl font-bold text-white">{formatMonthlyPrice(room)}</p>
+                              <p className="mt-1 font-display text-3xl font-bold text-white">{formatMonthlyPrice(room)}</p>
                               {!isPriceUnavailable && (
                                 <p className="text-[11px] text-white/50">x {duration} {duration === 1 ? "month" : "months"}</p>
                               )}
@@ -854,7 +856,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
 
                             <div className="mt-5">
                               {!canBook ? (
-                                <div className="border border-[#3D3D3D] bg-[#181818] py-2 text-center text-xs font-bold uppercase tracking-wider text-white/40">
+                                <div className="border border-white/10 bg-[#171822] py-2 text-center text-xs font-bold uppercase tracking-wider text-white/40">
                                   {isSoldOut ? "Sold Out" : "Unavailable"}
                                 </div>
                               ) : count === 0 ? (
@@ -862,21 +864,21 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                                   Select Room
                                 </NeoPopButton>
                               ) : (
-                                <div className="flex items-center justify-between border border-[var(--np-yellow)] bg-[#1A1A1A] p-1">
+                                <div className="flex items-center justify-between border border-[var(--vh-pink)] bg-[#171822] p-1">
                                   <button
                                     type="button"
                                     onClick={() => updateCount(roomKey, count - 1)}
-                                    className="flex h-8 w-8 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-white hover:bg-[#252525]"
+                                    className="flex h-8 w-8 items-center justify-center border border-white/10 bg-[#12131A] text-white hover:bg-[#252525]"
                                     aria-label="Remove room"
                                   >
                                     <Minus className="h-3.5 w-3.5" />
                                   </button>
-                                  <span className="font-['Cirka',serif] text-lg font-bold text-white px-2">{count} Selected</span>
+                                  <span className="font-display text-lg font-bold text-white px-2">{count} Selected</span>
                                   <button
                                     type="button"
                                     disabled={count >= room.availableCount}
                                     onClick={() => updateCount(roomKey, count + 1)}
-                                    className="flex h-8 w-8 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-white hover:bg-[#252525] disabled:opacity-40"
+                                    className="flex h-8 w-8 items-center justify-center border border-white/10 bg-[#12131A] text-white hover:bg-[#252525] disabled:opacity-40"
                                     aria-label="Add more"
                                   >
                                     <Plus className="h-3.5 w-3.5" />
@@ -892,7 +894,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                 </div>
 
                 {/* Coliving Addons Selector */}
-                <div className="mt-8 border border-[#3D3D3D] bg-[#161616] p-6 shadow-[4px_4px_0px_#000000]">
+                <div className="mt-8 border border-white/15 bg-[#171822] p-6 shadow-[4px_4px_0px_#000000]">
                   <SectionTitle
                     kicker="CUSTOMIZE YOUR RESIDENCY"
                     title="Coliving Addons & Upgrades"
@@ -911,11 +913,11 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                             "w-full flex items-center justify-between p-4 rounded-none border-2 text-left transition-all select-none",
                             isToggled
                               ? "border-[var(--np-green)] bg-[#121F17] shadow-[3px_3px_0px_var(--np-green)]"
-                              : "border-[#3D3D3D] bg-[#121212] hover:border-white/30",
+                              : "border-white/10 bg-[#12131A] hover:border-white/30",
                           )}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={cn("p-2 border", isToggled ? "border-[var(--np-green)] text-[var(--np-green)]" : "border-[#3D3D3D] text-white/60")}>
+                            <div className={cn("p-2 border", isToggled ? "border-[var(--np-green)] text-[var(--np-green)]" : "border-white/10 text-white/60")}>
                               <Icon className="h-5 w-5" />
                             </div>
                             <div>
@@ -924,7 +926,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                             </div>
                           </div>
                           <div className="text-right shrink-0 ml-4">
-                            <span className="font-['Cirka',serif] text-base font-bold text-white">+₹{formatINRPlain(addon.monthlyPrice)}</span>
+                            <span className="font-display text-base font-bold text-white">+₹{formatINRPlain(addon.monthlyPrice)}</span>
                             <span className="block text-[10px] uppercase text-white/50">/ month</span>
                           </div>
                         </button>
@@ -936,20 +938,20 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
 
               {/* Right Column: Digital Receipt Summary Card */}
               <aside className="hidden self-start lg:sticky lg:top-28 lg:block">
-                <div className="rounded-none border-2 border-[#3D3D3D] bg-[#161616] p-6 shadow-[6px_6px_0px_#000000]">
+                <div className="rounded-none border-2 border-white/15 bg-[#171822] p-6 shadow-[6px_6px_0px_#000000]">
                   {/* Receipt Header */}
-                  <div className="flex items-start justify-between border-b border-dashed border-[#3D3D3D] pb-4">
+                  <div className="flex items-start justify-between border-b border-dashed border-white/15 pb-4">
                     <div>
-                      <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[var(--np-yellow)]">DIGITAL RECEIPT</p>
-                      <h2 className="mt-1 font-['Cirka',serif] text-2xl text-white tracking-tight">Coliving Quote</h2>
+                      <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[var(--vh-pink)]">DIGITAL RECEIPT</p>
+                      <h2 className="mt-1 font-display text-2xl text-white tracking-tight">Coliving Quote</h2>
                     </div>
-                    <span className="border border-[#3D3D3D] bg-[#121212] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white">
+                    <span className="border border-white/10 bg-[#12131A] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white">
                       {duration} mo stay
                     </span>
                   </div>
 
                   {/* Dates Box */}
-                  <div className="mt-4 border border-[#3D3D3D] bg-[#121212] p-3 text-xs">
+                  <div className="mt-4 border border-white/10 bg-[#12131A] p-3 text-xs">
                     <div className="flex justify-between items-center text-white/70">
                       <span>MOVE-IN</span>
                       <span className="font-bold text-white">{formatColiveDate(moveIn)}</span>
@@ -960,14 +962,14 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                     </div>
                     <div className="mt-2 flex justify-between items-center text-white/70">
                       <span>PROFILE</span>
-                      <span className="font-bold uppercase text-[var(--np-yellow)]">{stayType}</span>
+                      <span className="font-bold uppercase text-[var(--vh-pink)]">{stayType}</span>
                     </div>
                   </div>
 
                   {/* Itemized charges */}
-                  <div className="mt-5 space-y-3 border-t border-dashed border-[#3D3D3D] pt-4 text-xs">
+                  <div className="mt-5 space-y-3 border-t border-dashed border-white/15 pt-4 text-xs">
                     {selectedRoomDrafts.length === 0 ? (
-                      <p className="border border-[#3D3D3D] bg-[#121212] p-4 text-center text-white/60">
+                      <p className="border border-white/10 bg-[#12131A] p-4 text-center text-white/60">
                         Select a room tier above to generate your itemized monthly receipt.
                       </p>
                     ) : (
@@ -1012,7 +1014,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                   </div>
 
                   {/* Coupon Code Section */}
-                  <div className="mt-5 border-t border-dashed border-[#3D3D3D] pt-4">
+                  <div className="mt-5 border-t border-dashed border-white/15 pt-4">
                     <span className="text-[10px] font-extrabold uppercase tracking-wider text-white/60">Promo Code</span>
                     <div className="mt-2 flex gap-2">
                       <input
@@ -1020,7 +1022,7 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value)}
                         placeholder="e.g. VIBECOLIVE"
-                        className="h-9 w-full rounded-none border border-[#3D3D3D] bg-[#121212] px-3 text-xs uppercase font-mono text-white outline-none focus:border-[var(--np-yellow)]"
+                        className="h-9 w-full rounded-none border border-white/10 bg-[#12131A] px-3 text-xs uppercase font-mono text-white outline-none focus:border-[var(--vh-pink)]"
                       />
                       <NeoPopButton variant="secondary" size="sm" onClick={handleApplyCoupon}>
                         Apply
@@ -1035,15 +1037,15 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                   </div>
 
                   {/* Total & Deposit */}
-                  <div className="mt-5 border-t-2 border-dashed border-[#3D3D3D] pt-4">
+                  <div className="mt-5 border-t-2 border-dashed border-white/15 pt-4">
                     <div className="flex items-baseline justify-between">
                       <span className="text-xs uppercase tracking-wider text-white/70">Estimated Total</span>
-                      <span className="font-['Cirka',serif] text-3xl font-bold text-[var(--np-yellow)]">
+                      <span className="font-display text-3xl font-bold text-[var(--vh-pink)]">
                         ₹{formatINRPlain(selectedRoomTotal)}
                       </span>
                     </div>
-                    <div className="mt-2 border border-[#3D3D3D] bg-[#121212] p-2.5 text-[11px] leading-5 text-white/60">
-                      <Info className="inline h-3.5 w-3.5 mr-1 text-[var(--np-yellow)]" />
+                    <div className="mt-2 border border-white/10 bg-[#12131A] p-2.5 text-[11px] leading-5 text-white/60">
+                      <Info className="inline h-3.5 w-3.5 mr-1 text-[var(--vh-pink)]" />
                       Refundable 1-month security deposit confirmed at backend checkout review.
                     </div>
                   </div>
@@ -1055,11 +1057,11 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                       type="checkbox"
                       checked={isAgeConfirmed}
                       onChange={(e) => setIsAgeConfirmed(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 rounded-none border border-[#3D3D3D] bg-[#121212] text-black accent-[var(--np-yellow)] cursor-pointer"
+                      className="mt-0.5 h-4 w-4 rounded-none border border-white/15 bg-[#12131A] accent-[var(--vh-pink)] cursor-pointer"
                     />
                     <label htmlFor="colive-age-confirm-desktop" className="text-xs text-white/80 cursor-pointer select-none leading-5">
                       I confirm all guests are <strong className="text-white">18+ years of age</strong> and accept the{" "}
-                      <Link href="/policies" className="text-[var(--np-yellow)] underline">
+                      <Link href="/policies" className="text-[var(--vh-pink)] underline">
                         terms & coliving rules
                       </Link>.
                     </label>
@@ -1088,21 +1090,21 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
           <section data-colive-reveal>
             <SectionTitle kicker="HOUSE RULES" title="Coliving Guidelines" />
             <div className="mt-6 max-w-4xl space-y-3">
-              <div className="flex flex-wrap gap-4 border border-[#3D3D3D] bg-[#161616] p-4 text-xs text-white/80">
+              <div className="flex flex-wrap gap-4 border border-white/10 bg-[#171822] p-4 text-xs text-white/80">
                 <div className="flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 text-[var(--np-yellow)]" />
+                  <CalendarDays className="h-4 w-4 text-[var(--vh-pink)]" />
                   <span>Check-in Window: <strong className="text-white">{propertyGuidelines.checkIn}</strong></span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock3 className="h-4 w-4 text-[var(--np-yellow)]" />
+                  <Clock3 className="h-4 w-4 text-[var(--vh-pink)]" />
                   <span>Quiet Hours: <strong className="text-white">11:00 PM – 8:00 AM</strong></span>
                 </div>
               </div>
 
               <Accordion className="space-y-2" defaultValue={["general-guidelines"]} type="multiple">
-                <AccordionItem className="rounded-none border border-[#3D3D3D] bg-[#161616] px-4" value="general-guidelines">
+                <AccordionItem className="rounded-none border border-white/10 bg-[#171822] px-4" value="general-guidelines">
                   <AccordionTrigger className="text-sm font-bold uppercase tracking-wider text-white">General Guidelines</AccordionTrigger>
-                  <AccordionContent className="border-t border-[#3D3D3D] pt-3 text-xs leading-6 text-white/70">
+                  <AccordionContent className="border-t border-white/10 pt-3 text-xs leading-6 text-white/70">
                     {propertyGuidelines.summary.map((item) => (
                       <p key={item}>• {item}</p>
                     ))}
@@ -1110,9 +1112,9 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                 </AccordionItem>
 
                 {propertyGuidelines.sections.map((section, index) => (
-                  <AccordionItem key={section.title} className="rounded-none border border-[#3D3D3D] bg-[#161616] px-4" value={`guideline-${index}`}>
+                  <AccordionItem key={section.title} className="rounded-none border border-white/10 bg-[#171822] px-4" value={`guideline-${index}`}>
                     <AccordionTrigger className="text-sm font-bold uppercase tracking-wider text-white">{section.title}</AccordionTrigger>
-                    <AccordionContent className="border-t border-[#3D3D3D] pt-3 text-xs leading-6 text-white/70">
+                    <AccordionContent className="border-t border-white/10 pt-3 text-xs leading-6 text-white/70">
                       {section.content.map((item) => (
                         <p key={item}>• {item}</p>
                       ))}
@@ -1131,9 +1133,9 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
                 <SectionTitle kicker="FREQUENT QUESTIONS" title="Coliving FAQs" />
                 <Accordion className="mt-6 space-y-3" defaultValue={["faq-0"]} type="multiple">
                   {roomFaqs.map((faq, index) => (
-                    <AccordionItem key={faq.question} className="rounded-none border border-[#3D3D3D] bg-[#161616] px-4" value={`faq-${index}`}>
+                    <AccordionItem key={faq.question} className="rounded-none border border-white/10 bg-[#171822] px-4" value={`faq-${index}`}>
                       <AccordionTrigger className="text-sm font-semibold text-white">{faq.question}</AccordionTrigger>
-                      <AccordionContent className="border-t border-[#3D3D3D] pt-3 text-xs leading-6 text-white/70">{faq.answer}</AccordionContent>
+                      <AccordionContent className="border-t border-white/10 pt-3 text-xs leading-6 text-white/70">{faq.answer}</AccordionContent>
                     </AccordionItem>
                   ))}
                 </Accordion>
@@ -1143,25 +1145,25 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
               <div className="space-y-6">
                 <div>
                   <SectionTitle kicker="SURROUNDINGS" title="Location & Access" />
-                  <div className="mt-6 overflow-hidden rounded-none border border-[#3D3D3D] shadow-[4px_4px_0px_#000000]">
+                  <div className="mt-6 overflow-hidden rounded-none border border-white/15 shadow-[4px_4px_0px_#000000]">
                     <iframe className="h-[280px] w-full" loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={locationMap.embedUrl} title={locationMap.title} />
                   </div>
-                  <Link className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--np-yellow)] hover:underline" href={propertyHero.mapsHref} target="_blank">
+                  <Link className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[var(--vh-pink)] hover:underline" href={propertyHero.mapsHref} target="_blank">
                     Open in Google Maps
                     <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
 
-                <div className="border border-[#3D3D3D] bg-[#161616] p-4 shadow-[3px_3px_0px_#000000]">
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-[var(--np-yellow)]">Nearby Spots</p>
+                <div className="border border-white/15 bg-[#171822] p-4 shadow-[3px_3px_0px_#000000]">
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-[var(--vh-pink)]">Nearby Spots</p>
                   <div className="mt-3 space-y-2.5">
                     {nearbyAttractions.map((place) => (
-                      <div key={place.name} className="flex items-center justify-between border-b border-[#3D3D3D] pb-2 last:border-b-0 last:pb-0 text-xs">
+                      <div key={place.name} className="flex items-center justify-between border-b border-white/10 pb-2 last:border-b-0 last:pb-0 text-xs">
                         <div>
                           <span className="font-semibold text-white">{place.name}</span>
                           <span className="block text-[10px] uppercase text-white/50">{place.type}</span>
                         </div>
-                        <span className="border border-[#3D3D3D] bg-[#121212] px-2 py-0.5 text-[10px] font-bold uppercase text-white/80">
+                        <span className="border border-white/10 bg-[#12131A] px-2 py-0.5 text-[10px] font-bold uppercase text-white/80">
                           {place.travel}
                         </span>
                       </div>
@@ -1175,11 +1177,11 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
       </section>
 
       {/* Mobile Sticky Booking Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-[#3D3D3D] bg-[#121212]/95 p-4 backdrop-blur-xl shadow-[0px_-4px_16px_rgba(0,0,0,0.8)]">
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-white/15 bg-[#12131A]/95 p-4 backdrop-blur-xl shadow-[0px_-4px_16px_rgba(0,0,0,0.8)]">
         <div className="flex items-center justify-between gap-3">
           <div>
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-white/50">Est. Total</span>
-            <p className="font-['Cirka',serif] text-xl font-bold text-[var(--np-yellow)]">₹{formatINRPlain(selectedRoomTotal)}</p>
+            <p className="font-display text-xl font-bold text-[var(--vh-pink)]">₹{formatINRPlain(selectedRoomTotal)}</p>
             <span className="text-[11px] text-white/70">
               {selectedRoomCount} room{selectedRoomCount === 1 ? "" : "s"} • {duration} mo
             </span>
@@ -1195,13 +1197,13 @@ export function ColiveFlow({ initialLocation }: { initialLocation?: string } = {
             <ArrowRight className="ml-1.5 h-4 w-4" />
           </NeoPopButton>
         </div>
-        <div className="mt-2 flex items-center gap-2 pt-2 border-t border-[#3D3D3D]">
+        <div className="mt-2 flex items-center gap-2 pt-2 border-t border-white/10">
           <input
             type="checkbox"
             id="colive-age-mobile"
             checked={isAgeConfirmed}
             onChange={(e) => setIsAgeConfirmed(e.target.checked)}
-            className="h-3.5 w-3.5 rounded-none border-[#3D3D3D] accent-[var(--np-yellow)] cursor-pointer"
+            className="h-3.5 w-3.5 rounded-none border-white/15 accent-[var(--vh-pink)] cursor-pointer"
           />
           <label htmlFor="colive-age-mobile" className="text-[10px] text-white/70 select-none">
             All guests are 18+ and accept terms.

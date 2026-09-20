@@ -74,7 +74,7 @@ export function BreakfastErrorPanel({
       </h2>
       <p className="mt-3 max-w-xl text-base leading-7 text-white/68">{message}</p>
       <Button
-        className="mt-6 h-12 rounded-none bg-[var(--np-yellow)] px-5 font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
+        className="mt-6 h-12 rounded-none bg-[#FF2E62] px-5 font-bold text-white border border-[#FF2E62] shadow-[3px_3px_0px_#991438] hover:bg-[#FF426F]"
         onClick={onRetry}
         type="button"
       >

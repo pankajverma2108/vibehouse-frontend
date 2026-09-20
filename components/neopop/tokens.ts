@@ -5,31 +5,35 @@
  */
 
 export const colorPalette = {
-  // Near-black layered surfaces
+  // Deep atmospheric dark layered surfaces (from partner & upcoming)
   black: {
-    500: '#0D0D0D', // Primary dark canvas
-    400: '#121212', // Surface: nav, panels, dialogs
-    300: '#161616', // Raised surface: cards, lanes, active work
-    200: '#3D3D3D', // Neutral edges, borders, inactive controls
-    100: '#262626', // Subtle dividers
+    500: '#0A0A0E', // Primary dark canvas
+    400: '#12131A', // Surface: nav, panels, dialogs
+    300: '#171822', // Raised surface: cards, lanes, active work
+    200: '#2A2A38', // Neutral edges, borders, inactive controls
+    100: '#1C1D28', // Subtle dividers
   },
-  // White hierarchy
+  // White hierarchy & warm ice
   white: {
-    500: '#FFFFFF', // Headings, primary labels, high-emphasis controls
-    300: '#EFEFEF', // Secondary headings or light section text
-    100: '#D2D2D2', // Supporting text and quiet icons
-    secondary: 'rgba(255, 255, 255, 0.62)', // Supporting copy
-    border: 'rgba(255, 255, 255, 0.16)', // Quiet separators
-    borderEmphasized: 'rgba(255, 255, 255, 0.36)', // Hover / active containment
+    500: '#FFFFFF', // High-emphasis labels, pure white
+    300: '#F3EEE6', // Warm ice headings, primary text
+    100: '#D2D2D8', // Supporting text and quiet icons
+    secondary: 'rgba(243, 238, 230, 0.72)', // Supporting copy
+    border: 'rgba(255, 255, 255, 0.14)', // Quiet separators
+    borderEmphasized: 'rgba(255, 255, 255, 0.28)', // Hover / active containment
   },
   // Affirmative momentum semantics
   semantic: {
-    affirmative: '#FFCB45', // Yellow: primary action, next step, active selection
+    affirmative: '#FF2E62', // Vibehouse Crimson: primary action, next step, active selection
+    brand: '#FF2E62', // Primary Brand Crimson
+    brandHover: '#FF426F', // Crimson Hover State
+    brandEdge: '#991438', // Crimson Bevel Edge
     progress: '#3BFFAD', // Green: completed progress, live/healthy, positive confirmation
-    focus: '#3F6FD9', // Blue: keyboard focus, active work, selected context
+    focus: '#FF2E62', // Keyboard focus & active context
     celebration: '#FF426F', // Pink: milestones, completion moments, celebratory CTA
+    amber: '#FFCB45', // Amber: secondary alert, highlight badge
     error: '#EE4D37', // Red: failure, destructive action, invalid field
-    neutral: '#3D3D3D', // Dark gray: counts, quiet badges, inactive state
+    neutral: '#2A2A38', // Dark gray: counts, quiet badges, inactive state
   },
 } as const;
 
