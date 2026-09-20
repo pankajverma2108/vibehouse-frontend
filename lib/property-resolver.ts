@@ -25,6 +25,7 @@ const HOST_TO_PROPERTY: Record<string, string> = {
   "vibehouse.co": "60765",
   "www.vibehouse.in": "60765",
   "vibehouse.in": "60765",
+  "vibe-house.netlify.app": "60765",
   "www.buteak.in": "55402",
   "buteak.in": "55402",
   "www.dev.buteak.in": "55402",
@@ -144,6 +145,7 @@ export function resolveClientBrand(options?: {
   return DEFAULT_BRAND;
 }
 
+
 /**
  * Server-side property resolver.
  * Call from layout, pages, or server components.
@@ -177,7 +179,7 @@ export function resolveServerPropertyId(options: {
     return envProperty;
   }
 
-  return "";
+  return "60765";
 }
 
 /**
@@ -213,12 +215,11 @@ export function resolveClientPropertyId(options: {
     return envProperty;
   }
 
-  return "";
+  return "60765";
 }
 
 /**
  * Get property name from property_id.
- * Returns empty string if property_id is unknown.
  */
 export function getPropertyName(propertyId: string): string {
   return PROPERTY_ID_TO_NAME[propertyId] || "";

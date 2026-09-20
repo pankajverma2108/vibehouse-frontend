@@ -30,6 +30,8 @@ export const BRAND_TO_DEFAULT_PROPERTY: Record<Brand, string> = {
 const HOST_TO_PROPERTY: Record<string, string> = {
   'www.thedailysocial.co.in': '60765',
   'thedailysocial.co.in':     '60765',
+  'vibe-house.netlify.app':   '60765',
+  'vibehouse-frontend.onrender.com': '60765',
   'www.buteak.in':            '55402',
   'buteak.in':                '55402',
   'dev.buteak.in':            '55402',
@@ -48,6 +50,8 @@ const HOST_TO_PROPERTY: Record<string, string> = {
 const HOST_TO_BRAND: Record<string, Brand> = {
   'www.thedailysocial.co.in': 'TDS',
   'thedailysocial.co.in':     'TDS',
+  'vibe-house.netlify.app':   'TDS',
+  'vibehouse-frontend.onrender.com': 'TDS',
   'www.buteak.in':            'BUTEAK',
   'buteak.in':                'BUTEAK',
   'dev.buteak.in':            'BUTEAK',
