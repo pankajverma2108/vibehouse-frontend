@@ -51,6 +51,9 @@ COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
 # Prisma schema needed at runtime (for Prisma client introspection)
 COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
 
+# Create uploads directory and ensure correct ownership
+RUN mkdir -p /app/uploads && chown -R nestjs:nodejs /app
+
 USER nestjs
 
 EXPOSE 8080

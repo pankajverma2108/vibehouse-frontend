@@ -14,12 +14,21 @@ import * as path from 'path';
 
 @Controller('uploads')
 export class UploadsController {
-  private readonly uploadsDir = path.resolve(process.cwd(), 'uploads');
+  private readonly uploadsDir: string;
 
   constructor() {
-    if (!fs.existsSync(this.uploadsDir)) {
-      fs.mkdirSync(this.uploadsDir, { recursive: true });
+    let dir = path.resolve(process.cwd(), 'uploads');
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    } catch {
+      dir = path.resolve('/tmp', 'uploads');
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
     }
+    this.uploadsDir = dir;
   }
 
   private resolveSafePath(req: Request): { safeKey: string; targetFile: string } {
