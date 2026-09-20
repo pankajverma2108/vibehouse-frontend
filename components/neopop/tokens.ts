@@ -61,10 +61,10 @@ export const spacing = {
 
 export const typography = {
   fonts: {
-    editorial: "'Cirka', 'Libre Bodoni', serif",
-    display: "'Gilroy', 'Urbanist', sans-serif",
-    body: "'Gilroy', 'Urbanist', sans-serif",
-    utility: "'Gilroy', 'Urbanist', sans-serif",
+    editorial: "'Geologica', sans-serif",
+    display: "'Geologica', sans-serif",
+    body: "'Lexend', sans-serif",
+    utility: "'Lexend', sans-serif",
   },
   tracking: {
     tight: '-0.02em',

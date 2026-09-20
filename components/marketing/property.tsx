@@ -419,7 +419,7 @@ function DateRangePicker({
       <PopoverTrigger asChild>
         <button
           aria-expanded={open}
-          className="flex w-full items-center justify-between gap-3 border border-white/15 bg-[#171822] px-5 py-3 text-white shadow-[3px_3px_0px_#000000] hover:border-[var(--vh-pink)] transition-all md:w-auto font-['Gilroy',sans-serif]"
+          className="flex w-full items-center justify-between gap-3 border border-white/15 bg-[#171822] px-5 py-3 text-white shadow-[3px_3px_0px_#000000] hover:border-[var(--vh-pink)] transition-all md:w-auto font-body"
           type="button"
         >
           <div className="inline-flex min-w-0 items-center gap-3">
@@ -509,7 +509,7 @@ function DesktopBookingSummary({
 
   return (
     <aside className="hidden self-start lg:sticky lg:top-28 lg:block">
-      <div className="border border-white/15 bg-[#171822] p-6 shadow-[4px_4px_0px_#000000] lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto font-['Gilroy',sans-serif]">
+      <div className="border border-white/15 bg-[#171822] p-6 shadow-[4px_4px_0px_#000000] lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto font-body">
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white font-display">{bookingSummary.title}</h2>
 
         <div className="mt-5 border border-white/10 bg-[#12131A] px-4 py-4 text-white">
@@ -613,7 +613,7 @@ function DesktopBookingSummary({
         {continueError ? <p className="mt-3 text-xs font-bold text-[#EE4D37] uppercase tracking-[0.06em]">{continueError}</p> : null}
         <div className="mt-5">
           <NeoPopButton
-            className="w-full font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em] text-sm"
+            className="w-full font-body font-black uppercase tracking-[0.12em] text-sm"
             disabled={!isAgeConfirmed || !hasSelection || isContinuing}
             onClick={onContinue}
             size="lg"
@@ -675,7 +675,7 @@ function MobileStickySummary({
   const showUnavailablePricePreview = !hasSelection && !previewRoomWithPrice;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-[#3D3D3D] bg-[#121212] shadow-[0_-4px_20px_rgba(0,0,0,0.7)] font-['Gilroy',sans-serif]">
+    <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-[#3D3D3D] bg-[#121212] shadow-[0_-4px_20px_rgba(0,0,0,0.7)] font-body">
       <div className="overflow-hidden bg-[#121212]">
         {open && hasSelection ? (
           <div className="border-b border-[#3D3D3D] bg-[#161616] px-4 py-4">
@@ -755,12 +755,12 @@ function MobileStickySummary({
 
         <div className="flex items-center justify-between gap-4 p-4">
           <div>
-            <p className="text-xl font-black text-white font-['Gilroy',sans-serif]">
+            <p className="text-xl font-black text-white font-body">
               {showUnavailablePricePreview ? "Price unavailable" : `₹${formatINRPlain(displayAmount)}`}
             </p>
             {continueError ? <p className="mt-1 max-w-[200px] text-[10px] font-bold text-[#EE4D37] uppercase">{continueError}</p> : null}
             <button
-              className="mt-1 inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-[0.1em] text-[var(--vh-pink)] font-['Gilroy',sans-serif]"
+              className="mt-1 inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-[0.1em] text-[var(--vh-pink)] font-body"
               disabled={!hasSelection}
               onClick={() => setOpen((value) => !value)}
               type="button"
@@ -770,7 +770,7 @@ function MobileStickySummary({
             </button>
           </div>
           <NeoPopButton
-            className="min-w-[130px] px-4 py-2.5 text-xs font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em]"
+            className="min-w-[130px] px-4 py-2.5 text-xs font-body font-black uppercase tracking-[0.12em]"
             disabled={!hasSelection || isContinuing}
             onClick={onContinue}
             size="sm"
@@ -795,15 +795,15 @@ function BuildYourStaySection() {
               key={item.id}
               className="relative border border-white/10 bg-[#171822] p-5 text-left shadow-[3px_3px_0px_#000000] hover:border-[var(--vh-pink)] transition-all"
             >
-              <span className="inline-block bg-[var(--vh-pink)] text-white text-[10px] font-black uppercase tracking-[0.12em] px-2.5 py-0.5 font-['Gilroy',sans-serif] mb-3">
+              <span className="inline-block bg-[var(--vh-pink)] text-white text-[10px] font-black uppercase tracking-[0.12em] px-2.5 py-0.5 font-body mb-3">
                 {item.kicker}
               </span>
 
-              <h3 className="text-base font-black uppercase text-white font-['Gilroy',sans-serif] tracking-[0.06em] mb-2">
+              <h3 className="text-base font-black uppercase text-white font-body tracking-[0.06em] mb-2">
                 {item.title}
               </h3>
 
-              <p className="text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">{item.body}</p>
+              <p className="text-xs leading-relaxed text-white/70 font-body">{item.body}</p>
             </div>
           );
         })}
@@ -931,7 +931,7 @@ function RoomDetailsPopup({
           <div className="p-5 md:p-6 lg:max-h-[92vh] lg:overflow-y-auto">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="inline-block bg-[var(--vh-pink)] text-white text-[10px] font-black uppercase tracking-[0.14em] px-2.5 py-0.5 font-['Gilroy',sans-serif]">
+                <span className="inline-block bg-[var(--vh-pink)] text-white text-[10px] font-black uppercase tracking-[0.14em] px-2.5 py-0.5 font-body">
                   Room Details
                 </span>
                 <h3 className="mt-3 text-3xl font-bold text-white font-display tracking-tight">{room.title}</h3>
@@ -946,21 +946,21 @@ function RoomDetailsPopup({
               </button>
             </div>
 
-            <p className="mt-5 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
+            <p className="mt-5 text-xs leading-relaxed text-white/70 font-body">
               Clean, practical, and comfortable for city stays, with features that make the room work well for both rest and day-to-day use.
             </p>
 
             <div className="mt-6 border border-white/10 bg-[#171822] p-5 shadow-[3px_3px_0px_#000000]">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50 font-['Gilroy',sans-serif]">Availability</p>
-              <p className="mt-1 text-base font-extrabold text-[var(--vh-pink)] font-['Gilroy',sans-serif]">{room.inventoryText}</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50 font-body">Availability</p>
+              <p className="mt-1 text-base font-extrabold text-[var(--vh-pink)] font-body">{room.inventoryText}</p>
               <div className="mt-4 flex items-center justify-between">
                 <div>
-                  <div className="flex items-baseline gap-1 font-['Gilroy',sans-serif]">
+                  <div className="flex items-baseline gap-1 font-body">
                     <span className="text-3xl font-black text-white">{formatRoomPrice(room)}</span>
                     {!isPriceUnavailable ? <span className="text-xs text-white/50 uppercase font-bold">/ night</span> : null}
                   </div>
                   {room.inventoryState === "limited" && room.availableCount > 0 && (
-                    <p className="mt-1 inline-flex items-center gap-1 bg-[#EE4D37]/15 border border-[#EE4D37]/40 px-2 py-0.5 text-[10px] font-bold text-[#EE4D37] uppercase font-['Gilroy',sans-serif]">
+                    <p className="mt-1 inline-flex items-center gap-1 bg-[#EE4D37]/15 border border-[#EE4D37]/40 px-2 py-0.5 text-[10px] font-bold text-[#EE4D37] uppercase font-body">
                       ⚡ Only {room.availableCount} left!
                     </p>
                   )}
@@ -968,22 +968,22 @@ function RoomDetailsPopup({
                 {!canBook ? (
                   <div className="flex flex-col items-end gap-1">
                     {isPriceUnavailable ? (
-                      <span className="border border-[var(--vh-pink)]/40 bg-[var(--vh-pink)]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[var(--vh-pink)] font-['Gilroy',sans-serif]">
+                      <span className="border border-[var(--vh-pink)]/40 bg-[var(--vh-pink)]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[var(--vh-pink)] font-body">
                         Price unavailable
                       </span>
                     ) : isAvailabilityPending ? (
-                      <span className="border border-[#3F6FD9]/40 bg-[#3F6FD9]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[#3F6FD9] font-['Gilroy',sans-serif]">
+                      <span className="border border-[#3F6FD9]/40 bg-[#3F6FD9]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[#3F6FD9] font-body">
                         Select dates
                       </span>
                     ) : (
-                      <span className="border border-[#EE4D37]/40 bg-[#EE4D37]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[#EE4D37] font-['Gilroy',sans-serif]">
+                      <span className="border border-[#EE4D37]/40 bg-[#EE4D37]/15 px-3 py-1.5 text-xs font-black uppercase tracking-[0.1em] text-[#EE4D37] font-body">
                         SOLD OUT
                       </span>
                     )}
                   </div>
                 ) : count === 0 ? (
                   <NeoPopButton
-                    className="font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em] px-6"
+                    className="font-body font-black uppercase tracking-[0.12em] px-6"
                     onClick={onIncrement}
                     size="default"
                     variant="primary"
@@ -1000,7 +1000,7 @@ function RoomDetailsPopup({
                     >
                       <Minus className="h-4 w-4" />
                     </button>
-                    <span className="w-8 text-center text-base font-black text-white font-['Gilroy',sans-serif]">{count}</span>
+                    <span className="w-8 text-center text-base font-black text-white font-body">{count}</span>
                     <button
                       aria-label="Increment Count"
                       className="flex h-9 w-9 items-center justify-center border border-white/15 bg-[#12131A] text-white shadow-[2px_2px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] transition-all font-bold disabled:opacity-40"
@@ -1016,13 +1016,13 @@ function RoomDetailsPopup({
             </div>
 
             <div className="mt-6">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50 font-['Gilroy',sans-serif]">Room Amenities</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50 font-body">Room Amenities</p>
               <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 {detailItems.map((label, index) => {
                   const Icon = iconForLabel(label);
 
                   return (
-                    <div key={`${label}-${index}`} className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.06em] text-white/80 font-['Gilroy',sans-serif] border border-white/10 bg-[#171822] p-2.5 shadow-[2px_2px_0px_#000000]">
+                    <div key={`${label}-${index}`} className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.06em] text-white/80 font-body border border-white/10 bg-[#171822] p-2.5 shadow-[2px_2px_0px_#000000]">
                       <span className="flex h-7 w-7 items-center justify-center border border-white/10 bg-[#12131A] text-[var(--vh-pink)]">
                         <Icon className="h-3.5 w-3.5" />
                       </span>
@@ -1576,7 +1576,7 @@ export function Property({
       <section className="bg-[#0A0A0E] pt-28 md:pt-36 pb-12 border-b border-white/10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="mb-10 text-center">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--vh-pink)] mb-3 font-['Gilroy',sans-serif] flex items-center justify-center gap-1.5">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--vh-pink)] mb-3 font-body flex items-center justify-center gap-1.5">
               <span>◉</span> THE FLAGSHIP HOSTEL
             </p>
             <h1 className="leading-tight">
@@ -1584,7 +1584,7 @@ export function Property({
                 VIBEHOUSE
               </span>
             </h1>
-            <p className="mx-auto mt-4 max-w-[760px] text-sm md:text-base leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
+            <p className="mx-auto mt-4 max-w-[760px] text-sm md:text-base leading-relaxed text-white/70 font-body">
               {propertyHero.blurb}
             </p>
           </FadeIn>
@@ -1617,11 +1617,11 @@ export function Property({
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start border border-white/15 bg-[#171822] p-6 md:p-8 shadow-[4px_4px_0px_#000000]">
                 <div>
                   <SectionTitle title="About" />
-                  <p className={`mt-3 text-sm leading-relaxed text-white/75 font-['Gilroy',sans-serif] ${aboutExpanded ? "" : "line-clamp-2"}`}>
+                  <p className={`mt-3 text-sm leading-relaxed text-white/75 font-body ${aboutExpanded ? "" : "line-clamp-2"}`}>
                     {propertyAboutText}
                   </p>
                   <button
-                    className="mt-3 text-xs font-bold uppercase tracking-[0.1em] text-[var(--vh-pink)] hover:underline font-['Gilroy',sans-serif]"
+                    className="mt-3 text-xs font-bold uppercase tracking-[0.1em] text-[var(--vh-pink)] hover:underline font-body"
                     onClick={() => setAboutExpanded((value) => !value)}
                     type="button"
                   >
@@ -1629,7 +1629,7 @@ export function Property({
                   </button>
                 </div>
                 <div className="hidden lg:block lg:sticky lg:top-28">
-                  <NeoPopButton asChild className="w-full font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em]" size="lg" variant="primary">
+                  <NeoPopButton asChild className="w-full font-body font-black uppercase tracking-[0.12em]" size="lg" variant="primary">
                     <Link href="#availability">View rooms</Link>
                   </NeoPopButton>
                 </div>
@@ -1639,7 +1639,7 @@ export function Property({
             <section id="amenities">
               <div>
                 <SectionTitle title="Amenities" />
-                <p className="mt-2 max-w-[640px] text-sm text-white/70 font-['Gilroy',sans-serif]">
+                <p className="mt-2 max-w-[640px] text-sm text-white/70 font-body">
                   The good stuff that keeps the stay easy, social, and very hard to complain about.
                 </p>
               </div>
@@ -1652,7 +1652,7 @@ export function Property({
                       <span className="inline-flex h-10 w-10 items-center justify-center text-[var(--vh-pink)]">
                         <Icon className="h-6 w-6" />
                       </span>
-                      <p className="mt-2 text-xs font-bold uppercase tracking-[0.08em] text-white/90 font-['Gilroy',sans-serif]">{amenity.label}</p>
+                      <p className="mt-2 text-xs font-bold uppercase tracking-[0.08em] text-white/90 font-body">{amenity.label}</p>
                     </div>
                   );
                 })}
@@ -1747,7 +1747,7 @@ export function Property({
                             </div>
                           </div>
 
-                          <div className="space-y-3 p-5 font-['Gilroy',sans-serif]">
+                          <div className="space-y-3 p-5 font-body">
                             <div className="flex flex-wrap items-center justify-between gap-3">
                               <button className="text-left" onClick={() => openRoomPopup(roomKey)} type="button">
                                 <h3 className="text-xl font-extrabold uppercase tracking-[0.06em] text-white hover:text-[var(--vh-pink)] transition-colors">
@@ -1797,7 +1797,7 @@ export function Property({
                             </div>
                           </div>
 
-                          <div className="flex flex-col justify-between border-t border-[#3D3D3D] p-5 lg:border-l lg:border-t-0 font-['Gilroy',sans-serif]">
+                          <div className="flex flex-col justify-between border-t border-[#3D3D3D] p-5 lg:border-l lg:border-t-0 font-body">
                             <div>
                               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">
                                 {room.hasLiveAvailability ? "Live price / night" : "From / night"}
@@ -1816,7 +1816,7 @@ export function Property({
                                 </button>
                               ) : count === 0 ? (
                                 <NeoPopButton
-                                  className="w-full font-['Gilroy',sans-serif] font-black uppercase tracking-[0.12em]"
+                                  className="w-full font-body font-black uppercase tracking-[0.12em]"
                                   onClick={() => updateCount(roomKey, 1)}
                                   size="sm"
                                   variant="primary"
@@ -1876,7 +1876,7 @@ export function Property({
             <section id="guidelines">
               <SectionTitle title="Guidelines" />
               <div className="mt-6 max-w-4xl">
-                <div className="mb-4 flex flex-wrap justify-between gap-x-4 gap-y-2 border border-white/15 bg-[#171822] p-4 text-white font-['Gilroy',sans-serif] shadow-[2px_2px_0px_#000000]">
+                <div className="mb-4 flex flex-wrap justify-between gap-x-4 gap-y-2 border border-white/15 bg-[#171822] p-4 text-white font-body shadow-[2px_2px_0px_#000000]">
                   <div className="flex min-w-[180px] items-center gap-3">
                     <CalendarDays className="h-5 w-5 text-[var(--vh-pink)]" />
                     <span className="text-xs uppercase tracking-[0.06em]">
@@ -1894,9 +1894,9 @@ export function Property({
                 </div>
 
                 <Accordion className="space-y-2" defaultValue={["general-guidelines"]} type="multiple">
-                  <AccordionItem className="border border-white/10 bg-[#171822] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]" value="general-guidelines">
+                  <AccordionItem className="border border-white/10 bg-[#171822] px-4 shadow-[2px_2px_0px_#000000] font-body" value="general-guidelines">
                     <AccordionTrigger className="text-sm font-extrabold uppercase tracking-[0.06em] text-white">General guidelines</AccordionTrigger>
-                    <AccordionContent className="space-y-2 border-t border-white/10 pt-3 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
+                    <AccordionContent className="space-y-2 border-t border-white/10 pt-3 text-xs leading-relaxed text-white/70 font-body">
                       {propertyGuidelines.summary.map((item) => (
                         <p key={item}>● {item}</p>
                       ))}
@@ -1906,11 +1906,11 @@ export function Property({
                   {propertyGuidelines.sections.map((section, index) => (
                     <AccordionItem
                       key={section.title}
-                      className="border border-white/10 bg-[#171822] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]"
+                      className="border border-white/10 bg-[#171822] px-4 shadow-[2px_2px_0px_#000000] font-body"
                       value={`guideline-${index}`}
                     >
                       <AccordionTrigger className="text-sm font-extrabold uppercase tracking-[0.06em] text-white">{section.title}</AccordionTrigger>
-                      <AccordionContent className="space-y-2 border-t border-white/10 pt-3 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
+                      <AccordionContent className="space-y-2 border-t border-white/10 pt-3 text-xs leading-relaxed text-white/70 font-body">
                         {section.content.map((item) => (
                           <p key={item}>● {item}</p>
                         ))}
@@ -1929,11 +1929,11 @@ export function Property({
                     {roomFaqs.map((faq, index) => (
                       <AccordionItem
                         key={faq.question}
-                        className="border border-white/10 bg-[#171822] px-4 shadow-[2px_2px_0px_#000000] font-['Gilroy',sans-serif]"
+                        className="border border-white/10 bg-[#171822] px-4 shadow-[2px_2px_0px_#000000] font-body"
                         value={`faq-${index}`}
                       >
                         <AccordionTrigger className="text-sm font-extrabold uppercase tracking-[0.06em] text-white">{faq.question}</AccordionTrigger>
-                        <AccordionContent className="border-t border-white/10 pt-4 text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">{faq.answer}</AccordionContent>
+                        <AccordionContent className="border-t border-white/10 pt-4 text-xs leading-relaxed text-white/70 font-body">{faq.answer}</AccordionContent>
                       </AccordionItem>
                     ))}
                   </Accordion>
@@ -1952,7 +1952,7 @@ export function Property({
                       />
                     </div>
                     <Link
-                      className="mt-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-[var(--vh-pink)] hover:underline font-['Gilroy',sans-serif]"
+                      className="mt-4 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-[var(--vh-pink)] hover:underline font-body"
                       href={propertyHero.mapsHref}
                       target="_blank"
                     >
@@ -1965,7 +1965,7 @@ export function Property({
                     <SectionTitle title="Nearby" />
                     <div className="mt-6 space-y-3 border border-white/15 bg-[#171822] p-5 shadow-[3px_3px_0px_#000000]">
                       {nearbyAttractions.map((place) => (
-                        <div key={place.name} className="flex items-center justify-between gap-4 border-b border-white/10 pb-3 last:border-b-0 last:pb-0 font-['Gilroy',sans-serif]">
+                        <div key={place.name} className="flex items-center justify-between gap-4 border-b border-white/10 pb-3 last:border-b-0 last:pb-0 font-body">
                           <div>
                             <p className="font-extrabold uppercase tracking-[0.04em] text-white text-xs">{place.name}</p>
                             <p className="text-[10px] uppercase tracking-[0.14em] text-white/50">{place.type}</p>

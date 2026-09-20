@@ -55,7 +55,7 @@ Vibehouse merges modern hostel culture with high-precision digital product desig
 
 - **NeoPOP Primitives Library (`components/neopop/`)**: Custom 3D plunk buttons (`NeoPopButton`) with 3px 45° bevels, tactile translation (`translate3d(2px, 2px, 0)`), selectable cards, status dots, and count badges.
 - **Strict Zero-Radius Standard**: Complete monorepo-wide enforcement of `rounded-none` (`0px`) across all cards, dialogs, inputs, dropzones, and chips.
-- **Editorial Typography Engine**: High-contrast `Cirka` display serif headlines paired with `Gilroy` UI body copy, tabular currency formatting, and uppercase tracked utility kickers.
+- **Editorial Typography Engine**: High-contrast **Geologica** display headlines paired with **Lexend** UI body copy, tabular currency formatting, and uppercase tracked utility kickers.
 - **Coliving Duration Engine (`/colive`)**: Interactive 1-Month, 2-Month, 3-Month (5% off), and 6-Month (10% off) selection passes with live addon reconfiguration (Chef's meal plan, dedicated desk, laundry).
 - **Guest Web Check-In & OCR (`/bookings/[eri]/web-check-in`)**: Multi-guest slot accordions, Gov. ID upload dropzone with client-side crop modal, and mock Textract OCR pipeline verification.
 - **Digital Ticket Confirmation (`/bookings/[eri]/confirmed`)**: Razorpay-verified digital ticket with 6px offset shadows, cancellation milestone timeline, and one-tap receipt exports.
@@ -91,8 +91,8 @@ Vibehouse's visual system is a local React 19-compatible adaptation of the **CRE
 
 </div>
 
-### 2. Curated Properties & Room Catalog
-> Sharp category filter tokens, live bed capacity markers, and brutalist room specifications.
+### 2. Curated Properties & Live Room Inventory
+> Real-time backend room inventory, live bed capacity markers, and brutalist room specifications.
 
 <div align="center">
 
@@ -100,7 +100,16 @@ Vibehouse's visual system is a local React 19-compatible adaptation of the **CRE
 
 </div>
 
-### 3. Community Events & Social Lineup Bento
+### 3. High-Fidelity Booking Checkout Review
+> Transparent cost schedules, instant coupon application, live guest verification, and Razorpay-ready payment summary.
+
+<div align="center">
+
+![Vibehouse Booking Checkout Review](./public/readme/booking-checkout.png)
+
+</div>
+
+### 4. Community Events & Social Lineup Bento
 > High-contrast event poster cards, neon status tokens, and tactile RSVP plunk triggers.
 
 <div align="center">
@@ -109,7 +118,16 @@ Vibehouse's visual system is a local React 19-compatible adaptation of the **CRE
 
 </div>
 
-### 4. Frictionless Web Check-In & Digital Boarding Ticket
+### 5. Mobile Responsiveness & Zero-Radius Shell
+> Touch-first booking search, compact NeoPOP action bar, and responsive navigation across all devices.
+
+<div align="center">
+
+<img src="./public/readme/homepage-mobile.png" width="420" alt="Vibehouse Mobile Viewport" />
+
+</div>
+
+### 6. Frictionless Web Check-In & Digital Boarding Ticket
 > Multi-guest slot accordion, Gov. ID upload dropzone with mock OCR, and Razorpay-verified digital ticket with 6px offset shadows.
 
 <div align="center">
@@ -135,11 +153,11 @@ Vibehouse's visual system is a local React 19-compatible adaptation of the **CRE
 
 ### Typography Hierarchy
 
-| Role | Primary Face | License-Safe Fallback | Application |
+| Role | Primary Face | Fallback Stack | Application |
 | :--- | :--- | :--- | :--- |
-| **Editorial Display** | `Cirka` | Cormorant Garamond, Libre Bodoni, Georgia | High-contrast hero moments, section titles, and ticket headlines. |
-| **Product Headings** | `Gilroy` | Urbanist, Space Grotesk, system-ui | Subsection titles, dialog titles, and card headers. |
-| **Body & UI Controls** | `Gilroy` | Urbanist, -apple-system, sans-serif | Dense booking summaries, house guidelines, and interactive inputs. |
+| **Editorial Display** | `Geologica` | -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif | High-contrast hero moments, section titles, and ticket headlines. |
+| **Product Headings** | `Geologica` | Space Grotesk, system-ui, sans-serif | Subsection titles, dialog titles, and card headers. |
+| **Body & UI Controls** | `Lexend` | Inter, -apple-system, sans-serif | Dense booking summaries, house guidelines, buttons, and inputs. |
 | **Utility & Numbers** | Monospace Tabular | Space Grotesk, monospace | Room rates (₹), check-in countdowns, dates, and promo codes. |
 
 ---
@@ -233,17 +251,17 @@ npm install
 cp .env.example .env.local
 ```
 
-### 3. Launch Development Server
+### 3. Launch Development Services
 
 ```bash
-# Start Next.js with Turbopack on port 3000
-npm run dev
+# Recommended: Full-stack supervisor (boots PostgreSQL 18, NestJS backend, and Next.js frontend together)
+npm run dev:all
 
-# Or start the standard dev server
-npm run dev:standard
+# Or start only Next.js with Turbopack (runs on port 3005 if port 3000 is occupied)
+npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) in your browser.
+Visit [http://localhost:3005](http://localhost:3005) (or `http://localhost:3000`) in your browser.
 
 ### 4. Build & Production Verification
 

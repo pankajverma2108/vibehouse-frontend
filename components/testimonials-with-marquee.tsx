@@ -105,13 +105,10 @@ const PHOTOS: PhotoCard[] = [...heroImages, ...heroImages].map((url, index) => (
   alt: `Hostel vibe photo ${index + 1}`,
 }));
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+function deterministicRotate<T>(arr: T[], offset: number): T[] {
+  if (arr.length === 0) return [];
+  const shift = ((offset % arr.length) + arr.length) % arr.length;
+  return [...arr.slice(shift), ...arr.slice(0, shift)];
 }
 
 const ROW_LENGTH = 16;
@@ -121,11 +118,12 @@ function buildPatternedRowFixedPlatform(
   reviews: Review[],
   platform: PlatformRating,
   count: RatingCount,
+  rowIndex: number,
   length = ROW_LENGTH
 ): CarouselItem[] {
   const out: CarouselItem[] = [];
-  const shReviews = shuffle(reviews);
-  const shPhotos = shuffle(photos);
+  const rotReviews = deterministicRotate(reviews, rowIndex * 2);
+  const rotPhotos = deterministicRotate(photos, rowIndex * 3);
   let rIndex = 0;
   let pIndex = 0;
 
@@ -138,10 +136,10 @@ function buildPatternedRowFixedPlatform(
     } else if (t === 'count') {
       out.push({ type: 'count', data: count });
     } else if (t === 'review') {
-      out.push({ type: 'review', data: shReviews[rIndex % shReviews.length] });
+      out.push({ type: 'review', data: rotReviews[rIndex % rotReviews.length] });
       rIndex++;
     } else {
-      out.push({ type: 'photo', data: shPhotos[pIndex % shPhotos.length] });
+      out.push({ type: 'photo', data: rotPhotos[pIndex % rotPhotos.length] });
       pIndex++;
     }
   }
@@ -203,7 +201,7 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
       onClick={toggle}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#FF2E62] font-['Gilroy',sans-serif]">
+        <span className="text-[10.5px] font-mono font-bold uppercase tracking-[0.16em] text-[#E01E5A]">
           {review.source}
         </span>
         <div className="flex gap-0.5">
@@ -211,7 +209,7 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
             <Star
               key={i}
               size={12}
-              className={i < review.rating ? 'fill-[#FF2E62] text-[#FF2E62]' : 'text-gray-700'}
+              className={i < review.rating ? 'fill-[#E01E5A] text-[#E01E5A]' : 'text-gray-700'}
             />
           ))}
         </div>
@@ -219,7 +217,7 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
 
       <div className="flex-1 mb-1 overflow-hidden">
         <div
-          className={`text-xs md:text-sm text-[#F3EEE6]/85 leading-relaxed custom-scroll font-['Gilroy',sans-serif] ${
+          className={`text-xs md:text-sm text-white/85 leading-relaxed custom-scroll font-body ${
             isExpanded ? 'unclamped' : 'clamped'
           }`}
           onWheel={(ev) => ev.stopPropagation()}
@@ -232,7 +230,7 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
         <div className="mb-1">
           <button
             onClick={toggle}
-            className="text-xs text-[#FF2E62] hover:text-white font-bold uppercase tracking-[0.06em] cursor-pointer"
+            className="text-xs text-[#E01E5A] hover:text-white font-mono font-bold uppercase tracking-[0.06em] cursor-pointer"
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => {
               e.stopPropagation();
@@ -245,12 +243,12 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
       )}
 
       <div className="mt-2 border-t border-white/10 pt-2.5">
-        <p className="text-xs font-bold uppercase tracking-[0.08em] text-white font-['Gilroy',sans-serif] truncate">
+        <p className="text-xs font-bold uppercase tracking-[0.08em] text-white font-display truncate">
           {review.author}
         </p>
         <div className="flex items-center justify-between mt-0.5">
-          <p className="text-[10px] text-white/50 font-['Gilroy',sans-serif] truncate">{review.location}</p>
-          <p className="text-[10px] font-medium text-white/50 font-['Gilroy',sans-serif] truncate">{review.date}</p>
+          <p className="text-[10px] text-white/50 font-body truncate">{review.location}</p>
+          <p className="text-[10px] font-mono font-medium text-white/50 truncate">{review.date}</p>
         </div>
       </div>
     </div>
@@ -299,12 +297,12 @@ const PlatformCard: React.FC<{ platform: PlatformRating }> = ({ platform }) => {
           className="object-contain transition-transform duration-300"
         />
       </div>
-      <h3 className="text-xs md:text-sm font-extrabold uppercase tracking-[0.1em] text-white mb-1 font-['Gilroy',sans-serif]">
+      <h3 className="text-xs md:text-sm font-display font-bold uppercase tracking-[0.1em] text-white mb-1">
         {platform.name}
       </h3>
-      <div className="flex items-baseline gap-1 mb-2 font-['Gilroy',sans-serif]">
+      <div className="flex items-baseline gap-1 mb-2 font-mono">
         <span
-          className="text-lg md:text-2xl font-black transition-transform"
+          className="text-lg md:text-2xl font-bold transition-transform"
           style={{
             color: platform.color,
             transform: animateNumber ? 'scale(1.5)' : 'scale(1)',
@@ -320,7 +318,7 @@ const PlatformCard: React.FC<{ platform: PlatformRating }> = ({ platform }) => {
           <Star
             key={i}
             size={14}
-            className={i < normalizedStars ? 'fill-[#FF2E62] text-[#FF2E62]' : 'text-gray-600'}
+            className={i < normalizedStars ? 'fill-[#E01E5A] text-[#E01E5A]' : 'text-gray-600'}
           />
         ))}
       </div>
@@ -374,7 +372,7 @@ const CountCard: React.FC<{ count: RatingCount }> = ({ count }) => {
       </div>
 
       <div
-        className="text-2xl md:text-3xl font-black transition-transform duration-200 font-['Gilroy',sans-serif]"
+        className="text-2xl md:text-3xl font-mono font-bold transition-transform duration-200"
         style={{
           color: count.color,
           transform: animateNumber ? 'scale(1.5)' : 'scale(1)',
@@ -384,7 +382,7 @@ const CountCard: React.FC<{ count: RatingCount }> = ({ count }) => {
       >
         {count.countLabel}
       </div>
-      <div className="text-[10px] font-bold tracking-[0.15em] text-[#A0A0A0] mt-1 uppercase font-['Gilroy',sans-serif]">
+      <div className="text-[10px] font-mono font-bold tracking-[0.15em] text-[#A0A0A0] mt-1 uppercase">
         REVIEWS
       </div>
     </div>
@@ -497,9 +495,9 @@ export default function TestimonialsMarquee() {
   const photosRow2 = PHOTOS.slice(photosPerRow, photosPerRow * 2);
   const photosRow3 = PHOTOS.slice(photosPerRow * 2);
 
-  const row1 = buildPatternedRowFixedPlatform(photosRow1, REVIEWS, platformRow1, countRow1, ROW_LENGTH);
-  const row2 = buildPatternedRowFixedPlatform(photosRow2, REVIEWS, platformRow2, countRow2, ROW_LENGTH);
-  const row3 = buildPatternedRowFixedPlatform(photosRow3, REVIEWS, platformRow3, countRow3, ROW_LENGTH);
+  const row1 = buildPatternedRowFixedPlatform(photosRow1, REVIEWS, platformRow1, countRow1, 0, ROW_LENGTH);
+  const row2 = buildPatternedRowFixedPlatform(photosRow2, REVIEWS, platformRow2, countRow2, 1, ROW_LENGTH);
+  const row3 = buildPatternedRowFixedPlatform(photosRow3, REVIEWS, platformRow3, countRow3, 2, ROW_LENGTH);
 
   return (
     <section className="overflow-hidden bg-[#000000] border-t border-white/10 py-24 sm:py-32">

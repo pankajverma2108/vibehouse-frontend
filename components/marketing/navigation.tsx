@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ArrowRight, CircleUserRound, Menu, X } from "lucide-react";
+import { ArrowRight, ChevronRight, CircleUserRound, Menu, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useGuestAuth } from "@/components/auth/guest-auth-provider";
@@ -324,19 +324,5 @@ export function Navigation() {
         )}
       </AnimatePresence>
     </>
-  );
-}
-
-function ChevronRight({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-    </svg>
   );
 }

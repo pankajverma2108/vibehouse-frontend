@@ -54,7 +54,7 @@ export function EventCard({
       {/* Event Metadata & RSVP */}
       <div className="p-6 flex flex-col flex-1 justify-between gap-5">
         <p className="text-xs leading-relaxed text-white/70 font-body line-clamp-2">
-          {description ?? "Experience details will be available from API soon. Stay tuned for full lineup info."}
+          {description ?? "Join resident nomads and local creators for an immersive evening under the Bangalore sky."}
         </p>
 
         <div className="grid grid-cols-2 gap-2">

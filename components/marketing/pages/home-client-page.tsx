@@ -18,8 +18,23 @@ import {
   roomTypesToHomeCards,
 } from "@/lib/cx-api";
 
-const HomeSections = dynamic(() =>
-  import("@/components/marketing/pages/home-sections").then((mod) => mod.HomeSections),
+const HomeSections = dynamic(
+  () => import("@/components/marketing/pages/home-sections").then((mod) => mod.HomeSections),
+  {
+    loading: () => (
+      <div aria-busy="true" className="min-h-[400px] max-w-7xl mx-auto px-4 sm:px-6 py-24 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <span className="sr-only">Experience sections are loading.</span>
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="bg-[#121216] border border-white/10 rounded-2xl p-6 space-y-4">
+            <div className="h-52 rounded-xl bg-white/5 animate-pulse" />
+            <div className="h-6 w-2/3 rounded-lg bg-white/5 animate-pulse" />
+            <div className="h-4 w-full rounded-lg bg-white/5 animate-pulse" />
+            <div className="h-10 w-full rounded-xl bg-white/5 animate-pulse mt-4" />
+          </div>
+        ))}
+      </div>
+    ),
+  },
 );
 
 type HomeContentState = {

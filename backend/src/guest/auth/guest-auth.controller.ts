@@ -76,8 +76,17 @@ const OAUTH_REDIRECT_HOST_ALLOWLIST = new Set<string>([
   'www.dev.buteak.in',
   'localhost:3000',
   'localhost:3001',
+  'localhost:3005',
   '127.0.0.1:3000',
+  '127.0.0.1:3005',
 ]);
+
+function isAllowedOAuthHost(host: string | undefined | null): boolean {
+  if (!host) return false;
+  const lower = host.toLowerCase();
+  if (OAUTH_REDIRECT_HOST_ALLOWLIST.has(lower)) return true;
+  return /^(localhost|127\.0\.0\.1)(:\d+)?$/i.test(lower);
+}
 
 /**
  * For an OAuth init request, returns the host the user was BROWSING FROM,
@@ -137,7 +146,7 @@ function parseOAuthState(raw: unknown): { brand: Brand | null; host: string | nu
         parsed.b === 'BUTEAK' || parsed.b === 'TDS' ? parsed.b : null;
       const host =
         typeof parsed.h === 'string' &&
-        OAUTH_REDIRECT_HOST_ALLOWLIST.has(parsed.h.toLowerCase())
+        isAllowedOAuthHost(parsed.h)
           ? parsed.h
           : null;
       return { brand, host };
@@ -287,10 +296,7 @@ export class GuestAuthController {
 
     // Capture originating host for post-OAuth redirect (allowlist-checked)
     const originHost = getOriginatingHost(req, returnTo);
-    const stateHost =
-      originHost && OAUTH_REDIRECT_HOST_ALLOWLIST.has(originHost.toLowerCase())
-        ? originHost
-        : undefined;
+    const stateHost = isAllowedOAuthHost(originHost) ? originHost! : undefined;
 
     const stateObj: OAuthState = { b: validBrand };
     if (stateHost) stateObj.h = stateHost;
