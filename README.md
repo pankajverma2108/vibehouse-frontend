@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./public/logo.png" width="88" alt="Vibehouse Logo" style="filter: drop-shadow(0 0 24px rgba(255, 203, 69, 0.25));" />
+<img src="./portfolio-export/vibehouse/images/logo-crest.png" width="96" alt="Vibehouse Logo" style="filter: drop-shadow(0 0 24px rgba(255, 203, 69, 0.25));" />
 
 # VIBEHOUSE
 
@@ -31,7 +31,7 @@ An expressive, dark-first digital hospitality platform where travelers, remote n
 
 <div align="center">
 
-![Vibehouse NeoPOP Homepage Hero & Live Booking Bar](./public/readme/hero-showcase.png)
+![Vibehouse NeoPOP Homepage Hero & Live Booking Bar](./portfolio-export/vibehouse/images/01-homepage-hero-desktop.png)
 
 </div>
 
@@ -87,7 +87,7 @@ Vibehouse's visual system is a local React 19-compatible adaptation of the **CRE
 
 <div align="center">
 
-![Vibehouse Coliving Duration Engine](./public/readme/colive-engine.png)
+![Vibehouse Coliving Duration Engine](./portfolio-export/vibehouse/images/05-colive-duration-engine-desktop.png)
 
 </div>
 
@@ -96,7 +96,7 @@ Vibehouse's visual system is a local React 19-compatible adaptation of the **CRE
 
 <div align="center">
 
-![Vibehouse Property & Rooms Showcase](./public/readme/property-rooms.png)
+![Vibehouse Property & Rooms Showcase](./portfolio-export/vibehouse/images/03-rooms-catalog-desktop.png)
 
 </div>
 
@@ -105,7 +105,7 @@ Vibehouse's visual system is a local React 19-compatible adaptation of the **CRE
 
 <div align="center">
 
-![Vibehouse Booking Checkout Review](./public/readme/booking-checkout.png)
+![Vibehouse Booking Checkout Review](./portfolio-export/vibehouse/images/07-booking-checkout-desktop.png)
 
 </div>
 
@@ -114,7 +114,7 @@ Vibehouse's visual system is a local React 19-compatible adaptation of the **CRE
 
 <div align="center">
 
-![Vibehouse Community Events & Lineup](./public/readme/events-bento.png)
+![Vibehouse Community Events & Lineup](./portfolio-export/vibehouse/images/06-community-events-bento-desktop.png)
 
 </div>
 
@@ -123,7 +123,7 @@ Vibehouse's visual system is a local React 19-compatible adaptation of the **CRE
 
 <div align="center">
 
-<img src="./public/readme/homepage-mobile.png" width="420" alt="Vibehouse Mobile Viewport" />
+<img src="./portfolio-export/vibehouse/images/02-homepage-mobile.png" width="420" alt="Vibehouse Mobile Viewport" />
 
 </div>
 
@@ -134,7 +134,22 @@ Vibehouse's visual system is a local React 19-compatible adaptation of the **CRE
 
 | Multi-Guest Web Check-In & KYC | Razorpay Verified Digital Ticket |
 | :---: | :---: |
-| ![Web Check-In Portal](./public/readme/web-checkin.png) | ![Digital Ticket Confirmation](./public/readme/digital-ticket.png) |
+| ![Web Check-In Portal](./portfolio-export/vibehouse/images/readme-web-checkin.png) | ![Digital Ticket Confirmation](./portfolio-export/vibehouse/images/readme-digital-ticket.png) |
+
+</div>
+
+### 7. Private Sanctuaries & Deep-Dive Property Amenities
+> High-contrast typography showcase for boutique private suites, acoustic dorm pods, and live property amenity guides.
+
+<div align="center">
+
+![Vibehouse Sanctuary Rooms Section](./portfolio-export/vibehouse/images/08-homepage-rooms-section-desktop.png)
+
+</div>
+
+<div align="center">
+
+![Vibehouse Property Details & Amenities](./portfolio-export/vibehouse/images/04-property-details-desktop.png)
 
 </div>
 
@@ -291,6 +306,8 @@ npm run start
 
 ## Provenance & Attributions
 
+- **Architecture & Frontend Lead**: Designed and implemented by **Pankaj Kumar Verma** ([@pankajverma2108](https://github.com/pankajverma2108)) — full CRED NeoPOP adaptation, typography overhaul (Geologica + Lexend), monorepo state architecture, and guest transactional flows.
+- **Deep-Dive Dossier**: Complete technical specifications, PMS synchronization protocols, and portfolio evidence are documented in [`portfolio-export/vibehouse/project-dossier.md`](./portfolio-export/vibehouse/project-dossier.md).
 - **CRED NeoPOP Web**: Visual principles, 3D button plunk mechanics, and spatial elevation tokens adapted from [CRED NeoPOP Web](https://github.com/cred-club/neopop-web) under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). Upstream commit pinned at `1f4b3d271f3e041abb400cb25061217230192fed`. Full legal details in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 - **shadcn/ui & Radix UI**: Core accessible component foundations used under the [MIT License](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md).
 - **Photography**: Bangalore lifestyle and hostel interior photography from [Unsplash](https://unsplash.com) under the [Unsplash License](https://unsplash.com/license).
