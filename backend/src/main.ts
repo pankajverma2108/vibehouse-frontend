@@ -72,8 +72,18 @@ async function bootstrap() {
       // omit the Origin header. Browser requests always set it.
       if (!origin) return cb(null, true);
       if (allowedOrigins.has(origin)) return cb(null, true);
-      // Allow any local development origin on localhost / 127.0.0.1 with any port
-      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL.replace(/\/+$/, '')) {
+        return cb(null, true);
+      }
+      if (process.env.ALLOWED_ORIGINS?.split(',').map(s => s.trim()).includes(origin)) {
+        return cb(null, true);
+      }
+      // Allow Netlify & Render preview/production domains as well as local development origins
+      if (
+        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
+        /\.netlify\.app$/.test(origin) ||
+        /\.onrender\.com$/.test(origin)
+      ) {
         return cb(null, true);
       }
       return cb(new Error(`CORS: origin ${origin} not allowed`), false);
