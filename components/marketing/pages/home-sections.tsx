@@ -49,7 +49,18 @@ import { MagneticButton } from "@/components/marketing/interactive/magnetic-butt
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-const TestimonialsMarquee = dynamic(() => import("@/components/testimonials-with-marquee"));
+const TestimonialsMarquee = dynamic(() => import("@/components/testimonials-with-marquee"), {
+  loading: () => (
+    <div aria-busy="true" className="min-h-[300px] w-full bg-black py-24 flex items-center justify-center">
+      <span className="sr-only">Guest reviews are loading.</span>
+      <div className="flex gap-4 overflow-hidden w-full max-w-7xl px-4 opacity-50">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="h-44 w-72 shrink-0 rounded-2xl bg-[#121216] border border-white/5 animate-pulse" />
+        ))}
+      </div>
+    </div>
+  ),
+});
 
 type SectionFrameProps = {
   alt?: boolean;
@@ -236,6 +247,13 @@ function RoomsSection({
           tagline="Crafted for deep rest, effortless co-working, and seamless privacy in the pulsing heart of Bangalore."
         />
 
+        {roomError ? (
+          <div className="bg-[#121216] border border-white/10 rounded-2xl p-5 text-center max-w-xl mx-auto mt-8 mb-4">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-[#E01E5A] font-semibold mb-1">Live Inventory Notice</p>
+            <p className="text-xs font-body text-white/75">{roomError}</p>
+          </div>
+        ) : null}
+
         {pending ? (
           <SectionCardSkeletons />
         ) : (
@@ -271,6 +289,13 @@ function EventsSection({
           title="Culture, Beats & Connections"
           tagline="Live acoustic sunsets, creator meetups, rooftop screening parties, and local food walks."
         />
+
+        {eventError ? (
+          <div className="bg-[#121216] border border-white/10 rounded-2xl p-5 text-center max-w-xl mx-auto mt-8 mb-4">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-[#E01E5A] font-semibold mb-1">Events Calendar Notice</p>
+            <p className="text-xs font-body text-white/75">{eventError}</p>
+          </div>
+        ) : null}
 
         {pending ? (
           <SectionCardSkeletons />

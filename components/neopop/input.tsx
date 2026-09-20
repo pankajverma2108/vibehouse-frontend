@@ -49,7 +49,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
   };
 
   return (
-    <div className="w-full flex flex-col gap-1.5 font-['Gilroy',sans-serif]">
+    <div className="w-full flex flex-col gap-1.5 font-body">
       <label
         htmlFor={generatedId}
         className={cn(
@@ -134,7 +134,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   const isError = status === 'error' || Boolean(errorMessage);
 
   return (
-    <div className="w-full flex flex-col gap-1.5 font-['Gilroy',sans-serif]">
+    <div className="w-full flex flex-col gap-1.5 font-body">
       <label
         htmlFor={generatedId}
         className={cn(
@@ -191,7 +191,7 @@ export const Selector = forwardRef<HTMLSelectElement, SelectorProps>(function Se
   const isError = Boolean(errorMessage);
 
   return (
-    <div className="w-full flex flex-col gap-1.5 font-['Gilroy',sans-serif]">
+    <div className="w-full flex flex-col gap-1.5 font-body">
       <label
         htmlFor={generatedId}
         className={cn(

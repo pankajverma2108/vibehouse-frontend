@@ -213,7 +213,10 @@ export function getGuestGoogleAuthUrl(returnTo?: string): string {
   try {
     const url = new URL(baseUrl);
     url.searchParams.set("brand", brand);
-    if (redirectPath && redirectPath !== "/") {
+    if (typeof window !== "undefined" && window.location?.origin) {
+      const fullReturnUrl = new URL(redirectPath || "/", window.location.origin).toString();
+      url.searchParams.set("return_to", fullReturnUrl);
+    } else if (redirectPath && redirectPath !== "/") {
       url.searchParams.set("return_to", redirectPath);
     }
     return url.toString();

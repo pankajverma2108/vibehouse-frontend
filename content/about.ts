@@ -2,51 +2,51 @@ export const aboutPillars = [
   {
     title: "Community",
     description:
-      "Meet travelers from around the world. Daily experiences and activities bring people together.",
-    color: "#c62828",
+      "Connect with tech founders, creators, and international explorers over curated dinners and rooftop acoustics.",
+    color: "#E01E5A",
   },
   {
-    title: "Cleanliness",
+    title: "Sanctuary Rest",
     description:
-      "Fresh linens daily, spotless bathrooms, and professional housekeeping. Your health matters.",
-    color: "#39ff14",
+      "Hospitality-grade bedding, sound-insulated pods, pristine private washrooms, and daily professional housekeeping.",
+    color: "#2FBC81",
   },
   {
-    title: "Location",
+    title: "Prime District",
     description:
-      "Central locations near metro, markets, and nightlife. Everything is within walking distance.",
-    color: "#00d1ff",
+      "Steps from Bangalore's best specialty coffee roasters, startup hubs, and Koramangala's legendary food scene.",
+    color: "#36C5F0",
   },
   {
-    title: "Security",
+    title: "Smart Security",
     description:
-      "24/7 CCTV, verified staff, secure lockers, and reception. Sleep soundly every night.",
-    color: "#facc15",
+      "24/7 biometric keyless access, encrypted RFID lockers, full CCTV coverage, and around-the-clock community hosts.",
+    color: "#ECB22E",
   },
 ];
 
 export const aboutStoryBlocks = [
   {
-    title: "Built by Travelers, for Travelers",
+    title: "Hospitality Reimagined for Nomads",
     body:
-      "Our founders met in a hostel in Goa in 2018. The vibe was amazing, but the facilities were not. They wanted spaces that balanced energy with high standards, and Vibehouse was born from that tension.",
-    color: "#c62828",
+      "Vibehouse was conceived to bridge the gap between sterile business hotels and chaotic backpacker hostels—delivering high-design spaces where ambitious nomads work, rest, and belong.",
+    color: "#E01E5A",
     image:
       "https://images.unsplash.com/photo-1681747971522-2d7a04c78321?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200",
   },
   {
-    title: "Safety is Non-Negotiable",
+    title: "Safety as an Absolute Priority",
     body:
-      "Every Vibehouse property has 24/7 security, female-only dorms, secure lockers, and zero-tolerance harassment policies so fun and peace of mind coexist.",
-    color: "#39ff14",
+      "From keyless access to dedicated women-only dorm wings and round-the-clock front desk teams, safety and seamless rest are engineered into every corner.",
+    color: "#2FBC81",
     image:
       "https://images.unsplash.com/photo-1694151569569-8288e3118519?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200",
   },
   {
-    title: "Mixed-Gender Co-Living, Done Right",
+    title: "Collaborative Living, Elevated",
     body:
-      "We celebrate diverse communities. Mixed dorms foster connection, and female-only options create safe havens where everyone can find their comfort zone.",
-    color: "#00d1ff",
+      "Balanced spaces designed for both intense work sprints and spontaneous social momentum, backed by 100Mbps dedicated fiber and ergonomic workspaces.",
+    color: "#36C5F0",
     image:
       "https://images.unsplash.com/photo-1641352848574-9dbb6a244a32?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200",
   },

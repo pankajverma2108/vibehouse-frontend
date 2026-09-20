@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
@@ -58,6 +59,7 @@ async function bootstrap() {
     // Local development
     'http://localhost:3000',
     'http://localhost:3001',
+    'http://localhost:3005',
     'http://localhost:8000',
     'http://localhost:8080',
     'http://127.0.0.1:3000',
@@ -70,6 +72,10 @@ async function bootstrap() {
       // omit the Origin header. Browser requests always set it.
       if (!origin) return cb(null, true);
       if (allowedOrigins.has(origin)) return cb(null, true);
+      // Allow any local development origin on localhost / 127.0.0.1 with any port
+      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+        return cb(null, true);
+      }
       return cb(new Error(`CORS: origin ${origin} not allowed`), false);
     },
     credentials: true,

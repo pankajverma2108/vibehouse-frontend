@@ -990,6 +990,11 @@ export function BookingCheckoutPage() {
       return;
     }
 
+    if (!validateAndStoreGuestDetails()) {
+      setActiveTab("guest");
+      return;
+    }
+
     setCheckoutError(null);
     const token = getStoredGuestToken();
     if (!token || !isAuthenticated) {
@@ -1354,7 +1359,7 @@ export function BookingCheckoutPage() {
     } finally {
       setIsPaying(false);
     }
-  }, [draft, estimatedGrandTotal, guestForm, isAuthenticated, openAuthModal, router, taxes, totalGuests]);
+  }, [draft, estimatedGrandTotal, guestForm, isAuthenticated, openAuthModal, router, taxes, totalGuests, validateAndStoreGuestDetails]);
 
   useEffect(() => {
     if (!isAuthenticated || !resumePaymentAfterAuthRef.current) {
@@ -1367,10 +1372,10 @@ export function BookingCheckoutPage() {
 
   const openPaymentFlow = useCallback(() => {
     if (!validateAndStoreGuestDetails()) {
+      setActiveTab("guest");
       return;
     }
 
-    setActiveTab("addons");
     void handlePayment();
   }, [handlePayment, validateAndStoreGuestDetails]);
 

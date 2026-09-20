@@ -30,7 +30,7 @@ export const Token = forwardRef<HTMLSpanElement, TokenProps>(function Token(
     <span
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center px-2 py-0.5 text-[0.68rem] font-extrabold uppercase tracking-[0.12em] rounded-none font-["Gilroy",sans-serif]',
+        'inline-flex items-center justify-center px-2 py-0.5 text-[0.68rem] font-extrabold uppercase tracking-[0.12em] rounded-none font-body',
         tokenVariantStyles[variant],
         className
       )}

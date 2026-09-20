@@ -10,6 +10,8 @@
     "serve:static": "node scripts/serve-static-export.mjs",
     "dev": "node --max-old-space-size=4096 ./node_modules/next/dist/bin/next dev --webpack",
     "dev:turbo": "next dev --turbopack",
+    "dev:all": "node scripts/dev-all.mjs",
+    "dev:backend": "cd backend && node -r dotenv/config dist/src/main.js",
     "start": "next start",
     "typecheck": "tsgo --project tsconfig.json --noEmit",
     "typecheck:legacy": "tsc --project tsconfig.json --noEmit",

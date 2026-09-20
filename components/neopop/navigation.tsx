@@ -37,7 +37,7 @@ export const SideNav = forwardRef<HTMLElement, SideNavProps>(function SideNav(
     <aside
       ref={ref}
       className={cn(
-        'h-full bg-[var(--np-black-400)] border-r border-[var(--np-black-200)] flex flex-col p-4 overflow-y-auto font-["Gilroy",sans-serif]',
+        'h-full bg-[var(--np-black-400)] border-r border-[var(--np-black-200)] flex flex-col p-4 overflow-y-auto font-body',
         width,
         className
       )}

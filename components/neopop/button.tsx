@@ -94,7 +94,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   );
 
   const containerClasses = cn(
-    'np-plunk select-none cursor-pointer uppercase font-["Gilroy",sans-serif]',
+    'np-plunk select-none cursor-pointer uppercase font-body',
     sizeConfig.container,
     fullWidth ? 'w-full flex' : 'inline-flex',
     disabled && 'opacity-40 cursor-not-allowed pointer-events-none',

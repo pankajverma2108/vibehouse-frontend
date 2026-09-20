@@ -4,13 +4,14 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 
 import { usePropertyId } from "@/hooks/use-property-id";
+import Loading from "@/app/property/loading";
 
 const Property = dynamic(() => import("@/components/marketing/property").then((mod) => mod.Property), {
-  loading: () => <div className="min-h-screen bg-[#07070a]" />,
+  loading: () => <Loading />,
 });
 
 const ColiveFlow = dynamic(() => import("@/components/colive/colive-flow").then((mod) => mod.ColiveFlow), {
-  loading: () => <div className="min-h-screen bg-[#07070a]" />,
+  loading: () => <Loading />,
 });
 
 const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;

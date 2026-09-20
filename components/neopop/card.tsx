@@ -67,7 +67,7 @@ export const SelectableCard = forwardRef<HTMLButtonElement, SelectableCardProps>
       aria-pressed={selected}
       disabled={disabled}
       className={cn(
-        'w-full text-left p-4.5 border-2 rounded-none transition-all select-none font-["Gilroy",sans-serif]',
+        'w-full text-left p-4.5 border-2 rounded-none transition-all select-none font-body',
         selected
           ? cn('bg-[var(--np-black-300)]', accentBorder, accentShadow)
           : cn('bg-[var(--np-black-400)] border-[var(--np-black-200)] text-[var(--np-white-500)] hover:border-[var(--np-white-100)]/40', cardElevations[elevation]),

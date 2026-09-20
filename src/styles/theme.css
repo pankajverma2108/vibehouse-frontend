@@ -136,7 +136,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Gilroy', 'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--font-body, 'Lexend', sans-serif);
   }
 
   html {
@@ -144,7 +144,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Cirka', 'Libre Bodoni', Georgia, serif;
+    font-family: var(--font-display, 'Geologica', sans-serif);
     letter-spacing: -0.01em;
   }
 

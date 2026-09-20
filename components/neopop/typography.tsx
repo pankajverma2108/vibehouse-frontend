@@ -12,8 +12,8 @@ const headingVariants = {
   h1: 'font-["Cirka",serif] text-[clamp(2.1rem,5vw,3.8rem)] font-bold tracking-tight leading-[1.05] text-balance',
   h2: 'font-["Cirka",serif] text-[clamp(1.55rem,3vw,2.35rem)] font-bold tracking-tight leading-[1.12]',
   h3: 'font-["Cirka",serif] text-[clamp(1.2rem,2vw,1.6rem)] font-semibold leading-[1.2]',
-  h4: 'font-["Gilroy",sans-serif] text-[1.15rem] font-bold uppercase tracking-[0.055em] leading-[1.25]',
-  h5: 'font-["Gilroy",sans-serif] text-[0.95rem] font-bold uppercase tracking-[0.08em] leading-[1.3]',
+  h4: 'font-body text-[1.15rem] font-bold uppercase tracking-[0.055em] leading-[1.25]',
+  h5: 'font-body text-[0.95rem] font-bold uppercase tracking-[0.08em] leading-[1.3]',
 };
 
 const headingColors = {
@@ -54,11 +54,11 @@ export interface TextProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 const textVariants = {
-  body: 'font-["Gilroy",sans-serif]',
-  subtitle: 'font-["Gilroy",sans-serif] text-base leading-relaxed',
-  caption: 'font-["Gilroy",sans-serif] text-xs leading-normal',
-  utility: 'font-["Gilroy",sans-serif] text-[0.69rem] font-extrabold uppercase tracking-[0.12em]',
-  control: 'font-["Gilroy",sans-serif] text-[0.82rem] font-bold uppercase tracking-[0.055em]',
+  body: 'font-body',
+  subtitle: 'font-body text-base leading-relaxed',
+  caption: 'font-body text-xs leading-normal',
+  utility: 'font-body text-[0.69rem] font-extrabold uppercase tracking-[0.12em]',
+  control: 'font-body text-[0.82rem] font-bold uppercase tracking-[0.055em]',
 };
 
 const textSizes = {
