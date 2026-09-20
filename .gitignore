@@ -28,7 +28,6 @@ ATTRIBUTIONS.md
 context.md
 .playwright-mcp/
 *.tsbuildinfo
-.github/workflows/
 .mcp.json
 scratch/
 

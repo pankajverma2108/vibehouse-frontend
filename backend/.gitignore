@@ -39,6 +39,6 @@ dist-tools/
 ZOHO_WEBHOOK_SECRET.local.txt
 
 # Uploaded guest documents (local dev storage)
-uploads/
+/uploads/
 *.tmp
 
