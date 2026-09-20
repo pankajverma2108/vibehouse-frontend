@@ -144,7 +144,7 @@ export function BreakfastOrderForm({
                 <button
                   aria-controls={`breakfast-room-panel-${item.ezee_reservation_id}`}
                   aria-selected={active}
-                  className={`min-h-14 min-w-0 rounded-none border px-4 py-2 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--np-yellow)] sm:min-w-40 sm:shrink-0 sm:px-5 ${active ? "border-[var(--np-yellow)] bg-[var(--np-yellow)] text-black shadow-[3px_3px_0px_#000000]" : "border-[#3D3D3D] bg-[#121212] text-white hover:bg-white/[0.08]"}`}
+                  className={`min-h-14 min-w-0 rounded-none border px-4 py-2 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF2E62] sm:min-w-40 sm:shrink-0 sm:px-5 ${active ? "border-[#FF2E62] bg-[#FF2E62] text-black shadow-[3px_3px_0px_#991438]" : "border-white/10 bg-[#12131A] text-white hover:bg-white/[0.08]"}`}
                   id={`breakfast-room-tab-${item.ezee_reservation_id}`}
                   key={item.ezee_reservation_id}
                   onClick={() => selectRoom(item.ezee_reservation_id)}
@@ -211,7 +211,7 @@ export function BreakfastOrderForm({
               <div className="border-b border-dashed border-[#3D3D3D] py-10 text-center">
                 <p className="text-base font-semibold text-white">Add a plate or skip breakfast for this room.</p>
                 <Button
-                  className="mt-4 h-11 rounded-none bg-[var(--np-yellow)] px-5 font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
+                  className="mt-4 h-11 rounded-none bg-[#FF2E62] px-5 font-bold text-black border border-[#FF2E62] shadow-[3px_3px_0px_#991438] hover:bg-[#FF2E62]/90"
                   onClick={() => setDraft((current) => addBreakfastPlate(current, room))}
                   type="button"
                 >
@@ -240,7 +240,7 @@ export function BreakfastOrderForm({
                     </div>
                     <button
                       aria-label={`Remove Plate ${plateIndex + 1}`}
-                      className="inline-flex size-11 items-center justify-center rounded-none border border-[#3D3D3D] text-white/64 hover:border-rose-300/50 hover:text-rose-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--np-yellow)]"
+                      className="inline-flex size-11 items-center justify-center rounded-none border border-[#3D3D3D] text-white/64 hover:border-rose-300/50 hover:text-rose-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF2E62]"
                       onClick={() => setDraft((current) => removeBreakfastPlate(current, room.ezee_reservation_id, plateIndex))}
                       type="button"
                     >
@@ -262,7 +262,7 @@ export function BreakfastOrderForm({
                         const id = `breakfast-${room.ezee_reservation_id}-${plateIndex}-main-${item.id}`;
                         return (
                           <label
-                            className="flex min-h-16 cursor-pointer items-center gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-3 transition-colors has-[:checked]:border-[var(--np-yellow)] has-[:checked]:bg-[#1F1D14] has-[:checked]:shadow-[2px_2px_0px_var(--np-yellow)]"
+                            className="flex min-h-16 cursor-pointer items-center gap-3 rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-3 transition-colors has-[:checked]:border-[#FF2E62] has-[:checked]:bg-[#1E0A10] has-[:checked]:shadow-[2px_2px_0px_#991438]"
                             htmlFor={id}
                             key={item.id}
                           >
@@ -357,7 +357,7 @@ export function BreakfastOrderForm({
                         const id = `breakfast-${room.ezee_reservation_id}-${plateIndex}-slot-${slot.id}`;
                         return (
                           <label
-                            className={`flex min-h-16 items-center justify-between gap-3 rounded-none border px-4 py-3 ${available ? "cursor-pointer border-[#3D3D3D] bg-[#121212] has-[:checked]:border-[var(--np-yellow)] has-[:checked]:bg-[#1F1D14] has-[:checked]:shadow-[2px_2px_0px_var(--np-yellow)]" : "cursor-not-allowed border-white/8 bg-white/[0.015] opacity-45"}`}
+                            className={`flex min-h-16 items-center justify-between gap-3 rounded-none border px-4 py-3 ${available ? "cursor-pointer border-[#3D3D3D] bg-[#121212] has-[:checked]:border-[#FF2E62] has-[:checked]:bg-[#1E0A10] has-[:checked]:shadow-[2px_2px_0px_#991438]" : "cursor-not-allowed border-white/8 bg-white/[0.015] opacity-45"}`}
                             htmlFor={id}
                             key={slot.id}
                           >
@@ -394,7 +394,7 @@ export function BreakfastOrderForm({
                     <textarea
                       aria-describedby={requestError ? getBreakfastErrorId(requestKey) : undefined}
                       aria-invalid={Boolean(requestError)}
-                      className="mt-3 min-h-24 w-full resize-y rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-3 text-sm text-white placeholder:text-white/35 focus:border-[var(--np-yellow)] focus:outline-none"
+                      className="mt-3 min-h-24 w-full resize-y rounded-none border border-[#3D3D3D] bg-[#121212] px-4 py-3 text-sm text-white placeholder:text-white/35 focus:border-[#FF2E62] focus:outline-none"
                       id={`requests-${room.ezee_reservation_id}-${plateIndex}`}
                       maxLength={MAX_BREAKFAST_REQUEST_LENGTH}
                       onBlur={() => markTouched(requestKey)}
@@ -421,7 +421,7 @@ export function BreakfastOrderForm({
       <div className="mt-8 border-t border-dashed border-[#3D3D3D] pt-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Button
-            className="h-13 rounded-none bg-[var(--np-yellow)] px-7 font-bold text-black border border-[var(--np-yellow)] shadow-[4px_4px_0px_#000000] hover:bg-[var(--np-yellow)]/90 disabled:cursor-not-allowed disabled:bg-white/12 disabled:text-white/48"
+            className="h-13 rounded-none bg-[#FF2E62] px-7 font-bold text-black border border-[#FF2E62] shadow-[4px_4px_0px_#991438] hover:bg-[#FF2E62]/90 disabled:cursor-not-allowed disabled:bg-white/12 disabled:text-white/48"
             disabled={!isComplete || pending}
             type="submit"
           >
@@ -460,3 +460,4 @@ export function BreakfastOrderForm({
     </form>
   );
 }
+

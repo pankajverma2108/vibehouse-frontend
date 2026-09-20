@@ -145,7 +145,7 @@ export function UpcomingPage() {
           </div>
         </section>
 
-        <Link className={styles.bigCta} href="mailto:hello@thedailysocial.co?subject=Upcoming%20hub%20updates">
+        <Link className={styles.bigCta} href="mailto:hello@vibehouse.co?subject=Upcoming%20hub%20updates">
           <span className={styles.ctaLabel}>Get Notified</span>
           <span className={styles.ctaArrow} aria-hidden="true">&rarr;</span>
         </Link>

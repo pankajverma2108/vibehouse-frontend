@@ -168,7 +168,7 @@ export function PartnerWithUsPage() {
         </section>
 
         <section className={styles.inquirySection}>
-          <form className={styles.inquiryForm} action="mailto:partner@thedailysocial.co?subject=Partner%20Inquiry" encType="text/plain" method="post">
+          <form className={styles.inquiryForm} action="mailto:partner@vibehouse.co?subject=Partner%20Inquiry" encType="text/plain" method="post">
             <div className={styles.inquiryFields}>
               <label>
                 Name

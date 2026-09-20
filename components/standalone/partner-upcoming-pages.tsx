@@ -124,7 +124,7 @@ function StandaloneHeader({ links }: { links: StandaloneNavLink[] }) {
   return (
     <header className={styles.header}>
       <Link className={styles.brand} href="/">
-        The Daily Social<sup>&reg;</sup>
+        Vibehouse<sup>&reg;</sup>
       </Link>
       <nav className={styles.desktopNav} aria-label="Standalone navigation">
         {links.map((link) => (
@@ -143,7 +143,7 @@ function StandaloneFooter() {
   return (
     <footer className={styles.standaloneFooter}>
       <span aria-hidden="true" className={styles.footerSpacer} />
-      <span>&copy; 2026 The Daily Social &mdash; partner@thedailysocial.co</span>
+      <span>&copy; 2026 Vibehouse &mdash; partner@vibehouse.co</span>
       <Link href="/policies">Privacy Policy</Link>
     </footer>
   );
@@ -239,7 +239,7 @@ export function UpcomingPage() {
           </div>
         </section>
 
-        <Link className={styles.bigCta} href="mailto:hello@thedailysocial.co?subject=Upcoming%20hub%20updates">
+        <Link className={styles.bigCta} href="mailto:hello@vibehouse.co?subject=Upcoming%20hub%20updates">
           <span className={styles.ctaLabel}>Get Notified</span>
           <span className={styles.ctaArrow} aria-hidden="true">&rarr;</span>
         </Link>
@@ -324,7 +324,7 @@ export function PartnerWithUsPage() {
             <SectionEyebrow>The Inquiry</SectionEyebrow>
             <p>Drop your details. A partnership lead reaches out within 48 hours. No shortcuts.</p>
           </div>
-          <form className={styles.inquiryForm} action="mailto:partner@thedailysocial.co?subject=Partner%20Inquiry" encType="text/plain" method="post">
+          <form className={styles.inquiryForm} action="mailto:partner@vibehouse.co?subject=Partner%20Inquiry" encType="text/plain" method="post">
             <label>
               Name
               <input name="name" type="text" />

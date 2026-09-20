@@ -27,7 +27,7 @@ export default function AboutPage() {
               <div className={`relative overflow-hidden transition-all duration-500 ease-in-out ${expanded ? "max-h-[420px]" : "max-h-32"}`}>
                 <div className="space-y-4 text-base leading-7 text-white/88">
                   <p>
-                    The Daily Social started with a simple idea: travel should bring people together. Not just to share a room, but to share experiences, stories, and lasting friendships.
+                    Vibehouse started with a simple idea: travel should bring people together. Not just to share a room, but to share experiences, stories, and lasting friendships.
                   </p>
                   <p>
                     Today we are building spaces for backpackers, digital nomads, and curious city explorers who want design, community, and comfort in the same place.
@@ -52,7 +52,7 @@ export default function AboutPage() {
 
           <FadeIn className="overflow-hidden rounded-[18px]" delay={0.1}>
             <ImageWithFallback
-              alt="The Daily Social building"
+              alt="Vibehouse building"
               className="aspect-[4/3] w-full object-cover"
               src="https://images.unsplash.com/photo-1501566953613-d93d5cb0be93?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200"
             />
@@ -62,7 +62,7 @@ export default function AboutPage() {
 
       <section className="vh-section vh-section-alt">
         <div className="vh-container max-w-screen-lg">
-          <SectionHeading subtitle="how we got here" title="The Daily Social Story" />
+          <SectionHeading subtitle="how we got here" title="The Vibehouse Story" />
           <Stagger className="space-y-12">
             {aboutStoryBlocks.map((block, index) => (
               <StaggerItem key={block.title}>
@@ -115,7 +115,7 @@ export default function AboutPage() {
             Your Vibe?
           </h2>
           <p className="mx-auto mt-6 max-w-[640px] text-lg italic text-white">
-            Join thousands of travelers who have made The Daily Social their home away from home.
+            Join thousands of travelers who have made Vibehouse their home away from home.
           </p>
           <Button asChild className="mt-10 bg-white text-[var(--vh-pink)] hover:translate-y-[-2px] hover:bg-[#ffe8e8] hover:text-[#8e1b1b]" size="lg" variant="secondary">
             <Link href={getDefaultPropertyDestinationHref()}>Search Availability</Link>

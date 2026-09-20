@@ -36,9 +36,9 @@
 }
 
 .card:hover {
-  border-color: #FFCB45;
+  border-color: #FF2E62;
   transform: translate3d(-2px, -2px, 0);
-  box-shadow: 5px 5px 0px #000000;
+  box-shadow: 5px 5px 0px #991438;
 }
 
 .cardCenter {
@@ -87,7 +87,7 @@
   border-radius: 0px;
   border: 1px solid #3D3D3D;
   background: #121212;
-  color: #FFCB45;
+  color: #FF2E62;
   font-family: 'Gilroy', sans-serif;
   font-size: 0.75rem;
   font-weight: 900;

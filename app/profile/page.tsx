@@ -374,7 +374,7 @@ export default function ProfilePage() {
               Your signature guest identity
             </p>
             <h1 className="mt-1 whitespace-nowrap font-['Suez_One'] text-[15px] font-normal uppercase tracking-[0.1em] text-slate-100 sm:text-lg md:text-xl">
-              Daily Social Passport
+              Vibehouse Passport
             </h1>
           </header>
 

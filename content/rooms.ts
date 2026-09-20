@@ -72,11 +72,11 @@ export const rooms: RoomCardProps[] = [
 
 export const propertyHero = {
   eyebrow: "Property",
-  title: "The Daily Social",
+  title: "Vibehouse",
   location: "Koramangala",
   blurb:
     "A social stay with clean rooms, practical shared spaces, and an easy Koramangala location for short trips, work stays, and longer city living.",
-  addressName: "The Daily Social Koramangala",
+  addressName: "Vibehouse Koramangala",
   address:
     "13/14, Bank Officer Housing Co-operative Society, Bengaluru Urban, Karnataka, India",
   mapsHref: "https://maps.app.goo.gl/jJKJUUKzdmFJGbCG6?g_st=aw",
@@ -85,7 +85,7 @@ export const propertyHero = {
 export const propertyGallery = [
   {
     src: "/images/property/hero-1-1600.webp",
-    alt: "The Daily Social dorm interior",
+    alt: "Vibehouse dorm interior",
   },
   {
     src: "/images/property/hero-2-1600.webp",
@@ -102,7 +102,7 @@ export const propertyGallery = [
 ];
 
 export const propertyOverview = [
-  "The Daily Social Koramangala brings together straightforward comfort and a social, city-friendly atmosphere for guests who want more than a plain overnight stop.",
+  "Vibehouse Koramangala brings together boutique comfort and a social, city-friendly atmosphere for guests who want more than a plain overnight stop.",
   "The property is set up to feel calm when you need rest and connected when you want common spaces, with room categories that work for solo guests, friends, and flexible stays.",
   "Its location makes it easy to step out for coffee, work meetings, food runs, and evenings in the neighborhood while still returning to a stay that feels organized and welcoming.",
 ];
@@ -123,7 +123,7 @@ export const propertyAmenities = [
 ];
 
 export const locationMap = {
-  title: "The Daily Social Koramangala",
+  title: "Vibehouse Koramangala",
   address:
     "13/14, Bank Officer Housing Co-operative Society, Bengaluru Urban, Karnataka, India",
   embedUrl:
@@ -136,6 +136,18 @@ export const nearbyAttractions = [
   { name: "St. John's Cafes", travel: "6 min drive", type: "Food & Coffee" },
   { name: "Lalbagh Botanical Garden", travel: "18 min drive", type: "City Escape" },
 ];
+
+export const bookingSummary = {
+  title: "Summary",
+  note: "Select dates to review category availability and continue with your preferred stay option.",
+  highlights: [
+    "Check-in at 1:00 PM",
+    "Check-out at 10:00 AM",
+    "Direct support from the property team",
+  ],
+  policiesNote:
+    "By continuing, you confirm that all guests meet the property's stay requirements and agree to the booking and guideline policies.",
+};
 
 export const roomCategories: CxRoomCategory[] = [
   {
@@ -191,29 +203,17 @@ export const roomCategories: CxRoomCategory[] = [
     totalPrice: 1299,
     availableCount: 3,
     totalCount: 3,
-    inventoryText: "03 rooms left",
-    features: ["Queen bed", "En-suite bathroom", "Work desk", "Mini-fridge"],
+    inventoryText: "03 rooms available",
+    features: ["Queen bed", "Private bathroom", "Work desk", "Linen change"],
     amenitiesLegend: ["AC", "Private bath", "Fresh linen", "Housekeeping"],
   },
 ];
-
-export const bookingSummary = {
-  title: "Summary",
-  note: "Select dates to review category availability and continue with your preferred stay option.",
-  highlights: [
-    "Check-in at 1:00 PM",
-    "Check-out at 10:00 AM",
-    "Direct support from the property team",
-  ],
-  policiesNote:
-    "By continuing, you confirm that all guests meet the property's stay requirements and agree to the booking and guideline policies.",
-};
 
 export const propertyGuidelines = {
   checkIn: "1:00 PM",
   checkOut: "10:00 AM",
   summary: [
-    "All guests must carry a government-issued photo ID during check-in.",
+    "Government ID is mandatory for all checking-in guests.",
     "Local ID acceptance is subject to property policy and management discretion.",
     "Outside visitors are not allowed beyond designated guest areas without approval.",
     "Cancellation and modification windows depend on the selected booking type.",
@@ -286,6 +286,6 @@ export const roomFaqs = [
   {
     question: "Who do I contact if I have a query?",
     answer:
-      "You can contact The Daily Social directly using the listed phone number or email before arrival.",
+      "You can contact Vibehouse directly using the listed email before arrival.",
   },
 ];

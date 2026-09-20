@@ -11,7 +11,7 @@ import { siteMeta } from "@/content/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://thedailysocial.co.in"),
+  metadataBase: new URL("http://localhost:3000"),
   title: {
     default: siteMeta.name,
     template: `%s | ${siteMeta.name}`,
@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" data-scroll-behavior="smooth">
-      <body suppressHydrationWarning className="vh-shell flex min-h-screen flex-col font-body bg-[#0D0D0D] text-white antialiased">
+      <body suppressHydrationWarning className="vh-shell flex min-h-screen flex-col font-body bg-[#000000] text-[#F1F1F1] antialiased selection:bg-[#E01E5A] selection:text-white">
         <GuestAuthProvider>
           <Suspense fallback={null}>
             <Navigation />

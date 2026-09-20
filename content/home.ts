@@ -137,7 +137,7 @@ export const homePageContent = {
   upsellSubtitle: "Elevate your nights",
   eventsTitle: "Tonight's Experiences",
   eventsSubtitle: "What's in the lineup",
-  experienceTitle: "The Daily Social Experience",
+  experienceTitle: "The Vibehouse Experience",
   experienceSubtitle: "Why we're unforgettable",
   energyTitle: "The Energy",
   energySubtitle: "Snapshots of real moments",

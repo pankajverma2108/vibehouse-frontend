@@ -270,7 +270,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
   const checkinLink = toBrandCheckinLink(ezeeReservationId);
   const absoluteCheckinLink = toAbsoluteBrandCheckinLink(ezeeReservationId);
   const { downloadReceipt, isGenerating: isReceiptGenerating, error: receiptError } = useDownloadReceipt(ezeeReservationId);
-  const supportPhoneDigits = siteMeta.contact.phoneDisplay.replace(/\D/g, "");
+  const supportEmail = siteMeta.contact.email;
   const tileHoverMotion = getHoverLift(reducedMotion, MOTION_DISTANCE.xs);
 
   const whatsappShareHref = useMemo(() => {
@@ -279,13 +279,13 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
   }, [absoluteCheckinLink, propertyName]);
 
   const supportWhatsAppHref = useMemo(
-    () => `https://wa.me/${supportPhoneDigits}?text=${encodeURIComponent(`Hey ${propertyName}, I need help with booking ${ezeeReservationId}.`)}`,
-    [ezeeReservationId, propertyName, supportPhoneDigits],
+    () => `mailto:${supportEmail}?subject=${encodeURIComponent(`Hey ${propertyName}, I need help with booking ${ezeeReservationId}.`)}`,
+    [ezeeReservationId, propertyName, supportEmail],
   );
 
   const cancelRequestHref = useMemo(
-    () => `https://wa.me/${supportPhoneDigits}?text=${encodeURIComponent(`Please help me cancel booking ${ezeeReservationId}.`)}`,
-    [ezeeReservationId, supportPhoneDigits],
+    () => `mailto:${supportEmail}?subject=${encodeURIComponent(`Please help me cancel booking ${ezeeReservationId}.`)}`,
+    [ezeeReservationId, supportEmail],
   );
 
   if (isRestoringSession || isLoading) {
@@ -332,16 +332,16 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
   }
 
   return (
-    <section className="min-h-screen bg-[#0D0D0D] pb-16 pt-24 animate-vh-fade-in md:pt-28 font-['Gilroy',sans-serif] text-white">
+    <section className="min-h-screen bg-[#0A0A0E] pb-16 pt-24 animate-vh-fade-in md:pt-28 font-['Gilroy',sans-serif] text-white">
       <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
         <div ref={tilesRef} className="space-y-7">
           <header className="text-center">
             <div className="flex justify-center mb-3">
-              <Token variant="yellow" label="RESERVATION CONFIRMED" />
+              <Token variant="brand" label="RESERVATION CONFIRMED" />
             </div>
             <h1 className="font-['Cirka',serif] text-center text-3xl leading-[1.12] text-white tracking-tight md:text-4xl lg:text-5xl">
               Bags packed. Vibes ready. <br />
-              <span className="text-[var(--np-yellow)]">{propertyName}</span> is ready for you.
+              <span className="text-[var(--vh-pink)]">{propertyName}</span> is ready for you.
             </h1>
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/70">
               Stay confirmed. Bring your government ID, keep your phone charged, and complete web check-in before arrival.
@@ -351,16 +351,16 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
           <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
             {/* Share Tile */}
             <motion.article className="lg:col-span-7" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
-              <div className="flex h-full flex-col rounded-none border border-[#3D3D3D] bg-[#161616] p-6 shadow-[6px_6px_0px_#000000]">
+              <div className="flex h-full flex-col rounded-none border border-white/15 bg-[#171822] p-6 shadow-[6px_6px_0px_#000000]">
                 <div className="space-y-2">
-                  <Token variant="yellow" label="SHARE PASS" />
+                  <Token variant="brand" label="SHARE PASS" />
                   <h2 className="font-['Cirka',serif] text-2xl text-white tracking-tight">Send the check-in link to co-guests</h2>
                   <p className="max-w-xl text-sm leading-6 text-white/70">Share the pre-arrival link on WhatsApp so the crew can complete their KYC before hitting the door.</p>
                 </div>
 
-                <div className="mt-5 flex flex-1 flex-col gap-4 border border-[#3D3D3D] bg-[#121212] p-5">
+                <div className="mt-5 flex flex-1 flex-col gap-4 border border-white/10 bg-[#12131A] p-5">
                   <div className="flex items-center gap-3 text-white">
-                    {checkinDate ? <CheckCircle2 className="h-5 w-5 text-[var(--np-green)]" /> : <ShieldCheck className="h-5 w-5 text-[var(--np-yellow)]" />}
+                    {checkinDate ? <CheckCircle2 className="h-5 w-5 text-[var(--np-green)]" /> : <ShieldCheck className="h-5 w-5 text-[var(--vh-pink)]" />}
                     <p className="text-sm font-semibold">{checkinDate ? "Your reservation is confirmed. Co-guests can verify instantly via WhatsApp." : "Tap WhatsApp and share the pre-arrival KYC portal."}</p>
                   </div>
 
@@ -377,11 +377,11 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
                   <DashedSeparator />
 
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="border border-[#3D3D3D] bg-[#181818] p-3">
+                    <div className="border border-white/10 bg-[#12131A] p-3">
                       <p className="text-[11px] font-extrabold uppercase tracking-wider text-white/50">Check-in</p>
                       <p className="mt-1 text-sm font-bold text-white">{formatScheduleDate(checkinDate)} · {propertyGuidelines.checkIn}</p>
                     </div>
-                    <div className="border border-[#3D3D3D] bg-[#181818] p-3">
+                    <div className="border border-white/10 bg-[#12131A] p-3">
                       <p className="text-[11px] font-extrabold uppercase tracking-wider text-white/50">Check-out</p>
                       <p className="mt-1 text-sm font-bold text-white">{formatScheduleDate(checkoutDate)} · {propertyGuidelines.checkOut}</p>
                     </div>
@@ -392,16 +392,16 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
 
             {/* Stay Timeline Tile */}
             <motion.article className="lg:col-span-5" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
-              <div className="flex h-full flex-col rounded-none border border-[#3D3D3D] bg-[#161616] p-6 shadow-[6px_6px_0px_#000000]">
+              <div className="flex h-full flex-col rounded-none border border-white/15 bg-[#171822] p-6 shadow-[6px_6px_0px_#000000]">
                 <div className="flex items-center gap-3">
-                  <Token variant="yellow" label="STAY TIMELINE" />
+                  <Token variant="brand" label="STAY TIMELINE" />
                 </div>
 
                 <div className="mt-4 space-y-4">
                   <h2 className="font-['Cirka',serif] text-2xl text-white tracking-tight">Stay Timeline</h2>
 
-                  <div className="flex items-start gap-3 border border-[#3D3D3D] bg-[#121212] p-4">
-                    <CalendarDays className="h-5 w-5 text-[var(--np-yellow)] shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-3 border border-white/10 bg-[#12131A] p-4">
+                    <CalendarDays className="h-5 w-5 text-[var(--vh-pink)] shrink-0 mt-0.5" />
                     <div className="flex flex-1 items-center gap-4 sm:gap-6">
                       <div>
                         <span className="block text-[11px] uppercase tracking-wider text-white/50">Check-in</span>
@@ -437,7 +437,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
 
             {/* Room Info Tile */}
             <motion.article className="lg:col-span-5" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
-              <div className="h-full rounded-none border border-[#3D3D3D] bg-[#161616] p-6 shadow-[6px_6px_0px_#000000]">
+              <div className="h-full rounded-none border border-white/15 bg-[#171822] p-6 shadow-[6px_6px_0px_#000000]">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <Token variant="blue" label="ACCOMMODATION" />
@@ -452,12 +452,12 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
                   {snapshotFallback?.roomTypeName && snapshotFallback.roomTypeName !== roomSummary ? (
                     <p className="text-xs text-white/60">{snapshotFallback.roomTypeName}</p>
                   ) : null}
-                  {booking?.room_number ? <p className="text-xs font-bold text-[var(--np-yellow)]">Assigned Room: {booking.room_number}</p> : null}
+                  {booking?.room_number ? <p className="text-xs font-bold text-[var(--vh-pink)]">Assigned Room: {booking.room_number}</p> : null}
                 </div>
 
-                <div className="mt-5 space-y-2.5 border border-[#3D3D3D] bg-[#121212] p-4 text-xs">
+                <div className="mt-5 space-y-2.5 border border-white/10 bg-[#12131A] p-4 text-xs">
                   <div className="flex items-center gap-2 text-white/80">
-                    <ShieldCheck className="h-4 w-4 text-[var(--np-yellow)] shrink-0" />
+                    <ShieldCheck className="h-4 w-4 text-[var(--vh-pink)] shrink-0" />
                     <span>Valid physical ID document required upon arrival.</span>
                   </div>
                   <div className="flex items-center gap-2 text-white/80">
@@ -487,17 +487,17 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
 
             {/* Payment Breakdown Tile */}
             <motion.article className="lg:col-span-7" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
-              <div className="h-full rounded-none border border-[#3D3D3D] bg-[#161616] p-6 shadow-[6px_6px_0px_#000000]">
+              <div className="h-full rounded-none border border-white/15 bg-[#171822] p-6 shadow-[6px_6px_0px_#000000]">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <Token variant="green" label="PAYMENT RECEIPT" />
                     <h2 className="mt-2 font-['Cirka',serif] text-2xl text-white tracking-tight">Billing Summary</h2>
                   </div>
-                  <WalletCards className="h-6 w-6 text-[var(--np-yellow)]" />
+                  <WalletCards className="h-6 w-6 text-[var(--vh-pink)]" />
                 </div>
 
                 <div className="mt-5 space-y-4 font-['Gilroy',sans-serif]">
-                  <div className="flex flex-col gap-3 text-xs border border-[#3D3D3D] bg-[#121212] p-4">
+                  <div className="flex flex-col gap-3 text-xs border border-white/10 bg-[#12131A] p-4">
                     <div className="flex items-center justify-between text-white/70">
                       <span>Room charges</span>
                       <span className="font-mono text-white">{formatCurrencyValue(paymentBreakdown.subtotalRooms)}</span>
@@ -513,7 +513,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
                     <DashedSeparator />
                     <div className="flex items-center justify-between text-sm font-bold text-white">
                       <span>Grand Total</span>
-                      <span className="font-mono text-[var(--np-yellow)]">{formatCurrencyValue(paymentBreakdown.grandTotal)}</span>
+                      <span className="font-mono text-[var(--vh-pink)]">{formatCurrencyValue(paymentBreakdown.grandTotal)}</span>
                     </div>
                     <DashedSeparator />
                     <div className="flex items-center justify-between text-white/70">
@@ -526,7 +526,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
                     </div>
                   </div>
 
-                  <div className="border border-[#3D3D3D] bg-[#121212] p-3 text-xs text-white/60">
+                  <div className="border border-white/10 bg-[#12131A] p-3 text-xs text-white/60">
                     Transparent billing: paid via Razorpay secure gateway. Confirmation token attached to reservation.
                   </div>
                 </div>
@@ -535,18 +535,18 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
 
             {/* Check-in / Out Guidelines */}
             <motion.article className="lg:col-span-5" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
-              <div className="h-full rounded-none border border-[#3D3D3D] bg-[#161616] p-6 shadow-[6px_6px_0px_#000000]">
+              <div className="h-full rounded-none border border-white/15 bg-[#171822] p-6 shadow-[6px_6px_0px_#000000]">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <Token variant="yellow" label="HOUSE RULES" />
+                    <Token variant="brand" label="HOUSE RULES" />
                     <h2 className="mt-2 font-['Cirka',serif] text-2xl text-white tracking-tight">Check-In / Out</h2>
                   </div>
-                  <CalendarDays className="h-6 w-6 text-[var(--np-yellow)]" />
+                  <CalendarDays className="h-6 w-6 text-[var(--vh-pink)]" />
                 </div>
 
-                <div className="mt-5 space-y-4 border border-[#3D3D3D] bg-[#121212] p-4 text-xs">
+                <div className="mt-5 space-y-4 border border-white/10 bg-[#12131A] p-4 text-xs">
                   <div className="flex items-start gap-3">
-                    <CalendarDays className="h-4 w-4 text-[var(--np-yellow)] shrink-0 mt-0.5" />
+                    <CalendarDays className="h-4 w-4 text-[var(--vh-pink)] shrink-0 mt-0.5" />
                     <div className="flex flex-1 items-center justify-between">
                       <div>
                         <span className="block text-[10px] uppercase text-white/50">Check-in</span>
@@ -568,11 +568,11 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
                       <span>Physical photo ID required for all guests.</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <TriangleAlert className="h-3.5 w-3.5 text-[var(--np-yellow)] shrink-0" />
+                      <TriangleAlert className="h-3.5 w-3.5 text-[#facc15] shrink-0" />
                       <span>Arriving after 10 PM? Notify host on WhatsApp.</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <ShieldCheck className="h-3.5 w-3.5 text-[var(--np-yellow)] shrink-0" />
+                      <ShieldCheck className="h-3.5 w-3.5 text-[var(--vh-pink)] shrink-0" />
                       <span>Quiet hours observed from 11 PM to 8 AM.</span>
                     </div>
                   </div>
@@ -582,13 +582,13 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
 
             {/* How to Reach Tile */}
             <motion.article className="lg:col-span-7" initial={false} whileHover={tileHoverMotion} data-confirmation-tile>
-              <div className="h-full rounded-none border border-[#3D3D3D] bg-[#161616] p-6 shadow-[6px_6px_0px_#000000]">
+              <div className="h-full rounded-none border border-white/15 bg-[#171822] p-6 shadow-[6px_6px_0px_#000000]">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <Token variant="blue" label="LOCATION" />
                     <h2 className="mt-2 font-['Cirka',serif] text-2xl text-white tracking-tight">How to Reach</h2>
                   </div>
-                  <MapPin className="h-6 w-6 text-[var(--np-yellow)]" />
+                  <MapPin className="h-6 w-6 text-[var(--vh-pink)]" />
                 </div>
 
                 <div className="mt-5 grid gap-5 md:grid-cols-[minmax(0,1fr)_1.2fr]">
@@ -603,7 +603,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
 
                     <div className="grid gap-2 pt-2">
                       {nearbyAttractions.slice(0, 3).map((attraction) => (
-                        <div key={attraction.name} className="border border-[#3D3D3D] bg-[#121212] px-3 py-2">
+                        <div key={attraction.name} className="border border-white/10 bg-[#12131A] px-3 py-2">
                           <p className="font-bold text-white text-xs">{attraction.name}</p>
                           <p className="mt-0.5 text-[10px] uppercase text-white/50">{attraction.type} · {attraction.travel}</p>
                         </div>
@@ -611,7 +611,7 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
                     </div>
                   </div>
 
-                  <div className="overflow-hidden rounded-none border border-[#3D3D3D] bg-[#121212]">
+                  <div className="overflow-hidden rounded-none border border-white/10 bg-[#12131A]">
                     <iframe
                       allowFullScreen
                       className="h-[220px] w-full md:h-full md:min-h-[260px]"
@@ -627,23 +627,22 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
           </div>
 
           {/* Cancellation & Help Section */}
-          <section className="rounded-none border border-[#3D3D3D] bg-[#161616] p-6 shadow-[6px_6px_0px_#000000]">
-            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between border-b border-[#3D3D3D] pb-5">
+          <section className="rounded-none border border-white/15 bg-[#171822] p-6 shadow-[6px_6px_0px_#000000]">
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between border-b border-white/10 pb-5">
               <div className="max-w-3xl space-y-2">
-                <Token variant="yellow" label="SUPPORT & POLICIES" />
+                <Token variant="brand" label="SUPPORT & POLICIES" />
                 <h2 className="font-['Cirka',serif] text-2xl text-white md:text-3xl tracking-tight">Need assistance with your booking?</h2>
-                <p className="text-xs leading-6 text-white/70">Reach out directly via WhatsApp for check-in queries, timing updates, or modification requests.</p>
+                <p className="text-xs leading-6 text-white/70">Reach out directly via email for check-in queries, timing updates, or modification requests.</p>
               </div>
 
               <div className="flex flex-wrap gap-3">
                 <NeoPopButton variant="primary" asChild>
-                  <a href={supportWhatsAppHref} rel="noreferrer" target="_blank">
-                    <WhatsAppIcon className="mr-2 h-4 w-4" />
-                    WhatsApp Support
+                  <a href={supportWhatsAppHref}>
+                    Contact Support
                   </a>
                 </NeoPopButton>
                 <NeoPopButton variant="secondary" asChild>
-                  <a href={cancelRequestHref} rel="noreferrer" target="_blank">
+                  <a href={cancelRequestHref}>
                     Cancel Request
                   </a>
                 </NeoPopButton>
@@ -651,11 +650,11 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
             </div>
 
             <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-              <div className="space-y-4 border border-[#3D3D3D] bg-[#121212] p-5">
+              <div className="space-y-4 border border-white/10 bg-[#12131A] p-5">
                 <h3 className="font-['Cirka',serif] text-xl text-white tracking-tight">Cancellation Milestones</h3>
                 <div className="space-y-3">
                   {cancellationMilestones.map((milestone) => (
-                    <div key={milestone.label} className="grid gap-2 border-b border-[#3D3D3D]/50 pb-2.5 last:border-b-0 last:pb-0 md:grid-cols-[140px_minmax(0,1fr)] md:items-start text-xs">
+                    <div key={milestone.label} className="grid gap-2 border-b border-white/10 pb-2.5 last:border-b-0 last:pb-0 md:grid-cols-[140px_minmax(0,1fr)] md:items-start text-xs">
                       <div>
                         <p className="font-extrabold uppercase text-white/50 text-[10px]">{milestone.label}</p>
                         <p className="font-bold text-white mt-0.5">{milestone.date}</p>
@@ -668,14 +667,14 @@ export function BookingConfirmedPage({ ezeeReservationId }: { ezeeReservationId:
                 </div>
               </div>
 
-              <div className="space-y-4 border border-[#3D3D3D] bg-[#121212] p-5 text-xs text-white/70">
+              <div className="space-y-4 border border-white/10 bg-[#12131A] p-5 text-xs text-white/70">
                 <h3 className="font-['Cirka',serif] text-xl text-white tracking-tight">Hostel Conduct & Verification</h3>
                 <p className="leading-6">All guests must be at least 18 years of age. A valid physical government-issued ID (Passport, Aadhaar, Driving Licence) is mandatory at check-in.</p>
                 <DashedSeparator />
                 <ul className="space-y-1.5">
                   {propertyGuidelines.summary.map((line) => (
                     <li key={line} className="flex gap-2">
-                      <span className="text-[var(--np-yellow)]">•</span>
+                      <span className="text-[var(--vh-pink)]">•</span>
                       <span>{line}</span>
                     </li>
                   ))}

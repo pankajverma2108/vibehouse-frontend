@@ -6,7 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import { HeroCarousel } from "@/components/marketing/widgets/hero-carousel";
 import { BookingWidget } from "@/components/marketing/widgets/booking-widget";
+import { upcomingEvents as staticEvents } from "@/content/events";
 import { heroImages, homePageContent } from "@/content/home";
+import { rooms as staticRooms } from "@/content/rooms";
 import type { EventCardProps, RoomCardProps } from "@/content/types";
 import { usePropertyId } from "@/hooks/use-property-id";
 import {
@@ -30,9 +32,9 @@ type HomeContentState = {
 
 const initialContent: HomeContentState = {
   eventError: null,
-  events: [],
+  events: staticEvents.slice(0, 3),
   roomError: null,
-  rooms: [],
+  rooms: staticRooms.slice(0, 3),
   key: "",
 };
 
@@ -78,25 +80,28 @@ export function HomeClientPage() {
           getPublicEventsResult({ propertyId, limit: 3, signal: controller.signal }),
         ]);
 
+        const liveRooms = roomTypesToHomeCards(snapshot.roomTypes, { destinationHref: propertyDestinationHref });
+        const resolvedRooms = liveRooms.length > 0 ? liveRooms : staticRooms.slice(0, 3);
+        const resolvedEvents = eventsResult.events.length > 0 ? eventsResult.events : staticEvents.slice(0, 3);
+
         setContent({
-          eventError: eventsResult.error,
-          events: eventsResult.events,
+          eventError: null,
+          events: resolvedEvents,
           key: requestKey,
-          roomError: snapshot.availabilityError,
-          rooms: roomTypesToHomeCards(snapshot.roomTypes, { destinationHref: propertyDestinationHref }),
+          roomError: null,
+          rooms: resolvedRooms,
         });
       } catch (error) {
         if (controller.signal.aborted) {
           return;
         }
 
-        const message = error instanceof Error ? error.message : "Live stay details are unavailable right now.";
         setContent({
-          eventError: message,
-          events: [],
+          eventError: null,
+          events: staticEvents.slice(0, 3),
           key: requestKey,
-          roomError: message,
-          rooms: [],
+          roomError: null,
+          rooms: staticRooms.slice(0, 3),
         });
       }
     }
@@ -107,19 +112,16 @@ export function HomeClientPage() {
 
   return (
     <>
-      <section className="relative min-h-[85vh] overflow-hidden">
-        <HeroCarousel images={heroImages} titleParts={homePageContent.heroTitle} />
-        <div className="absolute inset-x-0 bottom-8 z-10 flex justify-center px-4">
-          <div className="w-full max-w-[500px]">
-            <BookingWidget
-              destinationHref={propertyDestinationHref}
-              initialCheckIn={checkin || undefined}
-              initialCheckOut={checkout || undefined}
-              submitLabel="Book Now"
-              variant="hero"
-            />
-          </div>
-        </div>
+      <section className="relative w-full overflow-hidden">
+        <HeroCarousel images={heroImages} titleParts={homePageContent.heroTitle}>
+          <BookingWidget
+            destinationHref={propertyDestinationHref}
+            initialCheckIn={checkin || undefined}
+            initialCheckOut={checkout || undefined}
+            submitLabel="Check Availability"
+            variant="hero"
+          />
+        </HeroCarousel>
       </section>
 
       <HomeSections

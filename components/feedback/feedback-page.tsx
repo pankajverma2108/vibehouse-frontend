@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -96,13 +96,13 @@ function FeedbackShell({
         <div className="mx-auto max-w-[760px]">
           <header className="mb-4 flex items-center justify-between gap-3 border-b border-dashed border-[#3D3D3D] pb-3 sm:mb-5 sm:gap-4 sm:pb-4">
             <Link
-              aria-label="The Daily Social home"
+              aria-label="Vibehouse home"
               className="inline-flex items-center"
               href="/"
             >
               <span className="relative block h-[44px] w-[86px] sm:h-[52px] sm:w-[104px] md:h-[60px] md:w-[120px]">
                 <Image
-                  alt="The Daily Social"
+                  alt="Vibehouse"
                   fill
                   priority
                   src="/brands/tds/logo.png"
@@ -142,7 +142,7 @@ function ContextPanel({
     <div className="order-1 h-full">
       <div className="flex h-full flex-col rounded-none border border-dashed border-[#3D3D3D] bg-[#0D0D0D] p-4 shadow-[6px_6px_0px_#000000] sm:p-5 md:rounded-none md:p-6">
         <div className="space-y-3 sm:space-y-4">
-          <p className="font-caption text-white/55">The Daily Social</p>
+          <p className="font-caption text-white/55">Vibehouse</p>
           <h1 className="font-['Cirka',serif] text-2xl text-white tracking-tight text-[25px] leading-[1.02] text-white sm:text-[32px] md:text-[42px]">
             {displayTitle}
           </h1>
@@ -254,7 +254,7 @@ function TerminalPanel({
               asChild
               className="vh-cta-button h-11 px-5 text-sm"
             >
-              <Link href="/">Back to The Daily Social</Link>
+              <Link href="/">Back to Vibehouse</Link>
             </Button>
           </div>
         </div>

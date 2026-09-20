@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
-export type TokenVariant = 'yellow' | 'green' | 'blue' | 'pink' | 'red' | 'neutral';
+export type TokenVariant = 'brand' | 'crimson' | 'yellow' | 'green' | 'blue' | 'pink' | 'red' | 'neutral';
 
 export interface TokenProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: TokenVariant;
@@ -9,10 +9,12 @@ export interface TokenProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const tokenVariantStyles: Record<TokenVariant, string> = {
+  brand: 'bg-[var(--vh-pink)] text-white border border-[var(--vh-pink)]',
+  crimson: 'bg-[var(--vh-pink)] text-white border border-[var(--vh-pink)]',
   yellow: 'bg-[var(--np-yellow)] text-black border border-[var(--np-yellow)]',
   green: 'bg-[var(--np-green)] text-black border border-[var(--np-green)]',
   blue: 'bg-[var(--np-blue)] text-white border border-[var(--np-blue)]',
-  pink: 'bg-[var(--np-pink)] text-white border border-[var(--np-pink)]',
+  pink: 'bg-[var(--vh-pink)] text-white border border-[var(--vh-pink)]',
   red: 'bg-[var(--np-red)] text-white border border-[var(--np-red)]',
   neutral: 'bg-[var(--np-black-300)] text-[var(--np-white-300)] border border-[var(--np-black-200)]',
 };
@@ -45,7 +47,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const badgeVariantStyles = {
-  primary: 'bg-[var(--np-yellow)] text-black',
+  primary: 'bg-[var(--vh-pink)] text-white',
   secondary: 'bg-[var(--np-black-300)] text-white border border-[var(--np-black-200)]',
   accent: 'bg-[var(--np-green)] text-black',
   destructive: 'bg-[var(--np-red)] text-white',

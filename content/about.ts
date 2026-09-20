@@ -29,7 +29,7 @@ export const aboutStoryBlocks = [
   {
     title: "Built by Travelers, for Travelers",
     body:
-      "Our founders met in a hostel in Goa in 2018. The vibe was amazing, but the facilities were not. They wanted spaces that balanced energy with high standards, and The Daily Social was born from that tension.",
+      "Our founders met in a hostel in Goa in 2018. The vibe was amazing, but the facilities were not. They wanted spaces that balanced energy with high standards, and Vibehouse was born from that tension.",
     color: "#c62828",
     image:
       "https://images.unsplash.com/photo-1681747971522-2d7a04c78321?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200",
@@ -37,7 +37,7 @@ export const aboutStoryBlocks = [
   {
     title: "Safety is Non-Negotiable",
     body:
-      "Every The Daily Social property has 24/7 security, female-only dorms, secure lockers, and zero-tolerance harassment policies so fun and peace of mind coexist.",
+      "Every Vibehouse property has 24/7 security, female-only dorms, secure lockers, and zero-tolerance harassment policies so fun and peace of mind coexist.",
     color: "#39ff14",
     image:
       "https://images.unsplash.com/photo-1694151569569-8288e3118519?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200",

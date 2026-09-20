@@ -349,21 +349,12 @@ export default function PoliciesPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="mailto:thedailysocial01@gmail.com"
+                href="mailto:hello@vibehouse.co"
                 className="inline-flex items-center gap-2 bg-white px-6 py-3 rounded-[4px] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.3)] transition-all"
               >
                 <Mail className="w-5 h-5 text-[#c62828]" />
                 <span className="font-['Space_Grotesk'] font-bold text-[14px] text-[#c62828] uppercase">
                   Email Us
-                </span>
-              </a>
-              <a
-                href="https://wa.me/918884973328"
-                className="inline-flex items-center gap-2 bg-white px-6 py-3 rounded-[4px] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.3)] transition-all"
-              >
-                <MessageCircle className="w-5 h-5 text-[#39ff14]" />
-                <span className="font-['Space_Grotesk'] font-bold text-[14px] text-[#c62828] uppercase">
-                  WhatsApp
                 </span>
               </a>
             </div>

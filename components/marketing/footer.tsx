@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { VibehouseLogo } from "./vibehouse-logo";
 import { footerLinks, siteMeta } from "@/content/site";
 import { isStandalonePublicRoute } from "@/lib/feedback-route";
 
@@ -14,27 +15,22 @@ export function Footer() {
   }
 
   return (
-    <footer className="bg-[#0D0D0D] border-t border-[#3D3D3D] px-4 py-12 md:px-6">
-      <div className="vh-container">
-        <div className="mb-10 grid grid-cols-1 gap-8 md:grid-cols-4">
-          <div className="md:col-span-2">
-            <div className="mb-4">
-              <div className="text-2xl md:text-3xl font-extrabold tracking-[0.1em] uppercase text-white font-['Gilroy',sans-serif]">
-                THE DAILY SOCIAL
-              </div>
-            </div>
-            <p className="mb-4 text-sm uppercase tracking-[0.06em] text-white/65 font-['Gilroy',sans-serif]">{siteMeta.tagline}</p>
-            <div className="space-y-1.5 text-sm text-white/65 font-['Gilroy',sans-serif]">
+    <footer className="bg-black border-t border-white/[0.08] px-4 py-16 md:px-8">
+      <div className="vh-container max-w-[1545px] mx-auto">
+        <div className="mb-10 grid grid-cols-1 gap-10 md:grid-cols-4">
+          <div className="md:col-span-2 space-y-4">
+            <VibehouseLogo />
+            <p className="text-xs uppercase tracking-[0.14em] text-white/75 font-body font-bold">
+              Stay, Play, Belong.
+            </p>
+            <div className="space-y-1.5 text-xs text-white/65 font-body">
               {siteMeta.contact.addressLines.map((line) => (
                 <p key={line}>{line}</p>
               ))}
-              <a className="block transition-colors hover:text-[var(--np-yellow)]" href={siteMeta.contact.mapsHref} target="_blank" rel="noreferrer">
+              <a className="block transition-colors hover:text-[#E01E5A]" href={siteMeta.contact.mapsHref} target="_blank" rel="noreferrer">
                 View on Google Maps
               </a>
-              <a className="block transition-colors hover:text-[var(--np-yellow)]" href={siteMeta.contact.phoneHref}>
-                {siteMeta.contact.phoneDisplay}
-              </a>
-              <a className="block transition-colors hover:text-[var(--np-yellow)]" href={siteMeta.contact.emailHref}>
+              <a className="block transition-colors hover:text-[#E01E5A]" href={siteMeta.contact.emailHref}>
                 {siteMeta.contact.email}
               </a>
             </div>
@@ -42,14 +38,14 @@ export function Footer() {
 
           <div className="grid grid-cols-2 gap-8 md:col-span-2 md:grid-cols-2">
             <div>
-              <h3 className="mb-4 font-['Gilroy',sans-serif] text-xs font-bold uppercase tracking-[0.12em] text-[var(--np-yellow)]">
+              <h3 className="mb-4 font-display text-xs font-bold uppercase tracking-wider text-white border-b border-white/10 pb-2">
                 Quick Links
               </h3>
               <div className="space-y-2.5">
                 {footerLinks.quickLinks.map((item) => (
                   <Link
                     key={item.href}
-                    className="block text-sm text-white/65 transition-colors hover:text-white"
+                    className="block text-xs font-body uppercase tracking-[0.06em] text-white/70 transition-colors hover:text-white"
                     href={item.href}
                   >
                     {item.label}
@@ -59,14 +55,14 @@ export function Footer() {
             </div>
 
             <div>
-              <h3 className="mb-4 font-['Gilroy',sans-serif] text-xs font-bold uppercase tracking-[0.12em] text-[var(--np-yellow)]">
+              <h3 className="mb-4 font-display text-xs font-bold uppercase tracking-wider text-white border-b border-white/10 pb-2">
                 Policies
               </h3>
               <div className="space-y-2.5">
                 {footerLinks.legal.map((item) => (
                   <Link
                     key={item.href}
-                    className="block text-sm text-white/65 transition-colors hover:text-white"
+                    className="block text-xs font-body uppercase tracking-[0.06em] text-white/70 transition-colors hover:text-white"
                     href={item.href}
                   >
                     {item.label}
@@ -77,11 +73,11 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="w-full shrink-0 h-px my-8 bg-[#3D3D3D]" />
+        <div className="w-full shrink-0 h-px my-8 bg-white/10" />
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs uppercase tracking-[0.08em] text-white/45 font-['Gilroy',sans-serif]">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] uppercase tracking-wider text-white/40">
           <span>&copy; 2026 {siteMeta.name}. ALL RIGHTS RESERVED.</span>
-          <span className="text-[var(--np-green)]">• LIVE PROPERTY DIRECT</span>
+          <span className="text-[#2FBC81]">● LIVE PROPERTY DIRECT</span>
         </div>
       </div>
     </footer>

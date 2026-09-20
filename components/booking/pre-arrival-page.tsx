@@ -763,7 +763,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
   const { guest, isAuthenticated, isRestoringSession, openAuthModal } = useGuestAuth();
 
   const [bookingTitle, setBookingTitle] = useState("Web check-in");
-  const [propertyName, setPropertyName] = useState("The Daily Social");
+  const [propertyName, setPropertyName] = useState("Vibehouse");
   const [bookingLifecycleStatus, setBookingLifecycleStatus] = useState<string | null>(null);
   const [slots, setSlots] = useState<BookingSlotSummary[]>([]);
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null);
@@ -1604,7 +1604,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
   }
 
   return (
-    <section className="min-h-screen bg-[#0D0D0D] pb-12 pt-24 animate-vh-fade-in md:pt-28">
+    <section className="min-h-screen bg-[#0A0A0E] pb-12 pt-24 animate-vh-fade-in md:pt-28">
       <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
         <div className="mx-auto max-w-[980px]">
           <div className="relative min-h-10">
@@ -1740,7 +1740,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">First Name</span>
                       <input
-                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.first_name ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#12131A] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.first_name ? "border-[#EE4D37]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
                         onChange={(event) => setField("first_name", event.target.value)}
                         placeholder="First name"
                         value={editorState.first_name}
@@ -1751,7 +1751,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Last Name</span>
                       <input
-                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.last_name ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#12131A] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.last_name ? "border-[#EE4D37]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
                         onChange={(event) => setField("last_name", event.target.value)}
                         placeholder="Last name"
                         value={editorState.last_name}
@@ -1762,7 +1762,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     <label className="space-y-2 md:col-span-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Email</span>
                       <input
-                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.email ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#12131A] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.email ? "border-[#EE4D37]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
                         onChange={(event) => setField("email", event.target.value)}
                         placeholder="Email"
                         type="email"
@@ -1776,14 +1776,14 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                       <Popover onOpenChange={setDobPickerOpen} open={dobPickerOpen}>
                         <PopoverTrigger asChild>
                           <button
-                            className={`flex h-12 w-full items-center justify-between rounded-none border bg-[#121212] px-4 text-left text-sm text-white outline-none ${fieldErrors.date_of_birth ? "border-[#EE4D37]" : "border-[#3D3D3D] hover:border-white/20"}`}
+                            className={`flex h-12 w-full items-center justify-between rounded-none border bg-[#12131A] px-4 text-left text-sm text-white outline-none ${fieldErrors.date_of_birth ? "border-[#EE4D37]" : "border-white/10 hover:border-white/20"}`}
                             type="button"
                           >
                             <span>{formatDobDate(editorState.date_of_birth)}</span>
                             <ChevronDown className="h-4 w-4 text-[#99A1AF]" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent align="start" className="z-[220] w-auto border-[#3D3D3D] bg-[#10111a] p-2">
+                        <PopoverContent align="start" className="z-[220] w-auto border-white/15 bg-[#171822] p-2">
                           <Calendar
                             captionLayout="dropdown"
                             className="vh-calendar-dark vh-calendar-balanced rounded-none"
@@ -1838,7 +1838,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Contact Number</span>
                       <input
-                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.contact_number ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#12131A] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.contact_number ? "border-[#EE4D37]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
                         onChange={(event) => setField("contact_number", normalizeContactNumber(event.target.value))}
                         placeholder="+918765432109"
                         value={editorState.contact_number}
@@ -1849,7 +1849,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     <label className="space-y-2 md:col-span-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Address</span>
                       <textarea
-                        className={`min-h-[120px] w-full resize-y rounded-none border bg-[#121212] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.permanent_address ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
+                        className={`min-h-[120px] w-full resize-y rounded-none border bg-[#12131A] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.permanent_address ? "border-[#EE4D37]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
                         onChange={(event) => setField("permanent_address", event.target.value)}
                         placeholder="Full address"
                         value={editorState.permanent_address}
@@ -1891,7 +1891,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                         <label className="space-y-2">
                           <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">ID Number</span>
                           <input
-                            className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${idNumberErrorMessage ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
+                            className={`h-12 w-full rounded-none border bg-[#12131A] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${idNumberErrorMessage ? "border-[#EE4D37]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
                             onChange={(event) => handleIdNumberInputChange(event.target.value)}
                             placeholder="You can Enter ID Number Manually, No Prob!"
                             value={editorState.id_number}
@@ -1995,7 +1995,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
 
                       <div className="mt-3 flex justify-center">
                         <Button
-                          className="w-[80%] rounded-none bg-[var(--np-yellow)] font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
+                          className="w-[80%] rounded-none bg-[var(--vh-pink)] font-bold text-white border border-[var(--vh-pink)] shadow-[3px_3px_0px_#000000] hover:bg-[#FF426F]"
                           disabled={!canEditActiveSlot || !editorState.document_file_key}
                           loading={isRunningOcr}
                           loadingText="Scanning ID"
@@ -2045,7 +2045,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Coming From</span>
                       <input
-                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.coming_from ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#12131A] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.coming_from ? "border-[#EE4D37]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
                         onChange={(event) => setField("coming_from", event.target.value)}
                         placeholder="e.g. Delhi"
                         value={editorState.coming_from}
@@ -2056,7 +2056,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                     <label className="space-y-2">
                       <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#99A1AF]">Next Destination</span>
                       <input
-                        className={`h-12 w-full rounded-none border bg-[#121212] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.going_to ? "border-[#EE4D37]" : "border-[#3D3D3D] focus:border-[var(--np-yellow)]"}`}
+                        className={`h-12 w-full rounded-none border bg-[#12131A] px-4 text-sm text-white outline-none placeholder:text-[#6A7282] ${fieldErrors.going_to ? "border-[#EE4D37]" : "border-white/10 focus:border-[var(--vh-pink)]"}`}
                         onChange={(event) => setField("going_to", event.target.value)}
                         placeholder="e.g. Goa"
                         value={editorState.going_to}
@@ -2080,7 +2080,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
 
                 {activeStep < 3 ? (
                   <Button
-                    className="rounded-none bg-[var(--np-yellow)] font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90 disabled:cursor-not-allowed disabled:opacity-45"
+                    className="rounded-none bg-[var(--vh-pink)] font-bold text-white border border-[var(--vh-pink)] shadow-[3px_3px_0px_#000000] hover:bg-[#FF426F] disabled:cursor-not-allowed disabled:opacity-45"
                     disabled={!canAdvanceToNextStep}
                     onClick={nextStep}
                     type="button"
@@ -2090,7 +2090,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                   </Button>
                 ) : (
                   <Button
-                    className="rounded-none bg-[var(--np-yellow)] font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
+                    className="rounded-none bg-[var(--vh-pink)] font-bold text-white border border-[var(--vh-pink)] shadow-[3px_3px_0px_#000000] hover:bg-[#FF426F]"
                     disabled={!canEditActiveSlot}
                     loading={isSubmitting}
                     loadingText="Finishing check-in"
@@ -2182,7 +2182,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
                 >
                   Cancel
                 </Button>
-                <Button className="rounded-none bg-[var(--np-yellow)] font-bold text-black border border-[var(--np-yellow)] shadow-[3px_3px_0px_#000000] hover:bg-[var(--np-yellow)]/90" onClick={() => void applyUploadPreview()} type="button">
+                <Button className="rounded-none bg-[var(--vh-pink)] font-bold text-white border border-[var(--vh-pink)] shadow-[3px_3px_0px_#000000] hover:bg-[#FF426F]" onClick={() => void applyUploadPreview()} type="button">
                   Apply
                 </Button>
               </div>
@@ -2210,7 +2210,7 @@ export function PreArrivalPage({ ezeeReservationId }: { ezeeReservationId: strin
 
             <div className="mt-8 flex justify-center">
               <Button
-                className="h-12 rounded-none bg-[var(--np-yellow)] px-10 text-sm font-bold uppercase tracking-[0.08em] text-black border border-[var(--np-yellow)] shadow-[4px_4px_0px_#000000] hover:bg-[var(--np-yellow)]/90"
+                className="h-12 rounded-none bg-[var(--vh-pink)] px-10 text-sm font-bold uppercase tracking-[0.08em] text-white border border-[var(--vh-pink)] shadow-[4px_4px_0px_#000000] hover:bg-[#FF426F]"
                 onClick={() => {
                   setIsCompletionModalOpen(false);
                   window.location.assign(`/bookings/${encodeURIComponent(ezeeReservationId)}/confirmed`);

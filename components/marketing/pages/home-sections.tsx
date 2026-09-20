@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -7,13 +9,10 @@ import {
   BedDouble,
   Briefcase,
   CalendarCheck,
-  Cross,
   Coffee,
   Droplets,
-  LampDesk,
   Laptop,
   Lock,
-  LockKeyhole,
   MapPin,
   Moon,
   Music,
@@ -25,13 +24,17 @@ import {
   Users,
   Wifi,
   ArrowRight,
+  Zap,
+  Compass,
 } from "lucide-react";
+
+import { upcomingEvents as fallbackEvents } from "@/content/events";
+import { rooms as fallbackRooms } from "@/content/rooms";
 
 import {
   amenities,
   experienceCards,
   guestEnergyImages,
-  homePageContent,
   homeSectionOrder,
   type HomeSectionId,
   upsellBentoItems,
@@ -42,7 +45,7 @@ import { RoomCard } from "@/components/marketing/widgets/room-card";
 import { SectionHeading } from "@/components/marketing/widgets/section-heading";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { FadeIn, Stagger, StaggerItem } from "@/components/shared/motion";
-import { Button as NeoPopButton } from "@/components/neopop";
+import { MagneticButton } from "@/components/marketing/interactive/magnetic-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -51,11 +54,20 @@ const TestimonialsMarquee = dynamic(() => import("@/components/testimonials-with
 type SectionFrameProps = {
   alt?: boolean;
   children: ReactNode;
+  className?: string;
 };
 
-function SectionFrame({ alt = false, children }: SectionFrameProps) {
+function SectionFrame({ alt = false, children, className = "" }: SectionFrameProps) {
   return (
-    <section className={cn("py-20 border-b border-[#3D3D3D]", alt ? "bg-[#0A0A0A]" : "bg-[#0D0D0D]")}>
+    <section
+      className={cn(
+        "relative py-24 sm:py-32 overflow-hidden border-b border-white/[0.07]",
+        alt ? "bg-[#060608]" : "bg-black",
+        className
+      )}
+    >
+      {/* Subtle Atmospheric Glow */}
+      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#E01E5A]/[0.025] blur-[120px] rounded-full" />
       {children}
     </section>
   );
@@ -76,118 +88,160 @@ const amenityIconMap = {
   laptop: Laptop,
   sunset: Sunset,
   users: Users,
-  lamp: LampDesk,
   briefcase: Briefcase,
-  cross: Cross,
   sparkles: ShieldCheck,
   "shield-check": ShieldCheck,
   "bed-double": BedDouble,
-  "lock-keyhole": LockKeyhole,
   "calendar-check": CalendarCheck,
 } as const;
 
 function AmenitiesSection() {
+  const amenityPillars = [
+    {
+      icon: Laptop,
+      title: "Nomad Workspace",
+      subtitle: "100Mbps Dedicated Fiber",
+      description: "Ergonomic seating, silent focus zones, universal power strips, and zero lag for remote founders and creators.",
+      accentClass: "bg-[#36C5F0]/10 border-[#36C5F0]/25 text-[#36C5F0]",
+      subtitleClass: "text-[#36C5F0]",
+    },
+    {
+      icon: Coffee,
+      title: "Rooftop Cafe & Bar",
+      subtitle: "Artisanal Pour-Overs",
+      description: "Sunlit terrace, specialty coffee blends, healthy breakfasts, and evening craft cocktails under the Bangalore sky.",
+      accentClass: "bg-[#ECB22E]/10 border-[#ECB22E]/25 text-[#ECB22E]",
+      subtitleClass: "text-[#ECB22E]",
+    },
+    {
+      icon: Bed,
+      title: "Sanctuary Rest",
+      subtitle: "Acoustic Privacy Pods",
+      description: "Blackout privacy curtains, orthopedic mattresses, individual climate vents, personal reading lamps and USB-C docks.",
+      accentClass: "bg-[#2FBC81]/10 border-[#2FBC81]/25 text-[#2FBC81]",
+      subtitleClass: "text-[#2FBC81]",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Seamless Safety",
+      subtitle: "24/7 Smart Biometrics",
+      description: "Keyless access, secure luggage vaults, daily professional housekeeping, and friendly 24-hour community hosts.",
+      accentClass: "bg-[#E01E5A]/10 border-[#E01E5A]/25 text-[#E01E5A]",
+      subtitleClass: "text-[#E01E5A]",
+    },
+  ];
+
   return (
     <SectionFrame alt>
-      <div className="vh-container">
-        <SectionHeading tagline={homePageContent.amenitiesTagline} title={homePageContent.amenitiesTitle} />
-        
-        <FadeIn className="-mt-4 mb-8 text-center">
-          <span className="inline-block border border-[var(--np-yellow)] bg-[var(--np-yellow)]/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]">
-            Live Better · Stay Better
-          </span>
-        </FadeIn>
+      <div className="vh-container max-w-7xl mx-auto px-4 sm:px-6">
+        <SectionHeading
+          subtitle="Engineered for Nomads"
+          title="Everything You Need. Nothing You Don't."
+          tagline="Thoughtfully designed amenities to elevate your workday, recharge your body, and ignite your social life."
+        />
 
-        <Stagger className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-w-5xl mx-auto">
-          {amenities.map((item) => {
-            const Icon = amenityIconMap[item.icon as keyof typeof amenityIconMap] ?? ShieldCheck;
-
+        {/* 4 Architectural Lifestyle Pillars with Nudge Quad-Color Accents */}
+        <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 mb-12">
+          {amenityPillars.map((pillar) => {
+            const Icon = pillar.icon;
             return (
-              <StaggerItem key={item.label}>
-                <div className="flex items-center gap-3 border border-[#3D3D3D] bg-[#161616] p-3.5 shadow-[3px_3px_0px_#000000] hover:border-white/50 transition-colors">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-[#3D3D3D] bg-[#121212] text-[var(--np-yellow)]">
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <span className="text-xs font-extrabold uppercase tracking-[0.06em] text-white font-['Gilroy',sans-serif]">
-                    {item.label}
-                  </span>
+              <StaggerItem key={pillar.title}>
+                <div className="bg-[#121216] p-6 sm:p-7 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 h-full flex flex-col justify-between group shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+                  <div>
+                    <div className={cn("flex h-12 w-12 items-center justify-center rounded-2xl border mb-6 group-hover:scale-105 transition-transform", pillar.accentClass)}>
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <p className={cn("text-[10.5px] font-mono font-medium uppercase tracking-wider mb-2", pillar.subtitleClass)}>
+                      {pillar.subtitle}
+                    </p>
+                    <h3 className="text-xl font-bold uppercase tracking-tight text-white font-display mb-3">
+                      {pillar.title}
+                    </h3>
+                    <p className="text-xs leading-relaxed text-white/65 font-body">
+                      {pillar.description}
+                    </p>
+                  </div>
                 </div>
               </StaggerItem>
             );
           })}
         </Stagger>
+
+        {/* Floating Amenities Chip Bar */}
+        <FadeIn className="bg-[#121216] p-4 sm:p-6 rounded-2xl border border-white/8 mt-6">
+          <p className="text-center text-[10px] font-mono font-medium uppercase tracking-wider text-white/45 mb-4">
+            Full Complimentary In-House Perks
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            {amenities.map((item) => {
+              const Icon = amenityIconMap[item.icon as keyof typeof amenityIconMap] ?? ShieldCheck;
+              return (
+                <span
+                  key={item.label}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/8 text-[11px] font-mono font-medium uppercase tracking-wider text-white/80 hover:bg-white/[0.08] hover:border-white/20 transition-colors"
+                >
+                  <Icon className="h-3.5 w-3.5 text-[#36C5F0]" />
+                  <span>{item.label}</span>
+                </span>
+              );
+            })}
+          </div>
+        </FadeIn>
       </div>
     </SectionFrame>
   );
 }
 
-function InlineSectionState({
-  title,
-  body,
-}: {
-  title: string;
-  body: string;
-}) {
+function InlineSectionState({ title, body }: { title: string; body: string }) {
   return (
-    <div className="border border-dashed border-[#3D3D3D] bg-[#161616] p-8 text-center text-white max-w-xl mx-auto">
-      <p className="font-['Gilroy',sans-serif] text-lg font-bold uppercase tracking-[0.08em]">{title}</p>
-      <p className="mt-2 text-xs leading-relaxed text-white/60 font-['Gilroy',sans-serif]">{body}</p>
+    <div className="bg-[#121216] p-8 text-center text-white max-w-xl mx-auto rounded-2xl border border-white/10">
+      <p className="font-display text-xl font-bold uppercase tracking-wide text-white">{title}</p>
+      <p className="mt-2 text-xs leading-relaxed text-white/60 font-body">{body}</p>
     </div>
   );
 }
 
 function SectionCardSkeletons() {
   return (
-    <div aria-busy="true" className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <span className="sr-only">Live content is being prepared.</span>
+    <div aria-busy="true" className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
       {[0, 1, 2].map((item) => (
-        <div className="border border-[#3D3D3D] bg-[#161616] p-4" key={item}>
-          <Skeleton className="h-[220px] w-full bg-white/5 rounded-none" />
-          <div className="space-y-3 mt-4">
-            <Skeleton className="h-6 w-2/3 bg-white/5 rounded-none" />
-            <Skeleton className="h-4 w-full bg-white/5 rounded-none" />
-            <Skeleton className="h-4 w-4/5 bg-white/5 rounded-none" />
-          </div>
+        <div className="bg-[#121216] p-5 rounded-2xl border border-white/10 space-y-4" key={item}>
+          <Skeleton className="h-[220px] w-full bg-white/5 rounded-xl" />
+          <Skeleton className="h-6 w-2/3 bg-white/5 rounded-lg" />
+          <Skeleton className="h-4 w-full bg-white/5 rounded-lg" />
+          <Skeleton className="h-10 w-full bg-white/5 rounded-xl mt-4" />
         </div>
       ))}
     </div>
   );
 }
 
-function RoomsSection({ pending, roomError, rooms }: { pending?: boolean; roomError?: string | null; rooms: RoomCardProps[] }) {
-  const roomItems = rooms;
-  const roomGridClass =
-    roomItems.length <= 1
-      ? "grid grid-cols-1 gap-6 md:max-w-[420px] md:mx-auto"
-      : roomItems.length === 2
-      ? "grid grid-cols-1 gap-6 md:grid-cols-2 md:max-w-[920px] md:mx-auto"
-      : "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3";
+function RoomsSection({
+  pending,
+  roomError,
+  rooms,
+}: {
+  pending?: boolean;
+  roomError?: string | null;
+  rooms: RoomCardProps[];
+}) {
+  const roomItems = rooms && rooms.length > 0 ? rooms : fallbackRooms;
 
   return (
     <SectionFrame>
-      <div className="vh-container">
-        <SectionHeading tagline={homePageContent.roomsTagline} title={homePageContent.roomsTitle} />
-        
-        <FadeIn className="-mt-4 mb-8 text-center">
-          <span className="inline-block border border-[var(--np-yellow)] bg-[var(--np-yellow)]/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]">
-            Your Sanctuary
-          </span>
-        </FadeIn>
+      <div className="vh-container max-w-7xl mx-auto px-4 sm:px-6">
+        <SectionHeading
+          subtitle="Bespoke Rooms & Nomad Suites"
+          title="Your Private Sanctuary"
+          tagline="Crafted for deep rest, effortless co-working, and seamless privacy in the pulsing heart of Bangalore."
+        />
 
         {pending ? (
           <SectionCardSkeletons />
-        ) : roomError ? (
-          <FadeIn>
-            <InlineSectionState body={roomError} title="Rooms did not load" />
-          </FadeIn>
-        ) : roomItems.length === 0 ? (
-          <FadeIn>
-            <InlineSectionState body="No rooms are available right now for the selected stay window." title="No rooms available" />
-          </FadeIn>
         ) : (
-          <Stagger className={roomGridClass}>
+          <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
             {roomItems.map((room) => (
-              <StaggerItem key={room.title}>
+              <StaggerItem key={room.title} className="h-full">
                 <RoomCard {...room} />
               </StaggerItem>
             ))}
@@ -198,40 +252,32 @@ function RoomsSection({ pending, roomError, rooms }: { pending?: boolean; roomEr
   );
 }
 
-function EventsSection({ eventError, events, pending }: { eventError?: string | null; events: EventCardProps[]; pending?: boolean }) {
-  const eventItems = events;
-  const eventGridClass =
-    eventItems.length <= 1
-      ? "grid grid-cols-1 gap-6 md:grid-cols-1 md:max-w-[460px] md:mx-auto"
-      : eventItems.length === 2
-      ? "grid grid-cols-1 gap-6 md:grid-cols-2"
-      : "grid grid-cols-1 gap-6 md:grid-cols-3";
+function EventsSection({
+  eventError,
+  events,
+  pending,
+}: {
+  eventError?: string | null;
+  events: EventCardProps[];
+  pending?: boolean;
+}) {
+  const eventItems = events && events.length > 0 ? events : fallbackEvents.slice(0, 3);
 
   return (
     <SectionFrame alt>
-      <div className="vh-container">
-        <SectionHeading title={homePageContent.eventsTitle} />
-        
-        <FadeIn className="-mt-4 mb-8 text-center">
-          <span className="inline-block border border-[var(--np-blue)] bg-[var(--np-blue)]/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--np-blue)] font-['Gilroy',sans-serif]">
-            Weekly Lineup
-          </span>
-        </FadeIn>
+      <div className="vh-container max-w-7xl mx-auto px-4 sm:px-6">
+        <SectionHeading
+          subtitle="The Weekly Rhythm"
+          title="Culture, Beats & Connections"
+          tagline="Live acoustic sunsets, creator meetups, rooftop screening parties, and local food walks."
+        />
 
         {pending ? (
           <SectionCardSkeletons />
-        ) : eventError ? (
-          <FadeIn>
-            <InlineSectionState body={eventError} title="Events did not load" />
-          </FadeIn>
-        ) : eventItems.length === 0 ? (
-          <FadeIn>
-            <InlineSectionState body="No events are scheduled right now." title="No upcoming events" />
-          </FadeIn>
         ) : (
-          <Stagger className={eventGridClass}>
+          <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
             {eventItems.slice(0, 3).map((event) => (
-              <StaggerItem key={`${event.title}-${event.date}-${event.time}`}>
+              <StaggerItem key={`${event.title}-${event.date}-${event.time}`} className="h-full">
                 <EventCard {...event} />
               </StaggerItem>
             ))}
@@ -245,37 +291,42 @@ function EventsSection({ eventError, events, pending }: { eventError?: string | 
 function UpsellSection() {
   return (
     <SectionFrame alt>
-      <div className="vh-container">
-        <SectionHeading title={homePageContent.upsellTitle} />
-        
-        <FadeIn className="-mt-4 mb-8 text-center">
-          <span className="inline-block border border-[var(--np-yellow)] bg-[var(--np-yellow)]/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]">
-            Elevate Your Nights
-          </span>
-        </FadeIn>
+      <div className="vh-container max-w-7xl mx-auto px-4 sm:px-6">
+        <SectionHeading
+          subtitle="Stay Longer, Go Deeper"
+          title="Designed for Extended Nomads"
+          tagline="Zero lock-ins, seamless monthly renewals, and curated community dining."
+        />
 
-        <Stagger className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {upsellBentoItems.map((item) => (
-            <StaggerItem key={item.id}>
-              <div className="border border-[#3D3D3D] bg-[#161616] p-6 shadow-[4px_4px_0px_#000000] hover:border-white/40 transition-colors h-full flex flex-col justify-between">
-                <div>
-                  <div className="mb-4">
-                    <span className="border border-black bg-[var(--np-yellow)] text-black px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.14em]">
+        <Stagger className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+          {upsellBentoItems.map((item, index) => {
+            const accents = ["#36C5F0", "#ECB22E", "#2FBC81"];
+            const currentAccent = accents[index % accents.length];
+            return (
+              <StaggerItem key={item.id} className="h-full">
+                <div className="bg-[#121216] p-7 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 h-full flex flex-col justify-between group shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+                  <div>
+                    <span
+                      className="inline-block rounded-full px-3 py-1 text-[10px] font-mono font-medium uppercase tracking-wider mb-4 border"
+                      style={{
+                        backgroundColor: `${currentAccent}1A`,
+                        borderColor: `${currentAccent}4D`,
+                        color: currentAccent,
+                      }}
+                    >
                       {item.kicker}
                     </span>
+                    <h3 className="text-xl font-bold uppercase tracking-tight text-white font-display mb-3">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs leading-relaxed text-white/65 font-body">
+                      {item.body}
+                    </p>
                   </div>
-
-                  <h3 className="text-lg font-extrabold uppercase tracking-[0.06em] text-white font-['Gilroy',sans-serif] mb-2">
-                    {item.title}
-                  </h3>
-
-                  <p className="text-xs leading-relaxed text-white/65 font-['Gilroy',sans-serif]">
-                    {item.body}
-                  </p>
                 </div>
-              </div>
-            </StaggerItem>
-          ))}
+              </StaggerItem>
+            );
+          })}
         </Stagger>
       </div>
     </SectionFrame>
@@ -283,30 +334,67 @@ function UpsellSection() {
 }
 
 function ExperienceSection() {
+  const quadAccents = [
+    { color: "#E01E5A", icon: Zap, kicker: "HIGH OCTANE" },
+    { color: "#2FBC81", icon: ShieldCheck, kicker: "SAFE HAVEN" },
+    { color: "#36C5F0", icon: Users, kicker: "TRIBE CULTURE" },
+    { color: "#ECB22E", icon: Compass, kicker: "CITY CENTER" },
+  ];
+
   return (
     <SectionFrame>
-      <div className="vh-container">
-        <SectionHeading title={homePageContent.experienceTitle} />
-        
-        <FadeIn className="-mt-4 mb-8 text-center">
-          <span className="inline-block border border-[var(--np-green)] bg-[var(--np-green)]/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--np-green)] font-['Gilroy',sans-serif]">
-            The Daily Experience
-          </span>
-        </FadeIn>
+      <div className="vh-container max-w-7xl mx-auto px-4 sm:px-6">
+        <SectionHeading
+          subtitle="The Vibehouse Ethos"
+          title="More Than A Bed"
+          tagline="A sanctuary built on spontaneous conversations, shared journeys, and creative momentum."
+        />
 
-        <Stagger className="mx-auto grid max-w-screen-lg grid-cols-1 gap-6 md:grid-cols-2">
-          {experienceCards.map((item) => (
-            <StaggerItem key={item.title}>
-              <div className="border border-[#3D3D3D] bg-[#161616] p-6 shadow-[4px_4px_0px_#000000] hover:border-white/40 transition-colors">
-                <h3 className="mb-2 font-['Gilroy',sans-serif] text-xl font-extrabold uppercase tracking-[0.06em] text-[var(--np-yellow)]">
-                  {item.title}
-                </h3>
-                <p className="text-xs leading-relaxed text-white/70 font-['Gilroy',sans-serif]">
-                  {item.body}
-                </p>
-              </div>
-            </StaggerItem>
-          ))}
+        <Stagger className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 max-w-5xl mx-auto">
+          {experienceCards.map((item, index) => {
+            const quad = quadAccents[index % quadAccents.length];
+            const Icon = quad.icon;
+
+            return (
+              <StaggerItem key={item.title}>
+                <div className="bg-[#121216] p-8 rounded-2xl border border-white/10 hover:border-white/25 transition-all duration-300 hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.5)] group flex flex-col justify-between h-full">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div
+                        className="h-10 w-10 rounded-xl flex items-center justify-center border"
+                        style={{
+                          backgroundColor: `${quad.color}15`,
+                          borderColor: `${quad.color}35`,
+                          color: quad.color,
+                        }}
+                      >
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span
+                        className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border"
+                        style={{
+                          backgroundColor: `${quad.color}10`,
+                          borderColor: `${quad.color}30`,
+                          color: quad.color,
+                        }}
+                      >
+                        {quad.kicker}
+                      </span>
+                    </div>
+                    <h3
+                      className="font-display text-2xl font-bold uppercase tracking-tight mb-3 transition-colors"
+                      style={{ color: quad.color }}
+                    >
+                      {item.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm leading-relaxed text-white/70 font-body">
+                      {item.body}
+                    </p>
+                  </div>
+                </div>
+              </StaggerItem>
+            );
+          })}
         </Stagger>
       </div>
     </SectionFrame>
@@ -316,71 +404,59 @@ function ExperienceSection() {
 function MoreAboutUsSection() {
   return (
     <SectionFrame>
-      <div className="vh-container">
-        <SectionHeading title="More About Us" />
-        <Stagger className="mx-auto mt-4 grid max-w-screen-lg grid-cols-1 gap-6 md:grid-cols-2">
-          {/* Upcoming Properties card */}
+      <div className="vh-container max-w-7xl mx-auto px-4 sm:px-6">
+        <SectionHeading
+          subtitle="Expansion & Ecosystem"
+          title="The Future of Social Hospitality"
+        />
+
+        <Stagger className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 max-w-5xl mx-auto">
+          {/* Upcoming Properties */}
           <StaggerItem className="h-full">
             <Link
               href="/upcoming"
-              className="group flex h-full flex-col border border-[#3D3D3D] bg-[#161616] p-6 shadow-[4px_4px_0px_#000000] hover:border-white/40 transition-all"
+              className="group flex h-full flex-col justify-between bg-[#121216] p-8 rounded-2xl border border-white/10 hover:border-[#E01E5A]/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.7)]"
             >
-              <div className="space-y-3">
-                <span className="inline-block border border-black bg-[var(--np-yellow)] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.14em] text-black">
-                  Coming Soon
+              <div>
+                <span className="inline-block rounded-full bg-[#E01E5A] text-white px-3 py-1 text-[10px] font-mono font-medium uppercase tracking-wider mb-4 shadow-md">
+                  Coming Soon · 2026
                 </span>
-                <h3 className="text-xl font-extrabold uppercase tracking-[0.06em] text-white font-['Gilroy',sans-serif]">
+                <h3 className="font-display text-3xl font-bold uppercase tracking-tight text-white group-hover:text-white transition-colors">
                   Upcoming Properties
                 </h3>
-                <p className="text-xs leading-relaxed text-white/65 font-['Gilroy',sans-serif]">
-                  Two bold new social hubs landing in Bangalore — built for creators, travellers, and doers.
+                <p className="mt-3 text-xs sm:text-sm leading-relaxed text-white/70 font-body">
+                  Two bold new social destinations landing in Bangalore — TDSocial Stay &amp; Buteak Suites on Koramangala Club Road.
                 </p>
               </div>
 
-              <div className="mt-5 flex-1 space-y-2 border border-[#3D3D3D] bg-[#121212] p-4">
-                <p className="text-[10px] uppercase font-bold text-white/40 tracking-[0.12em]">What&apos;s Coming</p>
-                <p className="text-sm font-bold text-white font-['Gilroy',sans-serif]">TDSocial Stay · Buteak Suites</p>
-                <p className="text-xs text-white/65 font-['Gilroy',sans-serif]">
-                  Koramangala, Bangalore &mdash; opening 2026.
-                </p>
-              </div>
-
-              <div className="mt-6 flex items-center justify-between text-xs font-bold uppercase tracking-[0.1em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]">
-                <span>Explore Properties</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <div className="mt-8 pt-5 border-t border-white/10 flex items-center justify-between text-xs font-mono font-medium uppercase tracking-wider text-[#E01E5A]">
+                <span>Preview New Hubs</span>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />
               </div>
             </Link>
           </StaggerItem>
 
-          {/* Partner with Us card */}
+          {/* Partner With Us */}
           <StaggerItem className="h-full">
             <Link
               href="/partner-with-us"
-              className="group flex h-full flex-col border border-[#3D3D3D] bg-[#161616] p-6 shadow-[4px_4px_0px_#000000] hover:border-white/40 transition-all"
+              className="group flex h-full flex-col justify-between bg-[#121216] p-8 rounded-2xl border border-white/10 hover:border-[#E01E5A]/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.7)]"
             >
-              <div className="space-y-3">
-                <span className="inline-block border border-black bg-[var(--np-green)] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.14em] text-black">
-                  Invest &amp; Grow
+              <div>
+                <span className="inline-block rounded-full bg-white/[0.08] border border-white/15 text-white px-3 py-1 text-[10px] font-mono font-medium uppercase tracking-wider mb-4">
+                  Invest &amp; Scale
                 </span>
-                <h3 className="text-xl font-extrabold uppercase tracking-[0.06em] text-white font-['Gilroy',sans-serif]">
+                <h3 className="font-display text-3xl font-bold uppercase tracking-tight text-white group-hover:text-white transition-colors">
                   Partner With Us
                 </h3>
-                <p className="text-xs leading-relaxed text-white/65 font-['Gilroy',sans-serif]">
-                  We manage. You earn. Full-stack hospitality, staffing, software &amp; branding handled.
+                <p className="mt-3 text-xs sm:text-sm leading-relaxed text-white/70 font-body">
+                  Turn real estate into industry-leading yields. Full-stack hospitality management, brand architecture, and direct tribe distribution.
                 </p>
               </div>
 
-              <div className="mt-5 flex-1 space-y-2 border border-[#3D3D3D] bg-[#121212] p-4">
-                <p className="text-[10px] uppercase font-bold text-white/40 tracking-[0.12em]">Partnership Models</p>
-                <p className="text-sm font-bold text-white font-['Gilroy',sans-serif]">Leasing Model · Revenue Share</p>
-                <p className="text-xs text-white/65 font-['Gilroy',sans-serif]">
-                  Fixed rent or scalable profit &mdash; choose what fits.
-                </p>
-              </div>
-
-              <div className="mt-6 flex items-center justify-between text-xs font-bold uppercase tracking-[0.1em] text-[var(--np-green)] font-['Gilroy',sans-serif]">
-                <span>Partner Inquiries</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <div className="mt-8 pt-5 border-t border-white/10 flex items-center justify-between text-xs font-mono font-medium uppercase tracking-wider text-[#E01E5A]">
+                <span>Explore Models</span>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />
               </div>
             </Link>
           </StaggerItem>
@@ -393,22 +469,20 @@ function MoreAboutUsSection() {
 function EnergySection() {
   return (
     <SectionFrame>
-      <div className="vh-container">
-        <SectionHeading title={homePageContent.energyTitle} />
-        
-        <FadeIn className="-mt-4 mb-8 text-center">
-          <span className="inline-block border border-[var(--np-yellow)] bg-[var(--np-yellow)]/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]">
-            Reel Moments
-          </span>
-        </FadeIn>
+      <div className="vh-container max-w-7xl mx-auto px-4 sm:px-6">
+        <SectionHeading
+          subtitle="Captured In The Wild"
+          title="Vibes Unfiltered"
+          tagline="Real moments from our rooftop acoustics, community dinners, and Koramangala wanderings."
+        />
 
-        <Stagger className="mx-auto mb-8 grid max-w-screen-lg grid-cols-2 gap-4 md:grid-cols-4">
+        <Stagger className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-12 max-w-6xl mx-auto">
           {guestEnergyImages.map((image, index) => (
             <StaggerItem key={image}>
-              <div className="border border-[#3D3D3D] bg-[#161616] p-2 shadow-[4px_4px_0px_#000000]">
+              <div className="group relative overflow-hidden rounded-2xl bg-[#121216] border border-white/10 p-2 shadow-[0_12px_30px_rgba(0,0,0,0.5)]">
                 <ImageWithFallback
                   alt={`Guest energy ${index + 1}`}
-                  className="aspect-square w-full object-cover"
+                  className="aspect-square w-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
                   src={image}
                 />
               </div>
@@ -416,12 +490,12 @@ function EnergySection() {
           ))}
         </Stagger>
 
-        <FadeIn className="text-center">
-          <NeoPopButton asChild size="default" variant="secondary">
-            <Link href="https://instagram.com/thedailysocial01" rel="noreferrer" target="_blank">
-              Follow on Instagram
-            </Link>
-          </NeoPopButton>
+        <FadeIn className="mt-10 text-center">
+          <Link href="https://instagram.com/vibehouse" rel="noreferrer" target="_blank">
+            <MagneticButton className="rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 px-6 py-3 text-xs font-mono font-medium uppercase tracking-wider text-white transition-all">
+              <span>Follow @vibehouse</span>
+            </MagneticButton>
+          </Link>
         </FadeIn>
       </div>
     </SectionFrame>
@@ -434,29 +508,30 @@ function ReviewsSection() {
 
 function CtaSection({ destinationHref = "/property" }: { destinationHref?: string }) {
   return (
-    <SectionFrame alt>
-      <div className="vh-container">
-        <FadeIn className="mx-auto max-w-[600px] border border-[#3D3D3D] bg-[#121212] p-8 shadow-[8px_8px_0px_#000000]">
-          <div className="mb-4 text-center">
-            <span className="font-['Gilroy',sans-serif] text-xs font-black uppercase tracking-[0.2em] text-[var(--np-yellow)]">
-              THE DAILY SOCIAL
-            </span>
-          </div>
+    <SectionFrame alt className="py-28 sm:py-36">
+      <div className="vh-container max-w-4xl mx-auto px-4 sm:px-6">
+        <FadeIn className="bg-[#121216] rounded-3xl p-8 sm:p-12 border border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.8)] text-center relative overflow-hidden">
+          <div className="pointer-events-none absolute -bottom-24 left-1/2 -translate-x-1/2 w-[450px] h-[250px] bg-[#E01E5A]/10 blur-[90px] rounded-full" />
 
-          <SectionHeading subtitle={homePageContent.ctaBody} title={homePageContent.ctaTitle} />
+          <p className="text-[11px] font-mono font-medium uppercase tracking-wider text-[#E01E5A] mb-3">
+            Your Bengaluru Base
+          </p>
 
-          <div className="mt-6">
+          <h2 className="font-display text-3xl sm:text-5xl font-bold uppercase tracking-tight text-white leading-tight max-w-2xl mx-auto">
+            Experience Koramangala&apos;s Creative Energy
+          </h2>
+
+          <p className="mt-4 text-xs sm:text-sm font-body text-white/70 max-w-md mx-auto leading-relaxed">
+            Direct bookings guarantee best available rates, instant confirmation, and full community access.
+          </p>
+
+          <div className="mt-8 max-w-lg mx-auto">
             <BookingWidget
               destinationHref={destinationHref}
-              submitLabel="Book Now"
-              urgencyChips={homePageContent.ctaUrgencyChips}
+              submitLabel="Check Dates"
               variant="cta"
             />
           </div>
-
-          <p className="mt-5 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-white/50 font-['Gilroy',sans-serif]">
-            Free Cancellation · No Hidden Booking Fees
-          </p>
         </FadeIn>
       </div>
     </SectionFrame>
@@ -486,11 +561,25 @@ export function HomeSections({
     <>
       {order.map((sectionId) => {
         if (sectionId === "rooms") {
-          return <RoomsSection key={sectionId} pending={roomsPending} roomError={roomError} rooms={homeRooms} />;
+          return (
+            <RoomsSection
+              key={sectionId}
+              pending={roomsPending}
+              roomError={roomError}
+              rooms={homeRooms}
+            />
+          );
         }
 
         if (sectionId === "events") {
-          return <EventsSection eventError={eventError} events={homeEvents} key={sectionId} pending={eventsPending} />;
+          return (
+            <EventsSection
+              eventError={eventError}
+              events={homeEvents}
+              key={sectionId}
+              pending={eventsPending}
+            />
+          );
         }
 
         const sectionComponents: Record<Exclude<HomeSectionId, "rooms" | "events">, () => ReactNode> = {

@@ -4,7 +4,7 @@ import { UpcomingPage } from "@/components/standalone/upcoming-page";
 
 export const metadata: Metadata = {
   title: "Upcoming Hubs",
-  description: "Upcoming The Daily Social hubs in Koramangala.",
+  description: "Upcoming Vibehouse hubs in Koramangala.",
 };
 
 export default function Page() {

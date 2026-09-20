@@ -497,7 +497,7 @@ export function BookingReceiptPDF({ data }: BookingReceiptPDFProps) {
       title={`Receipt – ${data.booking_id}`}
       author={data.property_name}
       subject="Booking Confirmation Receipt"
-      creator="The Daily Social"
+      creator="Vibehouse"
     >
       <Page size="A4" style={s.page}>
         {/* ── Side strip ──────────────────────────────────────────── */}

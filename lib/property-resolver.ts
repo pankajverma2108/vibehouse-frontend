@@ -5,6 +5,13 @@
  * 2. Host mapping (matches backend rules)
  * 3. Env fallback (NEXT_PUBLIC_PROPERTY_ID) for local/dev only
  */
+/**
+ * Central property ID resolver for multi-property support.
+ * Resolves property_id in priority order:
+ * 1. Explicit route/search param
+ * 2. Host mapping (matches backend rules)
+ * 3. Env fallback (NEXT_PUBLIC_PROPERTY_ID) for local/dev only
+ */
 
 const PROPERTY_ID_REGEX = /^\d+$/;
 const DEFAULT_BRAND: Brand = "TDS";
@@ -14,8 +21,10 @@ export type Brand = "TDS" | "BUTEAK";
 // Host-to-property mapping (must match backend's property-resolver.ts)
 // See: docs/multi_property/13_multi_property.md
 const HOST_TO_PROPERTY: Record<string, string> = {
-  "www.thedailysocial.co.in": "60765",
-  "thedailysocial.co.in": "60765",
+  "www.vibehouse.co": "60765",
+  "vibehouse.co": "60765",
+  "www.vibehouse.in": "60765",
+  "vibehouse.in": "60765",
   "www.buteak.in": "55402",
   "buteak.in": "55402",
   "www.dev.buteak.in": "55402",
@@ -31,13 +40,9 @@ const PROPERTY_ID_TO_BRAND: Record<string, Brand> = {
 
 // Property ID to property name mapping
 const PROPERTY_ID_TO_NAME: Record<string, string> = {
-  "60765": "The Daily Social",
+  "60765": "Vibehouse",
   "55402": "Buteak",
 };
-
-/**
- * Validate property_id is numeric (eZee hotel code format).
- */
 export function isValidPropertyId(value: unknown): value is string {
   if (typeof value !== "string") {
     return false;
@@ -102,7 +107,7 @@ function getSearchParamFromPath(path: string | null | undefined, key: string): s
   }
 
   try {
-    const parsed = new URL(path, "https://www.thedailysocial.co.in");
+    const parsed = new URL(path, "http://localhost:3000");
     return parsed.searchParams.get(key);
   } catch {
     return null;

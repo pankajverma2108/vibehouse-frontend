@@ -197,13 +197,13 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
   return (
     <div
       ref={cardRef}
-      className={`w-[240px] md:w-[320px] ${
+      className={`w-[260px] md:w-[340px] ${
         isExpanded ? 'h-auto md:h-auto z-40' : 'h-[210px] md:h-[240px]'
-      } border border-[#3D3D3D] bg-[#161616] shadow-[3px_3px_0px_#000000] p-4 flex flex-col justify-between tile transition-all duration-300 flex-shrink-0 cursor-pointer`}
+      } glass-panel rounded-2xl border border-white/10 p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:shadow-[0_16px_40px_rgba(0,0,0,0.6)] flex-shrink-0 cursor-pointer`}
       onClick={toggle}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[var(--np-yellow)] font-['Gilroy',sans-serif]">
+        <span className="text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#FF2E62] font-['Gilroy',sans-serif]">
           {review.source}
         </span>
         <div className="flex gap-0.5">
@@ -211,7 +211,7 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
             <Star
               key={i}
               size={12}
-              className={i < review.rating ? 'fill-[var(--np-yellow)] text-[var(--np-yellow)]' : 'text-gray-700'}
+              className={i < review.rating ? 'fill-[#FF2E62] text-[#FF2E62]' : 'text-gray-700'}
             />
           ))}
         </div>
@@ -219,7 +219,7 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
 
       <div className="flex-1 mb-1 overflow-hidden">
         <div
-          className={`text-xs md:text-sm text-white/80 leading-relaxed custom-scroll font-['Gilroy',sans-serif] ${
+          className={`text-xs md:text-sm text-[#F3EEE6]/85 leading-relaxed custom-scroll font-['Gilroy',sans-serif] ${
             isExpanded ? 'unclamped' : 'clamped'
           }`}
           onWheel={(ev) => ev.stopPropagation()}
@@ -232,7 +232,7 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
         <div className="mb-1">
           <button
             onClick={toggle}
-            className="text-xs text-[var(--np-yellow)] hover:text-white font-bold uppercase tracking-[0.06em]"
+            className="text-xs text-[#FF2E62] hover:text-white font-bold uppercase tracking-[0.06em] cursor-pointer"
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => {
               e.stopPropagation();
@@ -244,13 +244,13 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
         </div>
       )}
 
-      <div className="mt-1 border-t border-[#3D3D3D] pt-2">
-        <p className="text-xs font-bold uppercase tracking-[0.06em] text-white font-['Gilroy',sans-serif] truncate">
+      <div className="mt-2 border-t border-white/10 pt-2.5">
+        <p className="text-xs font-bold uppercase tracking-[0.08em] text-white font-['Gilroy',sans-serif] truncate">
           {review.author}
         </p>
         <div className="flex items-center justify-between mt-0.5">
-          <p className="text-[10px] text-white/55 font-['Gilroy',sans-serif] truncate">{review.location}</p>
-          <p className="text-[10px] font-medium text-white/55 font-['Gilroy',sans-serif] truncate">{review.date}</p>
+          <p className="text-[10px] text-white/50 font-['Gilroy',sans-serif] truncate">{review.location}</p>
+          <p className="text-[10px] font-medium text-white/50 font-['Gilroy',sans-serif] truncate">{review.date}</p>
         </div>
       </div>
     </div>
@@ -259,8 +259,8 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
 
 const PhotoCardComponent: React.FC<{ photo: PhotoCard }> = ({ photo }) => {
   return (
-    <div className="w-[160px] h-[210px] md:w-[280px] md:h-[240px] overflow-hidden tile transition-all duration-300 flex-shrink-0 border border-[#3D3D3D] bg-[#161616] shadow-[3px_3px_0px_#000000]">
-      <Image src={photo.url} alt={photo.alt} width={560} height={480} className="h-full w-full object-cover" />
+    <div className="w-[160px] h-[210px] md:w-[280px] md:h-[240px] overflow-hidden rounded-2xl border border-white/10 shadow-[0_12px_30px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:shadow-[0_20px_40px_rgba(0,0,0,0.7)] flex-shrink-0 bg-[#0A0A0E]">
+      <Image src={photo.url} alt={photo.alt} width={560} height={480} className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
     </div>
   );
 };
@@ -286,7 +286,7 @@ const PlatformCard: React.FC<{ platform: PlatformRating }> = ({ platform }) => {
 
   return (
     <div
-      className="w-[160px] h-[210px] md:w-[280px] md:h-[240px] border border-[#3D3D3D] bg-[#161616] shadow-[3px_3px_0px_#000000] p-4 flex flex-col items-center justify-center tile transition-all duration-300 flex-shrink-0"
+      className="w-[160px] h-[210px] md:w-[280px] md:h-[240px] glass-panel rounded-2xl border border-white/10 p-5 flex flex-col items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:shadow-[0_16px_40px_rgba(0,0,0,0.6)] flex-shrink-0"
       onMouseEnter={() => setAnimateNumber(true)}
       onTouchStart={() => setAnimateNumber(true)}
     >
@@ -320,13 +320,13 @@ const PlatformCard: React.FC<{ platform: PlatformRating }> = ({ platform }) => {
           <Star
             key={i}
             size={14}
-            className={i < normalizedStars ? 'fill-[var(--np-yellow)] text-[var(--np-yellow)]' : 'text-gray-600'}
+            className={i < normalizedStars ? 'fill-[#FF2E62] text-[#FF2E62]' : 'text-gray-600'}
           />
         ))}
       </div>
-      <div className="w-full bg-white/15 h-1.5 overflow-hidden">
+      <div className="w-full bg-white/15 h-1.5 rounded-full overflow-hidden">
         <div
-          className="h-full transition-all duration-1000"
+          className="h-full rounded-full transition-all duration-1000"
           style={{ width: `${percentage}%`, backgroundColor: platform.color }}
         />
       </div>
@@ -346,7 +346,7 @@ const CountCard: React.FC<{ count: RatingCount }> = ({ count }) => {
 
   return (
     <div
-      className="w-[160px] h-[210px] md:w-[280px] md:h-[240px] border border-[#3D3D3D] shadow-[3px_3px_0px_#000000] p-4 flex flex-col items-center justify-center tile transition-all duration-300 flex-shrink-0"
+      className="w-[160px] h-[210px] md:w-[280px] md:h-[240px] glass-panel rounded-2xl border border-white/10 p-5 flex flex-col items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:shadow-[0_16px_40px_rgba(0,0,0,0.6)] flex-shrink-0"
       style={{ backgroundColor: count.bgColor }}
       onMouseEnter={() => setAnimateNumber(true)}
       onTouchStart={() => setAnimateNumber(true)}
@@ -502,18 +502,18 @@ export default function TestimonialsMarquee() {
   const row3 = buildPatternedRowFixedPlatform(photosRow3, REVIEWS, platformRow3, countRow3, ROW_LENGTH);
 
   return (
-    <section className="overflow-hidden bg-[#0D0D0D] border-t border-[#3D3D3D] py-16">
+    <section className="overflow-hidden bg-[#000000] border-t border-white/10 py-24 sm:py-32">
       <div className="mx-auto w-[95vw] max-w-[1400px] px-1 md:px-3">
-        <div className="text-center mb-10 px-4">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--np-yellow)] mb-2 font-['Gilroy',sans-serif]">
+        <div className="text-center mb-14 px-4">
+          <p className="text-[11px] font-mono font-medium uppercase tracking-wider text-[#2FBC81] mb-3">
             VOICES OF VIBEHOUSE
           </p>
-          <h2 className="text-3xl md:text-5xl font-black text-white font-['Cirka',serif] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-tight text-white font-display">
             Guests keep talking. We keep hosting.
           </h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <InfiniteScrollRow items={row1} direction="left" duration={70} mobileDuration={70} rowIndex={0} />
           <InfiniteScrollRow items={row2} direction="right" duration={80} mobileDuration={70} rowIndex={1} />
           <InfiniteScrollRow items={row3} direction="left" duration={70} mobileDuration={70} rowIndex={2} />
@@ -521,12 +521,10 @@ export default function TestimonialsMarquee() {
       </div>
 
       <style>{`
-        .tile { box-shadow: 3px 3px 0px #000000; transition: transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 160ms cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .tile:hover { transform: translate3d(-2px, -2px, 0); box-shadow: 5px 5px 0px #000000; }
         .custom-scroll::-webkit-scrollbar { width: 1px; height: 1px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #FFCB45; }
-        .custom-scroll { scrollbar-width: thin; scrollbar-color: #FFCB45 transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #E01E5A; }
+        .custom-scroll { scrollbar-width: thin; scrollbar-color: #E01E5A transparent; }
         .clamped { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
         .unclamped { max-height: 110px; overflow: auto; }
         @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-33.333%); } }

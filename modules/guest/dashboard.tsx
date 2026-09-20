@@ -73,7 +73,7 @@ const quickActions: QuickAction[] = [
   },
 ];
 
-const supportPhoneDigits = siteMeta.contact.phoneDisplay.replace(/\D/g, "");
+const supportEmail = siteMeta.contact.email;
 
 function getGuestSubpath(href: string) {
   return href.replace(/^\/guest\/?/, "");
@@ -329,7 +329,7 @@ export function GuestDashboard() {
   const stayWindow = `${formatDate(activeBooking?.checkin_date)} - ${formatDate(activeBooking?.checkout_date)}`;
   const roomOrBed = formatRoomOrBed(activeBooking?.room_number);
   const accessValue = activeBooking?.door_passcode ?? "Shared at check-in";
-  const supportHref = `https://wa.me/${supportPhoneDigits}?text=${encodeURIComponent(`Hey The Daily Social, I need help with booking ${activeBooking?.ezee_reservation_id ?? selectedBookingId ?? ""}.`)}`;
+  const supportHref = `mailto:${supportEmail}?subject=${encodeURIComponent(`Hey Vibehouse, I need help with booking ${activeBooking?.ezee_reservation_id ?? selectedBookingId ?? ""}`)}`;
   const primaryCtaClass = "vh-cta-button h-10 rounded-[4px] px-4 text-xs";
 
   useEffect(() => {
