@@ -85,6 +85,9 @@ function isAllowedOAuthHost(host: string | undefined | null): boolean {
   if (!host) return false;
   const lower = host.toLowerCase();
   if (OAUTH_REDIRECT_HOST_ALLOWLIST.has(lower)) return true;
+  if (lower === 'vibe-house.netlify.app' || lower.endsWith('.netlify.app') || lower.endsWith('.onrender.com')) {
+    return true;
+  }
   return /^(localhost|127\.0\.0\.1)(:\d+)?$/i.test(lower);
 }
 

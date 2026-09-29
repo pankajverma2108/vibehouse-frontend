@@ -19,3 +19,9 @@ services:
         value: "60765"
       - key: HOTEL_CODE
         value: "60765"
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_OAUTH_CALLBACK_URL
+        value: "https://vibehouse-frontend.onrender.com/guest/auth/google/callback"

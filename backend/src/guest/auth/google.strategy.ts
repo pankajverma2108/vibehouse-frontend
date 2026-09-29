@@ -36,10 +36,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
     // Log env var status at startup (values masked for security)
     const log = new Logger(GoogleStrategy.name);
+    const isMock = !clientID || clientID === 'mock-google-client-id';
     log.log(`Google OAuth config:`);
-    log.log(`  clientID:     ${clientID ? clientID.substring(0, 12) + '...' : '⚠️  MISSING'}`);
-    log.log(`  clientSecret: ${clientSecret ? '***SET***' : '⚠️  MISSING'}`);
+    log.log(`  clientID:     ${isMock ? '⚠️  MOCK / MISSING (Real OAuth will fail with Error 401: invalid_client)' : clientID.substring(0, 12) + '...'}`);
+    log.log(`  clientSecret: ${clientSecret && clientSecret !== 'mock-google-client-secret' ? '***SET***' : '⚠️  MOCK / MISSING'}`);
     log.log(`  callbackURL:  ${callbackURL}`);
+    if (isMock) {
+      log.warn(`Google OAuth is not configured with a valid client ID. Check GOOGLE_OAUTH_CLIENT_ID in .env.`);
+    }
   }
 
   async validate(
