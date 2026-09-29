@@ -39,6 +39,7 @@ import {
 import { withBrandName } from "@/lib/branding";
 import { getClientCache, setClientCache } from "@/lib/client-cache";
 import { getStoredGuestToken } from "@/lib/guest-auth-api";
+import { getApiBaseUrl } from "@/lib/vibehouse-api";
 import {
   stripImageMetadata,
   validateIdDocumentFile,
@@ -484,7 +485,12 @@ function isAdult(dateInput: string): boolean {
 }
 
 function publicFileUrlFromUploadUrl(uploadUrl: string): string {
-  return uploadUrl.split("?")[0] || uploadUrl;
+  const cleaned = uploadUrl.split("?")[0] || uploadUrl;
+  const apiBase = getApiBaseUrl();
+  if (cleaned.startsWith("http://localhost:8000") && apiBase && !apiBase.includes("localhost")) {
+    return cleaned.replace("http://localhost:8000", apiBase);
+  }
+  return cleaned;
 }
 
 function normalizeDetectedIdType(input?: string | null): string | null {

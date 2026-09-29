@@ -37,7 +37,7 @@ export default function AboutPage() {
         <div className="max-w-screen-xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="font-['Space_Grotesk'] font-bold text-[20px] text-[#c62828] uppercase tracking-[2px]">
-              The Daily Social
+              Vibehouse
             </Link>
             <div className="flex gap-6">
               <Link to="/" className="font-['Space_Grotesk'] text-[14px] text-white hover:text-[#c62828] transition-colors">
@@ -64,7 +64,7 @@ export default function AboutPage() {
           <div className="order-2 lg:order-1">
             <div className="bg-[#c62828] px-3 py-1 inline-block shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1)] mb-6">
               <p className="font-['Space_Grotesk'] font-bold text-[12px] text-white tracking-[1.2px] uppercase">
-                About The Daily Social
+                About Vibehouse
               </p>
             </div>
             
@@ -77,7 +77,7 @@ export default function AboutPage() {
             </p>
 
             <p className="font-['Space_Grotesk'] text-[16px] text-[rgba(255,255,255,0.9)] leading-[24px] mb-4">
-              The Daily Social started with a simple idea: travel should bring people together. Not just to share a room, but to share experiences, stories, and lifelong friendships.
+              Vibehouse started with a simple idea: travel should bring people together. Not just to share a room, but to share experiences, stories, and lifelong friendships.
             </p>
 
             <p className="font-['Space_Grotesk'] text-[16px] text-[rgba(255,255,255,0.9)] leading-[24px]">
@@ -90,7 +90,7 @@ export default function AboutPage() {
             <div className="rounded-[12px] overflow-hidden border-4 border-white shadow-[12px_12px_0px_0px_rgba(198,40,40,0.5)]" style={{ transform: 'rotate(2deg)' }}>
               <ImageWithFallback
                 src="https://images.unsplash.com/photo-1501566953613-d93d5cb0be93?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3N0ZWwlMjBleHRlcmlvciUyMGJ1aWxkaW5nJTIwY29sb3JmdWx8ZW58MXx8fHwxNzczNzI5NTI1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                alt="The Daily Social Building"
+                alt="Vibehouse Building"
                 className="w-full aspect-[4/3] object-cover"
               />
             </div>
@@ -98,11 +98,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* The Daily Social Story */}
+      {/* Vibehouse Story */}
       <section className="px-6 py-16 bg-[rgba(255,255,255,0.05)]">
         <div className="max-w-screen-lg mx-auto">
           <h2 className="font-['Space_Grotesk'] font-bold text-[36px] text-white tracking-[-1.8px] uppercase leading-[40px] text-center mb-3">
-            The Daily Social Story
+            Vibehouse Story
           </h2>
           <p className="font-['Liberation_Serif'] text-[16px] text-[rgba(255,255,255,0.7)] text-center mb-12 italic">
             how we got here
@@ -116,7 +116,7 @@ export default function AboutPage() {
                   Built by Travelers, for Travelers
                 </h3>
                 <p className="font-['Space_Grotesk'] text-[16px] text-[rgba(255,255,255,0.9)] leading-[24px]">
-                  Our founders met in a dingy hostel in Goa in 2018. The vibe was amazing, but the facilities? Not so much. They dreamed of creating spaces that balanced high energy with high standards. Two years later, The Daily Social Mumbai opened its doors.
+                  Our founders met in a dingy hostel in Goa in 2018. The vibe was amazing, but the facilities? Not so much. They dreamed of creating spaces that balanced high energy with high standards. Two years later, Vibehouse Mumbai opened its doors.
                 </p>
               </div>
               <div className="rounded-[8px] overflow-hidden border-4 border-[#c62828] shadow-[8px_8px_0px_0px_rgba(198,40,40,0.3)]" style={{ transform: 'rotate(-1deg)' }}>
@@ -142,7 +142,7 @@ export default function AboutPage() {
                   Safety is Non-Negotiable
                 </h3>
                 <p className="font-['Space_Grotesk'] text-[16px] text-[rgba(255,255,255,0.9)] leading-[24px]">
-                  We believe safety and fun go hand-in-hand. That's why every The Daily Social has 24/7 security, female-only dorms, secure lockers, and zero-tolerance harassment policies. You can let loose knowing we've got your back.
+                  We believe safety and fun go hand-in-hand. That's why every Vibehouse has 24/7 security, female-only dorms, secure lockers, and zero-tolerance harassment policies. You can let loose knowing we've got your back.
                 </p>
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function AboutPage() {
           </h2>
           
           <p className="font-['Liberation_Serif'] text-[18px] text-white italic mb-10 leading-[28px]">
-            Join thousands of travelers who've made The Daily Social their home away from home.
+            Join thousands of travelers who've made Vibehouse their home away from home.
           </p>
 
           <Link
@@ -249,7 +249,7 @@ export default function AboutPage() {
             {/* Brand */}
             <div className="md:col-span-2">
               <Link to="/" className="font-['Space_Grotesk'] font-bold text-[24px] text-[#c62828] uppercase tracking-[2px] mb-4 inline-block">
-                The Daily Social
+                Vibehouse
               </Link>
               <p className="font-['Liberation_Serif'] text-[14px] text-[rgba(255,255,255,0.6)] italic mb-4">
                 Stay. Mix. Repeat.
@@ -292,7 +292,7 @@ export default function AboutPage() {
 
           <div className="border-t-2 border-[#1e293b] pt-6 text-center">
             <p className="font-['Space_Grotesk'] text-[12px] text-[rgba(255,255,255,0.4)]">
-              © 2026 The Daily Social. All rights reserved.
+              © 2026 Vibehouse. All rights reserved.
             </p>
           </div>
         </div>

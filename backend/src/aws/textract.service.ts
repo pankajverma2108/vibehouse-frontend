@@ -67,7 +67,18 @@ export class TextractService {
   constructor() {
     const region = process.env.AWS_REGION ?? 'ap-south-1';
     this.bucket = process.env.AWS_S3_KYC_BUCKET ?? 'vibehouse-kyc-documents';
-    this.uploadsDir = path.resolve(process.cwd(), 'uploads');
+    let dir = path.resolve(process.cwd(), 'uploads');
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    } catch {
+      dir = path.resolve('/tmp', 'uploads');
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    }
+    this.uploadsDir = dir;
     this.isLocal =
       process.env.USE_LOCAL_STORAGE === 'true' ||
       process.env.NODE_ENV === 'development' ||

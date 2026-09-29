@@ -151,8 +151,8 @@ const POLICY_SECTIONS = [
   },
 ];
 
-const ROOM_GST_RATE = 0.05;
-const STANDARD_ADDON_GST_RATE = 0.18;
+const ROOM_GST_RATE = 0.12;
+const STANDARD_ADDON_GST_RATE = 0.12;
 
 function normalizeCouponCode(value?: string | null): string {
   return (value ?? "").trim().toUpperCase();
@@ -231,13 +231,14 @@ function calculatePricingBreakdown(params: {
 }) {
   // Pricing stays derived from one source so the summary and payment payload stay in sync.
   const addonSubtotal = params.activeAddons.reduce((sum, addon) => sum + addon.unitPrice * addon.quantity, 0);
-  const roomTaxExact = params.roomSubtotal * ROOM_GST_RATE;
+  const discountedRoomSubtotal = Math.max(0, params.roomSubtotal - params.couponDiscount);
+  const roomTaxExact = discountedRoomSubtotal * ROOM_GST_RATE;
   const addonTaxExact = params.activeAddons.reduce(
     (sum, addon) => sum + (addon.unitPrice * addon.quantity * STANDARD_ADDON_GST_RATE),
     0,
   );
   const taxesExact = roomTaxExact + addonTaxExact;
-  const discountedRoomSubtotal = Math.max(0, params.roomSubtotal - params.couponDiscount);
+
   const totalCharges = discountedRoomSubtotal + addonSubtotal;
   const grandTotal = totalCharges + taxesExact;
   const addonTaxBreakdown = params.activeAddons.reduce<Record<string, number>>((summary, addon) => {

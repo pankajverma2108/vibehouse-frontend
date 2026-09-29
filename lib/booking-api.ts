@@ -1,4 +1,4 @@
-import { requestJson } from "@/lib/vibehouse-api";
+import { getApiBaseUrl, requestJson } from "@/lib/vibehouse-api";
 
 export type StoreCatalogItem = {
   id: string;
@@ -460,7 +460,13 @@ export async function getBookingKycUploadUrl(
 }
 
 export async function uploadFileToPresignedUrl(uploadUrl: string, file: File): Promise<void> {
-  const response = await fetch(uploadUrl, {
+  let destinationUrl = uploadUrl;
+  const apiBase = getApiBaseUrl();
+  if (destinationUrl.startsWith("http://localhost:8000") && apiBase && !apiBase.includes("localhost")) {
+    destinationUrl = destinationUrl.replace("http://localhost:8000", apiBase);
+  }
+
+  const response = await fetch(destinationUrl, {
     method: "PUT",
     headers: {
       "Content-Type": file.type || "application/octet-stream",

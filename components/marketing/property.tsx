@@ -301,8 +301,8 @@ function getNightCount(checkIn: string, checkOut: string): number {
   return Math.max(1, Math.round((end - start) / 86400000));
 }
 
-const ROOM_GST_RATE = 0.05;
-const STANDARD_ADDON_GST_RATE = 0.18;
+const ROOM_GST_RATE = 0.12;
+const STANDARD_ADDON_GST_RATE = 0.12;
 
 function getAddonTaxRate(title: string): number {
   const normalized = title.trim().toLowerCase();

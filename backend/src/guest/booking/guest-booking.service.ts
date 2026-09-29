@@ -90,7 +90,7 @@ export class GuestBookingService {
     return {
       found: true,
       booking_id: booking.ezee_reservation_id,
-      property_name: booking.properties?.name ?? 'The Daily Social',
+      property_name: booking.properties?.name ?? 'Vibehouse',
       checkin_date: booking.checkin_date,
       checkout_date: booking.checkout_date,
       room_type_name: booking.room_type_name,
@@ -637,7 +637,7 @@ export class GuestBookingService {
 
     // Source string mirrors the brand; anonymous + logged-in bookings funnel
     // through the same path so this is the only place we set it.
-    const sourceLabel = property.brand === 'BUTEAK' ? 'Buteak' : 'The Daily Social';
+    const sourceLabel = property.brand === 'BUTEAK' ? 'Buteak' : 'Vibehouse';
 
     // Persist everything in a transaction
     const result = await this.prisma.$transaction(async (tx) => {
@@ -1578,7 +1578,7 @@ export class GuestBookingService {
       status: booking.status,
       booking_sync_status: this.deriveBookingSyncStatus(booking),
       room_number: booking.room_number,
-      property_name: booking.properties?.name ?? 'The Daily Social',
+      property_name: booking.properties?.name ?? 'Vibehouse',
       checkin_date: booking.checkin_date,
       checkout_date: booking.checkout_date,
       lock_access: lockAccess

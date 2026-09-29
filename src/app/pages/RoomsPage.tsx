@@ -295,10 +295,10 @@ export default function RoomsPage() {
       <footer className="bg-[#0f172a] border-t-2 border-[#1e293b] px-6 py-8">
         <div className="max-w-screen-xl mx-auto text-center">
           <Link to="/" className="font-['Space_Grotesk'] font-bold text-[20px] text-[#c62828] uppercase tracking-[2px]">
-            The Daily Social
+            Vibehouse
           </Link>
           <p className="font-['Space_Grotesk'] text-[12px] text-[rgba(255,255,255,0.4)] mt-4">
-            © 2026 The Daily Social. All rights reserved.
+            © 2026 Vibehouse. All rights reserved.
           </p>
         </div>
       </footer>

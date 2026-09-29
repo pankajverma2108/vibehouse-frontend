@@ -1,4 +1,4 @@
-const ZOSTEL_PATTERN = /\bzostel\b/gi;
+const REBRAND_PATTERN = /\b(the\s+daily\s+social|daily\s+social|tds|zostel)\b/gi;
 const LOCALHOST_PATTERN = /^https?:\/\/(localhost|127(?:\.\d+){3})(:\d+)?$/i;
 const DEFAULT_SITE_ORIGIN = "http://localhost:3000";
 
@@ -16,7 +16,7 @@ export function withBrandName(value?: string | null, fallback: string = BRAND_NA
     return fallback;
   }
 
-  const branded = raw.replace(ZOSTEL_PATTERN, BRAND_NAME).trim();
+  const branded = raw.replace(REBRAND_PATTERN, BRAND_NAME).trim();
   if (!branded || looksLikeSystemId(branded)) {
     return fallback;
   }
@@ -30,7 +30,7 @@ export function withBrandShortName(value?: string | null, fallback: string = BRA
     return fallback;
   }
 
-  const branded = raw.replace(ZOSTEL_PATTERN, BRAND_SHORT_NAME).trim();
+  const branded = raw.replace(REBRAND_PATTERN, BRAND_SHORT_NAME).trim();
   return branded || fallback;
 }
 

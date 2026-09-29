@@ -35,7 +35,7 @@ interface Branding {
 const DEFAULT_SES_REGION = process.env.AWS_REGION ?? 'ap-south-1';
 
 const TDS_DEFAULT: Branding = {
-  brandName: 'The Daily Social',
+  brandName: 'Vibehouse',
   primaryColor: '#C62828',
   secondaryColor: '#000000',
   accentColor: '#ffffff',

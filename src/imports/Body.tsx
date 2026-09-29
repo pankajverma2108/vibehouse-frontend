@@ -148,14 +148,14 @@ function HeaderHeroSection() {
 }
 
 function TonightAtDailySocialSectionPaints() {
-  return <div className="absolute bg-[#1a0a0e] inset-0" data-name="Tonight at The Daily Social Section paints" />;
+  return <div className="absolute bg-[#1a0a0e] inset-0" data-name="Tonight at Vibehouse Section paints" />;
 }
 
 function Heading1() {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="Heading 2">
       <div className="flex flex-col font-['Space_Grotesk:Bold',sans-serif] font-bold h-[36px] justify-center leading-[0] relative shrink-0 text-[#f1f5f9] text-[30px] tracking-[-1.5px] uppercase w-[303.78px]">
-        <p className="leading-[36px]">Tonight at The Daily Social</p>
+        <p className="leading-[36px]">Tonight at Vibehouse</p>
       </div>
     </div>
   );
@@ -519,7 +519,7 @@ function Container10() {
 
 function TonightAtDailySocialSection() {
   return (
-    <div className="absolute content-stretch flex flex-col gap-[32px] items-start left-0 px-[16px] py-[48px] right-0 top-[491px]" data-name="Tonight at The Daily Social Section">
+    <div className="absolute content-stretch flex flex-col gap-[32px] items-start left-0 px-[16px] py-[48px] right-0 top-[491px]" data-name="Tonight at Vibehouse Section">
       <div className="absolute flex inset-[-3.4px_0_-3.41px_0] items-center justify-center">
         <div className="flex-none h-[1449px] rotate-1 skew-x-1 w-[390.06px]">
           <div className="relative size-full" data-name="Border">

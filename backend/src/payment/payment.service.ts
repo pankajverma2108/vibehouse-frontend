@@ -1751,11 +1751,11 @@ export class PaymentService {
         onboarding_json: {
           whatsapp_url: 'https://wa.me/919999999999',
           events_url: 'https://vibehouse.in/events',
-          community_name: 'The Daily Social Community',
+          community_name: 'Vibehouse Community',
           next_steps: [
             'Complete your KYC before move-in',
-            'Join The Daily Social WhatsApp community',
-            'Download The Daily Social app for room access and services',
+            'Join Vibehouse WhatsApp community',
+            'Download the Vibehouse app for room access and services',
           ],
         },
       },

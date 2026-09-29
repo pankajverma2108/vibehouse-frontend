@@ -50,7 +50,7 @@ export default function PoliciesPage() {
           id: 'security',
           title: 'Security & Safety',
           content: [
-            'Use of personal lockers is mandatory for storing valuables. The Daily Social is not responsible for lost or stolen items.',
+            'Use of personal lockers is mandatory for storing valuables. Vibehouse is not responsible for lost or stolen items.',
             'CCTV cameras are installed in all common areas for guest safety (not in dorms or bathrooms).',
             '24/7 reception and security staff are available for any concerns or emergencies.',
             'Report any safety concerns immediately to the front desk.',
@@ -147,7 +147,7 @@ export default function PoliciesPage() {
           id: 'acceptance',
           title: 'Acceptance of Terms',
           content: [
-            'By making a booking at The Daily Social, you agree to these Terms & Conditions.',
+            'By making a booking at Vibehouse, you agree to these Terms & Conditions.',
             'These terms apply to all guests, visitors, and users of our services.',
             'We reserve the right to modify these terms at any time. Updates will be posted on our website.',
             'Continued use of our services after changes constitutes acceptance of the new terms.',
@@ -167,7 +167,7 @@ export default function PoliciesPage() {
           id: 'liability',
           title: 'Limitation of Liability',
           content: [
-            'The Daily Social is not responsible for loss, theft, or damage to personal belongings.',
+            'Vibehouse is not responsible for loss, theft, or damage to personal belongings.',
             'Use of hostel facilities (gym, pool, common areas) is at your own risk.',
             'We are not liable for injuries, accidents, or health issues during your stay unless caused by our negligence.',
             'Travel insurance is strongly recommended for all guests.',
@@ -177,7 +177,7 @@ export default function PoliciesPage() {
           id: 'intellectual-property',
           title: 'Intellectual Property',
           content: [
-            'All content on our website (text, images, logos, branding) is owned by The Daily Social and protected by copyright.',
+            'All content on our website (text, images, logos, branding) is owned by Vibehouse and protected by copyright.',
             'Unauthorized use, reproduction, or distribution of our content is prohibited.',
             'Guest photos taken during events may be used for marketing purposes unless you opt-out.',
           ],
@@ -188,7 +188,7 @@ export default function PoliciesPage() {
           content: [
             'These terms are governed by the laws of India.',
             'Disputes will be resolved through arbitration in Mumbai, Maharashtra.',
-            'By booking with The Daily Social, you consent to the jurisdiction of Mumbai courts.',
+            'By booking with Vibehouse, you consent to the jurisdiction of Mumbai courts.',
           ],
         },
       ],
@@ -204,7 +204,7 @@ export default function PoliciesPage() {
         <div className="max-w-screen-xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="font-['Space_Grotesk'] font-bold text-[20px] text-[#c62828] uppercase tracking-[2px]">
-              The Daily Social
+              Vibehouse
             </Link>
             <div className="flex gap-6">
               <Link to="/" className="font-['Space_Grotesk'] text-[14px] text-white hover:text-[#c62828] transition-colors">
@@ -366,10 +366,10 @@ export default function PoliciesPage() {
       <footer className="bg-[#0f172a] border-t-2 border-[#1e293b] px-6 py-8">
         <div className="max-w-screen-xl mx-auto text-center">
           <Link to="/" className="font-['Space_Grotesk'] font-bold text-[20px] text-[#c62828] uppercase tracking-[2px]">
-            The Daily Social
+            Vibehouse
           </Link>
           <p className="font-['Space_Grotesk'] text-[12px] text-[rgba(255,255,255,0.4)] mt-4">
-            © 2026 The Daily Social. All rights reserved.
+            © 2026 Vibehouse. All rights reserved.
           </p>
         </div>
       </footer>

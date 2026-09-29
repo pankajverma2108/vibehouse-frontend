@@ -52,7 +52,7 @@ export default function LandingPage() {
               <div key={idx} className="flex-[0_0_100%] min-w-0 relative">
                 <ImageWithFallback
                   src={img}
-                  alt={`The Daily Social ${idx + 1}`}
+                  alt={`Vibehouse ${idx + 1}`}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-[rgba(35,15,20,0.7)] to-[rgba(35,15,20,0.9)]" />
@@ -295,10 +295,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. Tonight at The Daily Social */}
+      {/* 5. Tonight at Vibehouse */}
       <section id="events-tonight" className="px-4 md:px-6 py-10 md:py-12 bg-[rgba(255,255,255,0.02)]">
         <h2 className="font-['Space_Grotesk'] font-bold text-[24px] md:text-[30px] text-white tracking-[-1.5px] uppercase leading-[30px] md:leading-[36px] text-center mb-2">
-          Tonight at The Daily Social
+          Tonight at Vibehouse
         </h2>
         <p className="font-['Playfair_Display'] text-[14px] text-[rgba(255,255,255,0.8)] text-center mb-8 italic">
           next 48 hours
@@ -351,10 +351,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 6. The Daily Social Experience */}
+      {/* 6. Vibehouse Experience */}
       <section id="vibe-experience" className="px-4 md:px-6 py-10 md:py-12">
         <h2 className="font-['Space_Grotesk'] font-bold text-[24px] md:text-[30px] text-white tracking-[-1.5px] uppercase leading-[30px] md:leading-[36px] text-center mb-2">
-          The Daily Social Experience
+          Vibehouse Experience
         </h2>
         <p className="font-['Playfair_Display'] text-[14px] text-[rgba(255,255,255,0.8)] text-center mb-8 italic">
           why travelers choose us
@@ -556,7 +556,7 @@ export default function LandingPage() {
             {/* Brand */}
             <div>
               <h3 className="font-['Space_Grotesk'] font-bold text-[20px] text-[#c62828] uppercase tracking-[2px] mb-2">
-                The Daily Social
+                Vibehouse
               </h3>
               <p className="font-['Playfair_Display'] text-[14px] text-[rgba(255,255,255,0.6)] italic mb-4">
                 Stay. Mix. Repeat.
@@ -596,7 +596,7 @@ export default function LandingPage() {
 
           <div className="border-t-2 border-[#1e293b] pt-6 text-center">
             <p className="font-['Space_Grotesk'] text-[12px] text-[rgba(255,255,255,0.4)]">
-              © 2026 The Daily Social. All rights reserved.
+              © 2026 Vibehouse. All rights reserved.
             </p>
           </div>
         </div>

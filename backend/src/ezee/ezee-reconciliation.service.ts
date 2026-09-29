@@ -427,7 +427,7 @@ export class EzeeReconciliationService implements OnApplicationBootstrap {
                     toEmail: match.email,
                     firstName: match.name?.split(' ')[0] ?? 'there',
                     bookingId: eri,
-                    propertyName: property.name ?? 'The Daily Social',
+                    propertyName: property.name ?? 'Vibehouse',
                     roomTypeName: res.roomTypeName ?? 'your room',
                     checkinDate: res.checkin ?? '',
                     checkoutDate: res.checkout ?? '',

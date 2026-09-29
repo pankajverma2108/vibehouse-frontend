@@ -858,7 +858,7 @@ export class GuestAuthService {
               toEmail: guest.email,
               firstName: guest.name?.split(' ')[0] ?? 'there',
               bookingId: booking.ezee_reservation_id,
-              propertyName: prop?.name ?? 'The Daily Social',
+              propertyName: prop?.name ?? 'Vibehouse',
               roomTypeName: booking.room_type_name ?? 'your room',
               checkinDate: booking.checkin_date?.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) ?? '',
               checkoutDate: booking.checkout_date?.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) ?? '',

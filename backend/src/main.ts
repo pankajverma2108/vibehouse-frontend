@@ -102,6 +102,6 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 8080;
   await app.listen(port);
-  console.log(`The Daily Social API running on http://localhost:${port}`);
+  console.log(`Vibehouse API running on http://localhost:${port}`);
 }
 bootstrap();

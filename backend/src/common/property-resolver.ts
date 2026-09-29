@@ -144,13 +144,13 @@ export function resolvePropertyFromSelectorKey(brand: Brand, text: string): stri
 
 /** Human-facing brand name for guest/prospect messages. */
 const BRAND_DISPLAY_NAME: Record<Brand, string> = {
-  TDS: 'The Daily Social',
+  TDS: 'Vibehouse',
   BUTEAK: 'Buteak Suites',
 };
 
 /** Public booking site per brand (env-overridable), used in the prospect "booking" reply. */
 const BRAND_BOOKING_URL: Record<Brand, string> = {
-  TDS: 'https://thedailysocial.co.in',
+  TDS: 'https://vibe-house.netlify.app',
   BUTEAK: 'https://buteak.in',
 };
 
@@ -160,7 +160,7 @@ export function brandDisplayName(brand: string): string {
 
 export function brandBookingUrl(brand: string): string {
   const b = brand?.toUpperCase() as Brand;
-  return process.env[`BOOKING_URL_${b}`] || BRAND_BOOKING_URL[b] || 'https://thedailysocial.co.in';
+  return process.env[`BOOKING_URL_${b}`] || BRAND_BOOKING_URL[b] || 'https://vibe-house.netlify.app';
 }
 
 /**

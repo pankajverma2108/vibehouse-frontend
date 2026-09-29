@@ -647,8 +647,8 @@ export class ColiveService {
         community_name: onboarding.community_name ?? undefined,
         next_steps: onboarding.next_steps ?? [
           'Complete your KYC before move-in',
-          'Join The Daily Social WhatsApp community',
-          'Download the The Daily Social app for room access',
+          'Join Vibehouse WhatsApp community',
+          'Download the Vibehouse app for room access',
         ],
       },
     };

@@ -26,8 +26,25 @@ export class S3Service implements OnModuleInit {
   constructor() {
     this.region = process.env.AWS_REGION ?? 'ap-south-1';
     this.bucket = process.env.AWS_S3_KYC_BUCKET ?? 'vibehouse-kyc-documents';
-    this.baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
-    this.uploadsDir = path.resolve(process.cwd(), 'uploads');
+    const defaultApiUrl =
+      process.env.RENDER_EXTERNAL_URL ||
+      (process.env.NODE_ENV === 'production'
+        ? 'https://vibehouse-frontend.onrender.com'
+        : 'http://localhost:8000');
+    this.baseUrl = (process.env.API_BASE_URL || defaultApiUrl).replace(/\/+$/, '');
+
+    let dir = path.resolve(process.cwd(), 'uploads');
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    } catch {
+      dir = path.resolve('/tmp', 'uploads');
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    }
+    this.uploadsDir = dir;
 
     // Use local storage if explicitly configured, running in development, or no AWS credentials provided
     this.isLocal =
