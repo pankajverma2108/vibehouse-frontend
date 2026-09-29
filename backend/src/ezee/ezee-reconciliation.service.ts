@@ -52,7 +52,25 @@ export class EzeeReconciliationService implements OnApplicationBootstrap {
     private readonly mygate: MyGateService,
   ) {}
 
+  private async isPropertyEzeeSyncEnabled(propertyId: string): Promise<boolean> {
+    if (process.env.EZEE_SYNC_ENABLED === 'false') {
+      return false;
+    }
+    const conn = await this.prisma.ezee_connection.findFirst({
+      where: { property_id: propertyId, is_active: true },
+    });
+    if (!conn) return false;
+    if (conn.api_key === 'mock-auth-code-local' || conn.api_key.startsWith('mock-')) {
+      return false;
+    }
+    return true;
+  }
+
   async onApplicationBootstrap(): Promise<void> {
+    if (process.env.EZEE_SYNC_ENABLED === 'false') {
+      this.logger.log('eZee reconciliation disabled (EZEE_SYNC_ENABLED=false)');
+      return;
+    }
     // Delay to let SQS consumers start first, then run immediately and every 15 min
     setTimeout(() => {
       this.reconcile();
@@ -78,6 +96,9 @@ export class EzeeReconciliationService implements OnApplicationBootstrap {
   // ── 1. Unsynced new bookings ─────────────────────────────────────────────
 
   private async reconcileUnsyncedBookings(): Promise<void> {
+    if (process.env.EZEE_SYNC_ENABLED === 'false') {
+      return;
+    }
     // Any locally-created booking that hasn't been pushed to eZee yet:
     // ezee_reservation_no is null until the SQS worker syncs it.
     //
@@ -185,6 +206,10 @@ export class EzeeReconciliationService implements OnApplicationBootstrap {
     let cancelled = 0, checkedIn = 0, checkedOut = 0, roomUpdated = 0;
 
     for (const booking of activeSynced) {
+      if (!(await this.isPropertyEzeeSyncEnabled(booking.property_id))) {
+        continue;
+      }
+
       try {
         const ezeeData = await this.ezee.fetchBooking(
           booking.property_id,
@@ -288,6 +313,10 @@ export class EzeeReconciliationService implements OnApplicationBootstrap {
     let ingested = 0;
 
     for (const property of properties) {
+      if (!(await this.isPropertyEzeeSyncEnabled(property.id))) {
+        continue;
+      }
+
       try {
         // Fetch eZee reservations: yesterday to 28 days out (eZee max window = 30 days)
         const fromDate = this.offsetDate(-1);
